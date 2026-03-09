@@ -1,0 +1,26 @@
+# DEMSPH/kernel/CMakeLists.txt
+cmake_minimum_required(VERSION 3.22)
+
+set(KERNEL_DIR ${CMAKE_CURRENT_LIST_DIR})
+set(UTIL_DIR   ${KERNEL_DIR}/myUtility)
+
+file(GLOB_RECURSE KERNEL_SRCS CONFIGURE_DEPENDS
+    ${KERNEL_DIR}/*.cu
+    ${KERNEL_DIR}/*.cpp
+    ${KERNEL_DIR}/*.cxx
+)
+
+add_library(DEMSPH_kernels STATIC ${KERNEL_SRCS})
+
+target_include_directories(DEMSPH_kernels PUBLIC
+    ${CMAKE_CURRENT_LIST_DIR}/..
+    ${KERNEL_DIR}
+    ${UTIL_DIR}
+)
+
+set_target_properties(DEMSPH_kernels PROPERTIES
+    CUDA_SEPARABLE_COMPILATION ${DEMSPH_ENABLE_RDC}
+    POSITION_INDEPENDENT_CODE  ${DEMSPH_ENABLE_PIC}
+    CXX_STANDARD 17
+    CXX_STANDARD_REQUIRED YES
+)
