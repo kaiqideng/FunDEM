@@ -1,53 +1,51 @@
-# 1) Install dependencies (requires sudo)
+# 1) compilation env
+# update
 sudo apt-get update
-sudo apt-get install -y build-essential ninja-build gdb
-sudo apt-get install -y gcc-12 g++-12
 
-# 2) CUDA env (pick ONE)
-# Option A
+# basic build tools
+sudo apt-get install -y build-essential cmake ninja-build git
+
+# (optional but recommended) pkg-config
+sudo apt-get install -y pkg-config
+
+# check
+cmake --version
+ninja --version
+g++ --version
+
+# 2) CUDA env
+# check
+which nvcc
+nvcc --version
+
+# CUDA PATH / LD_LIBRARY_PATH
 export CUDA_HOME=/usr/local/cuda
 export PATH=$CUDA_HOME/bin:$PATH
 export LD_LIBRARY_PATH=$CUDA_HOME/lib64:$LD_LIBRARY_PATH
 
-# Option B (example)
-export CUDA_HOME=/usr/local/cuda-12.0
-export PATH=$CUDA_HOME/bin:$PATH
-export LD_LIBRARY_PATH=$CUDA_HOME/lib64:$LD_LIBRARY_PATH
+# check
+nvcc --version
 
+echo 'export CUDA_HOME=/usr/local/cuda' >> ~/.bashrc
+echo 'export PATH=$CUDA_HOME/bin:$PATH' >> ~/.bashrc
+echo 'export LD_LIBRARY_PATH=$CUDA_HOME/lib64:$LD_LIBRARY_PATH' >> ~/.bashrc
+source ~/.bashrc
+
+# 3）check nvidia
 # check
 nvidia-smi
-nvcc --version
-ninja --version
-cmake --version
 
-rm -rf build && mkdir -p build
-
-# 3) Debug build (Ninja)
-cmake -S . -B build -G Ninja \
-  -DCMAKE_BUILD_TYPE=Debug \
-  -DDEMSPH_CUDA_ARCH=native \
-  -DCMAKE_CUDA_COMPILER=/usr/bin/nvcc \
-  -DCMAKE_CXX_COMPILER=/usr/bin/g++-12 \
-  -DCMAKE_C_COMPILER=/usr/bin/gcc-12
-
-cmake --build build -j
-
-# 4) Release build (Ninja)
-rm -rf build && mkdir -p build
-
-cmake -S . -B build -G Ninja \
-  -DCMAKE_BUILD_TYPE=Release \
-  -DDEMSPH_CUDA_ARCH=native \
-  -DCMAKE_CUDA_COMPILER=/usr/bin/nvcc \
-  -DCMAKE_CXX_COMPILER=/usr/bin/g++-12 \
-  -DCMAKE_C_COMPILER=/usr/bin/gcc-12
-
-cmake --build build -j
-
-# Debug
-cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug
-cmake --build build
-
-# Release
+# 4）release or debug (Ninja)
 cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
-cmake --build build
+cmake --build build -j
+
+cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug
+cmake --build build -j
+
+# CUDA_ARCHITECTURES
+cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_CUDA_ARCHITECTURES=86
+
+cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_CUDA_ARCHITECTURES="75;86"
+
+# 5) run
+./build/...

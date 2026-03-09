@@ -1,105 +1,121 @@
+# FunDEM/CMakeLists.txt
 cmake_minimum_required(VERSION 3.22)
-project(DEMSPH LANGUAGES CXX CUDA)
 
+project(FunDEM LANGUAGES CXX CUDA)
+
+# Make CUDA headers available to ALL targets (including pure C++ files)
+find_package(CUDAToolkit REQUIRED)
+
+# ------------------------------------------------------------
+# C++ standard
+# ------------------------------------------------------------
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# Generate compile_commands.json (useful for clangd)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-# ============================================================
+# ------------------------------------------------------------
 # Options
-# ============================================================
-set(DEMSPH_CUDA_ARCH "native" CACHE STRING "CUDA arch: native or e.g. 75;86")
-option(DEMSPH_ENABLE_RDC "Enable CUDA separable compilation (RDC)" ON)
-option(DEMSPH_ENABLE_PIC "Build position independent code (PIC)" ON)
+# ------------------------------------------------------------
+option(FUNDEM_ENABLE_RDC "Enable CUDA separable compilation (RDC)" ON)
+option(FUNDEM_ENABLE_PIC "Build position independent code (PIC)" ON)
 
-# ============================================================
-# CUDA arch
-# ============================================================
-if (DEMSPH_CUDA_ARCH STREQUAL "native")
-    set(CMAKE_CUDA_ARCHITECTURES native)
-else()
-    set(CMAKE_CUDA_ARCHITECTURES ${DEMSPH_CUDA_ARCH})
-endif()
-message(STATUS "CMAKE_CUDA_ARCHITECTURES = ${CMAKE_CUDA_ARCHITECTURES}")
-
-# ============================================================
+# ------------------------------------------------------------
 # Project root
-# ============================================================
-set(DEMSPH_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
+# ------------------------------------------------------------
+set(FUNDEM_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 
-# ============================================================
-# Bring in kernel/ (defines target: DEMSPH_kernels)
-# ============================================================
+# ------------------------------------------------------------
+# Add kernel subdirectory (defines target FunDEM_kernels)
+# ------------------------------------------------------------
 add_subdirectory(kernel)
 
-# ============================================================
-# App sources (top-level only)
-#   - One executable per file that contains main()
-#   - Other top-level sources are built into a common static library
-# ============================================================
-file(GLOB APP_SRCS CONFIGURE_DEPENDS
-    ${DEMSPH_ROOT}/*.cpp
-    ${DEMSPH_ROOT}/*.cxx
-    ${DEMSPH_ROOT}/*.cu
+# ------------------------------------------------------------
+# Collect top-level app sources (ONLY files directly under FunDEM/)
+# - Build one executable per top-level .cpp/.cxx containing main()
+# - Optional: build other top-level sources (no main) into FunDEM_app_common
+# ------------------------------------------------------------
+file(GLOB FUNDEM_TOP_SRCS CONFIGURE_DEPENDS
+    ${FUNDEM_ROOT}/*.cpp
+    ${FUNDEM_ROOT}/*.cxx
+    ${FUNDEM_ROOT}/*.cu
 )
 
-set(APP_MAIN_SRCS "")
-set(APP_COMMON_SRCS "")
+set(FUNDEM_MAIN_SRCS "")
+set(FUNDEM_COMMON_SRCS "")
 
-foreach(src ${APP_SRCS})
-    # Heuristic: detect a translation unit that contains main()
+foreach(src ${FUNDEM_TOP_SRCS})
+    # Heuristic: detect "main(" in the file
+    # This is not a full parser, but works well in practice.
     file(STRINGS "${src}" _main_hits
         REGEX "[^A-Za-z0-9_]main[ \t\r\n]*\\("
         LIMIT_COUNT 2000
     )
+
     if (_main_hits)
-        list(APPEND APP_MAIN_SRCS "${src}")
+        list(APPEND FUNDEM_MAIN_SRCS "${src}")
     else()
-        list(APPEND APP_COMMON_SRCS "${src}")
+        list(APPEND FUNDEM_COMMON_SRCS "${src}")
     endif()
 endforeach()
 
-# ============================================================
-# Common library for non-main top-level sources
-# ============================================================
-if (APP_COMMON_SRCS)
-    add_library(DEMSPH_app_common STATIC ${APP_COMMON_SRCS})
+# ------------------------------------------------------------
+# Common library for non-main top-level sources (optional)
+# ------------------------------------------------------------
+if (FUNDEM_COMMON_SRCS)
+    add_library(FunDEM_app_common STATIC ${FUNDEM_COMMON_SRCS})
 
-    # Link against kernels so app_common inherits CUDA/C++ settings and include paths
-    target_link_libraries(DEMSPH_app_common PUBLIC DEMSPH_kernels)
+    # Link kernels so this target inherits CUDA device-link settings if needed
+    target_link_libraries(FunDEM_app_common PUBLIC FunDEM_kernels)
 
-    # Optional: allow app_common to include headers from the project root
-    target_include_directories(DEMSPH_app_common PUBLIC ${DEMSPH_ROOT})
+    target_include_directories(FunDEM_app_common PUBLIC
+        ${FUNDEM_ROOT}
+    )
 
-    set_target_properties(DEMSPH_app_common PROPERTIES
-        POSITION_INDEPENDENT_CODE ${DEMSPH_ENABLE_PIC}
+    set_target_properties(FunDEM_app_common PROPERTIES
         CXX_STANDARD 17
         CXX_STANDARD_REQUIRED YES
+        POSITION_INDEPENDENT_CODE ${FUNDEM_ENABLE_PIC}
     )
+
+    if (FUNDEM_ENABLE_RDC)
+        set_target_properties(FunDEM_app_common PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
+    endif()
 endif()
 
-# ============================================================
-# Create executables for every top-level file that has main()
-# ============================================================
-if (NOT APP_MAIN_SRCS)
-    message(FATAL_ERROR "No top-level main() was found under ${DEMSPH_ROOT}")
+# ------------------------------------------------------------
+# Create one executable for each top-level file that has main()
+# ------------------------------------------------------------
+if (NOT FUNDEM_MAIN_SRCS)
+    message(FATAL_ERROR "No top-level *.cpp/*.cxx/*.cu containing main() found in ${FUNDEM_ROOT}")
 endif()
 
-foreach(main_src ${APP_MAIN_SRCS})
+foreach(main_src ${FUNDEM_MAIN_SRCS})
     get_filename_component(exe_name "${main_src}" NAME_WE)
 
     add_executable(${exe_name} ${main_src})
 
-    # Inherit include dirs from DEMSPH_kernels via PUBLIC usage requirements
-    target_link_libraries(${exe_name} PRIVATE DEMSPH_kernels)
+    # Root include dir (for headers like buildLevelSetParticle.h, etc.)
+    target_include_directories(${exe_name} PRIVATE
+        ${FUNDEM_ROOT}
+    )
 
-    if (TARGET DEMSPH_app_common)
-        target_link_libraries(${exe_name} PRIVATE DEMSPH_app_common)
+    # Link kernels (PUBLIC includes from kernels propagate)
+    target_link_libraries(${exe_name} PRIVATE FunDEM_kernels)
+
+    # Link common non-main code if it exists
+    if (TARGET FunDEM_app_common)
+        target_link_libraries(${exe_name} PRIVATE FunDEM_app_common)
     endif()
 
     set_target_properties(${exe_name} PROPERTIES
-        POSITION_INDEPENDENT_CODE ${DEMSPH_ENABLE_PIC}
         CXX_STANDARD 17
         CXX_STANDARD_REQUIRED YES
+        POSITION_INDEPENDENT_CODE ${FUNDEM_ENABLE_PIC}
     )
+
+    if (FUNDEM_ENABLE_RDC)
+        set_target_properties(${exe_name} PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
+    endif()
 endforeach()

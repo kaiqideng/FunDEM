@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<VTKFile type="UnstructuredGrid" version="0.1" byte_order="LittleEndian">
+  <UnstructuredGrid>
+    <FieldData>
+      <DataArray type="Float32" Name="TIME"  NumberOfTuples="1" format="ascii"> 0.1500000000 </DataArray>
+      <DataArray type="Int32"   Name="STEP"  NumberOfTuples="1" format="ascii"> 15000 </DataArray>
+    </FieldData>
+    <Piece NumberOfPoints="0" NumberOfCells="0">
+      <Points>
+        <DataArray type="Float32" NumberOfComponents="3" format="ascii">
+
+        </DataArray>
+      </Points>
+      <Cells>
+        <DataArray type="Int32" Name="connectivity" format="ascii">
+
+        </DataArray>
+        <DataArray type="Int32" Name="offsets" format="ascii">
+
+        </DataArray>
+        <DataArray type="UInt8" Name="types" format="ascii">
+
+        </DataArray>
+      </Cells>
+      <PointData Scalars="overlap">
+        <DataArray type="Float32" Name="overlap" format="ascii">
+
+        </DataArray>
+        <DataArray type="Float32" Name="contact normal" NumberOfComponents="3" format="ascii">
+
+        </DataArray>
+        <DataArray type="Float32" Name="contact force" NumberOfComponents="3" format="ascii">
+
+        </DataArray>
+        <DataArray type="Float32" Name="contact torque" NumberOfComponents="3" format="ascii">
+
+        </DataArray>
+        <DataArray type="Float32" Name="sliding spring" NumberOfComponents="3" format="ascii">
+
+        </DataArray>
+      </PointData>
+    </Piece>
+  </UnstructuredGrid>
+</VTKFile>
