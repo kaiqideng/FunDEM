@@ -4,7 +4,6 @@
 /teamspace/studios/this_studio/FunDEM/build/CMakeFiles/damBreak2.dir
 /teamspace/studios/this_studio/FunDEM/build/CMakeFiles/elasticBounce.dir
 /teamspace/studios/this_studio/FunDEM/build/CMakeFiles/ice-struct.dir
-/teamspace/studios/this_studio/FunDEM/build/CMakeFiles/levelSetParticle.dir
 /teamspace/studios/this_studio/FunDEM/build/CMakeFiles/levelSetParticleFall.dir
 /teamspace/studios/this_studio/FunDEM/build/CMakeFiles/edit_cache.dir
 /teamspace/studios/this_studio/FunDEM/build/CMakeFiles/rebuild_cache.dir

@@ -55,8 +55,6 @@ build CMakeFiles/FunDEM_app_common.dir/externalForceTorque.cu.o: CUDA_COMPILER__
   INCLUDES = -I/teamspace/studios/this_studio/FunDEM -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -isystem /usr/local/cuda/targets/x86_64-linux/include
   OBJECT_DIR = CMakeFiles/FunDEM_app_common.dir
   OBJECT_FILE_DIR = CMakeFiles/FunDEM_app_common.dir
-  TARGET_COMPILE_PDB = CMakeFiles/FunDEM_app_common.dir/FunDEM_app_common.pdb
-  TARGET_PDB = libFunDEM_app_common.pdb
 
 
 # =============================================================================
@@ -71,9 +69,8 @@ build libFunDEM_app_common.a: CUDA_STATIC_LIBRARY_LINKER__FunDEM_app_common_Rele
   OBJECT_DIR = CMakeFiles/FunDEM_app_common.dir
   POST_BUILD = :
   PRE_LINK = :
-  TARGET_COMPILE_PDB = CMakeFiles/FunDEM_app_common.dir/FunDEM_app_common.pdb
   TARGET_FILE = libFunDEM_app_common.a
-  TARGET_PDB = libFunDEM_app_common.pdb
+  TARGET_PDB = FunDEM_app_common.a.dbg
 
 # =============================================================================
 # Object build statements for EXECUTABLE target bondedParticleBeam
@@ -90,8 +87,6 @@ build CMakeFiles/bondedParticleBeam.dir/bondedParticleBeam.cpp.o: CXX_COMPILER__
   INCLUDES = -I/teamspace/studios/this_studio/FunDEM -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -isystem /usr/local/cuda/targets/x86_64-linux/include
   OBJECT_DIR = CMakeFiles/bondedParticleBeam.dir
   OBJECT_FILE_DIR = CMakeFiles/bondedParticleBeam.dir
-  TARGET_COMPILE_PDB = CMakeFiles/bondedParticleBeam.dir/
-  TARGET_PDB = bondedParticleBeam.pdb
 
 
 # =============================================================================
@@ -106,9 +101,7 @@ build CMakeFiles/bondedParticleBeam.dir/cmake_device_link.o: CXX_EXECUTABLE_DEVI
   LINK_LIBRARIES = kernel/libFunDEM_kernels.a libFunDEM_app_common.a  -lcudadevrt -lcudart_static -lrt -lpthread -ldl
   LINK_PATH = -L/usr/local/cuda/targets/x86_64-linux/lib
   OBJECT_DIR = CMakeFiles/bondedParticleBeam.dir
-  TARGET_COMPILE_PDB = CMakeFiles/bondedParticleBeam.dir/
   TARGET_FILE = CMakeFiles/bondedParticleBeam.dir/cmake_device_link.o
-  TARGET_PDB = bondedParticleBeam.pdb
 
 # =============================================================================
 # Link build statements for EXECUTABLE target bondedParticleBeam
@@ -124,9 +117,8 @@ build bondedParticleBeam: CXX_EXECUTABLE_LINKER__bondedParticleBeam_Release CMak
   OBJECT_DIR = CMakeFiles/bondedParticleBeam.dir
   POST_BUILD = :
   PRE_LINK = :
-  TARGET_COMPILE_PDB = CMakeFiles/bondedParticleBeam.dir/
   TARGET_FILE = bondedParticleBeam
-  TARGET_PDB = bondedParticleBeam.pdb
+  TARGET_PDB = bondedParticleBeam.dbg
 
 # =============================================================================
 # Object build statements for EXECUTABLE target damBreak
@@ -143,8 +135,6 @@ build CMakeFiles/damBreak.dir/damBreak.cpp.o: CXX_COMPILER__damBreak_unscanned_R
   INCLUDES = -I/teamspace/studios/this_studio/FunDEM -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -isystem /usr/local/cuda/targets/x86_64-linux/include
   OBJECT_DIR = CMakeFiles/damBreak.dir
   OBJECT_FILE_DIR = CMakeFiles/damBreak.dir
-  TARGET_COMPILE_PDB = CMakeFiles/damBreak.dir/
-  TARGET_PDB = damBreak.pdb
 
 
 # =============================================================================
@@ -159,9 +149,7 @@ build CMakeFiles/damBreak.dir/cmake_device_link.o: CXX_EXECUTABLE_DEVICE_LINKER_
   LINK_LIBRARIES = kernel/libFunDEM_kernels.a libFunDEM_app_common.a  -lcudadevrt -lcudart_static -lrt -lpthread -ldl
   LINK_PATH = -L/usr/local/cuda/targets/x86_64-linux/lib
   OBJECT_DIR = CMakeFiles/damBreak.dir
-  TARGET_COMPILE_PDB = CMakeFiles/damBreak.dir/
   TARGET_FILE = CMakeFiles/damBreak.dir/cmake_device_link.o
-  TARGET_PDB = damBreak.pdb
 
 # =============================================================================
 # Link build statements for EXECUTABLE target damBreak
@@ -177,9 +165,8 @@ build damBreak: CXX_EXECUTABLE_LINKER__damBreak_Release CMakeFiles/damBreak.dir/
   OBJECT_DIR = CMakeFiles/damBreak.dir
   POST_BUILD = :
   PRE_LINK = :
-  TARGET_COMPILE_PDB = CMakeFiles/damBreak.dir/
   TARGET_FILE = damBreak
-  TARGET_PDB = damBreak.pdb
+  TARGET_PDB = damBreak.dbg
 
 # =============================================================================
 # Object build statements for EXECUTABLE target damBreak2
@@ -196,8 +183,6 @@ build CMakeFiles/damBreak2.dir/damBreak2.cpp.o: CXX_COMPILER__damBreak2_unscanne
   INCLUDES = -I/teamspace/studios/this_studio/FunDEM -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -isystem /usr/local/cuda/targets/x86_64-linux/include
   OBJECT_DIR = CMakeFiles/damBreak2.dir
   OBJECT_FILE_DIR = CMakeFiles/damBreak2.dir
-  TARGET_COMPILE_PDB = CMakeFiles/damBreak2.dir/
-  TARGET_PDB = damBreak2.pdb
 
 
 # =============================================================================
@@ -212,9 +197,7 @@ build CMakeFiles/damBreak2.dir/cmake_device_link.o: CXX_EXECUTABLE_DEVICE_LINKER
   LINK_LIBRARIES = kernel/libFunDEM_kernels.a libFunDEM_app_common.a  -lcudadevrt -lcudart_static -lrt -lpthread -ldl
   LINK_PATH = -L/usr/local/cuda/targets/x86_64-linux/lib
   OBJECT_DIR = CMakeFiles/damBreak2.dir
-  TARGET_COMPILE_PDB = CMakeFiles/damBreak2.dir/
   TARGET_FILE = CMakeFiles/damBreak2.dir/cmake_device_link.o
-  TARGET_PDB = damBreak2.pdb
 
 # =============================================================================
 # Link build statements for EXECUTABLE target damBreak2
@@ -230,9 +213,8 @@ build damBreak2: CXX_EXECUTABLE_LINKER__damBreak2_Release CMakeFiles/damBreak2.d
   OBJECT_DIR = CMakeFiles/damBreak2.dir
   POST_BUILD = :
   PRE_LINK = :
-  TARGET_COMPILE_PDB = CMakeFiles/damBreak2.dir/
   TARGET_FILE = damBreak2
-  TARGET_PDB = damBreak2.pdb
+  TARGET_PDB = damBreak2.dbg
 
 # =============================================================================
 # Object build statements for EXECUTABLE target elasticBounce
@@ -249,8 +231,6 @@ build CMakeFiles/elasticBounce.dir/elasticBounce.cpp.o: CXX_COMPILER__elasticBou
   INCLUDES = -I/teamspace/studios/this_studio/FunDEM -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -isystem /usr/local/cuda/targets/x86_64-linux/include
   OBJECT_DIR = CMakeFiles/elasticBounce.dir
   OBJECT_FILE_DIR = CMakeFiles/elasticBounce.dir
-  TARGET_COMPILE_PDB = CMakeFiles/elasticBounce.dir/
-  TARGET_PDB = elasticBounce.pdb
 
 
 # =============================================================================
@@ -265,9 +245,7 @@ build CMakeFiles/elasticBounce.dir/cmake_device_link.o: CXX_EXECUTABLE_DEVICE_LI
   LINK_LIBRARIES = kernel/libFunDEM_kernels.a libFunDEM_app_common.a  -lcudadevrt -lcudart_static -lrt -lpthread -ldl
   LINK_PATH = -L/usr/local/cuda/targets/x86_64-linux/lib
   OBJECT_DIR = CMakeFiles/elasticBounce.dir
-  TARGET_COMPILE_PDB = CMakeFiles/elasticBounce.dir/
   TARGET_FILE = CMakeFiles/elasticBounce.dir/cmake_device_link.o
-  TARGET_PDB = elasticBounce.pdb
 
 # =============================================================================
 # Link build statements for EXECUTABLE target elasticBounce
@@ -283,9 +261,8 @@ build elasticBounce: CXX_EXECUTABLE_LINKER__elasticBounce_Release CMakeFiles/ela
   OBJECT_DIR = CMakeFiles/elasticBounce.dir
   POST_BUILD = :
   PRE_LINK = :
-  TARGET_COMPILE_PDB = CMakeFiles/elasticBounce.dir/
   TARGET_FILE = elasticBounce
-  TARGET_PDB = elasticBounce.pdb
+  TARGET_PDB = elasticBounce.dbg
 
 # =============================================================================
 # Object build statements for EXECUTABLE target ice-struct
@@ -302,8 +279,6 @@ build CMakeFiles/ice-struct.dir/ice-struct.cpp.o: CXX_COMPILER__ice-struct_unsca
   INCLUDES = -I/teamspace/studios/this_studio/FunDEM -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -isystem /usr/local/cuda/targets/x86_64-linux/include
   OBJECT_DIR = CMakeFiles/ice-struct.dir
   OBJECT_FILE_DIR = CMakeFiles/ice-struct.dir
-  TARGET_COMPILE_PDB = CMakeFiles/ice-struct.dir/
-  TARGET_PDB = ice-struct.pdb
 
 
 # =============================================================================
@@ -318,9 +293,7 @@ build CMakeFiles/ice-struct.dir/cmake_device_link.o: CXX_EXECUTABLE_DEVICE_LINKE
   LINK_LIBRARIES = kernel/libFunDEM_kernels.a libFunDEM_app_common.a  -lcudadevrt -lcudart_static -lrt -lpthread -ldl
   LINK_PATH = -L/usr/local/cuda/targets/x86_64-linux/lib
   OBJECT_DIR = CMakeFiles/ice-struct.dir
-  TARGET_COMPILE_PDB = CMakeFiles/ice-struct.dir/
   TARGET_FILE = CMakeFiles/ice-struct.dir/cmake_device_link.o
-  TARGET_PDB = ice-struct.pdb
 
 # =============================================================================
 # Link build statements for EXECUTABLE target ice-struct
@@ -336,62 +309,8 @@ build ice-struct: CXX_EXECUTABLE_LINKER__ice-struct_Release CMakeFiles/ice-struc
   OBJECT_DIR = CMakeFiles/ice-struct.dir
   POST_BUILD = :
   PRE_LINK = :
-  TARGET_COMPILE_PDB = CMakeFiles/ice-struct.dir/
   TARGET_FILE = ice-struct
-  TARGET_PDB = ice-struct.pdb
-
-# =============================================================================
-# Object build statements for EXECUTABLE target levelSetParticle
-
-
-#############################################
-# Order-only phony target for levelSetParticle
-
-build cmake_object_order_depends_target_levelSetParticle: phony || cmake_object_order_depends_target_FunDEM_app_common cmake_object_order_depends_target_FunDEM_kernels
-
-build CMakeFiles/levelSetParticle.dir/levelSetParticle.cpp.o: CXX_COMPILER__levelSetParticle_unscanned_Release /teamspace/studios/this_studio/FunDEM/levelSetParticle.cpp || cmake_object_order_depends_target_levelSetParticle
-  DEP_FILE = CMakeFiles/levelSetParticle.dir/levelSetParticle.cpp.o.d
-  FLAGS = -O3 -DNDEBUG -std=gnu++17 -fPIE
-  INCLUDES = -I/teamspace/studios/this_studio/FunDEM -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -isystem /usr/local/cuda/targets/x86_64-linux/include
-  OBJECT_DIR = CMakeFiles/levelSetParticle.dir
-  OBJECT_FILE_DIR = CMakeFiles/levelSetParticle.dir
-  TARGET_COMPILE_PDB = CMakeFiles/levelSetParticle.dir/
-  TARGET_PDB = levelSetParticle.pdb
-
-
-# =============================================================================
-# Device Link build statements for EXECUTABLE target levelSetParticle
-
-
-#############################################
-# Link the executable CMakeFiles/levelSetParticle.dir/cmake_device_link.o
-
-build CMakeFiles/levelSetParticle.dir/cmake_device_link.o: CXX_EXECUTABLE_DEVICE_LINKER__levelSetParticle_Release CMakeFiles/levelSetParticle.dir/levelSetParticle.cpp.o | kernel/libFunDEM_kernels.a libFunDEM_app_common.a kernel/libFunDEM_kernels.a /usr/local/cuda-12.6/targets/x86_64-linux/lib/libcudart.so || kernel/libFunDEM_kernels.a libFunDEM_app_common.a
-  LANGUAGE_COMPILE_FLAGS = -O3 -DNDEBUG "--generate-code=arch=compute_75,code=[compute_75,sm_75]"
-  LINK_LIBRARIES = kernel/libFunDEM_kernels.a libFunDEM_app_common.a  -lcudadevrt -lcudart_static -lrt -lpthread -ldl
-  LINK_PATH = -L/usr/local/cuda/targets/x86_64-linux/lib
-  OBJECT_DIR = CMakeFiles/levelSetParticle.dir
-  TARGET_COMPILE_PDB = CMakeFiles/levelSetParticle.dir/
-  TARGET_FILE = CMakeFiles/levelSetParticle.dir/cmake_device_link.o
-  TARGET_PDB = levelSetParticle.pdb
-
-# =============================================================================
-# Link build statements for EXECUTABLE target levelSetParticle
-
-
-#############################################
-# Link the executable levelSetParticle
-
-build levelSetParticle: CXX_EXECUTABLE_LINKER__levelSetParticle_Release CMakeFiles/levelSetParticle.dir/levelSetParticle.cpp.o CMakeFiles/levelSetParticle.dir/cmake_device_link.o | kernel/libFunDEM_kernels.a libFunDEM_app_common.a kernel/libFunDEM_kernels.a /usr/local/cuda-12.6/targets/x86_64-linux/lib/libcudart.so || kernel/libFunDEM_kernels.a libFunDEM_app_common.a
-  FLAGS = -O3 -DNDEBUG
-  LINK_LIBRARIES = -Wl,-rpath,/usr/local/cuda-12.6/targets/x86_64-linux/lib  kernel/libFunDEM_kernels.a  libFunDEM_app_common.a  kernel/libFunDEM_kernels.a  /usr/local/cuda-12.6/targets/x86_64-linux/lib/libcudart.so  -lcudadevrt  -lcudart_static  -lrt  -lpthread  -ldl
-  LINK_PATH = -L/usr/local/cuda/targets/x86_64-linux/lib
-  OBJECT_DIR = CMakeFiles/levelSetParticle.dir
-  POST_BUILD = :
-  PRE_LINK = :
-  TARGET_COMPILE_PDB = CMakeFiles/levelSetParticle.dir/
-  TARGET_FILE = levelSetParticle
-  TARGET_PDB = levelSetParticle.pdb
+  TARGET_PDB = ice-struct.dbg
 
 # =============================================================================
 # Object build statements for EXECUTABLE target levelSetParticleFall
@@ -408,8 +327,6 @@ build CMakeFiles/levelSetParticleFall.dir/levelSetParticleFall.cpp.o: CXX_COMPIL
   INCLUDES = -I/teamspace/studios/this_studio/FunDEM -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -isystem /usr/local/cuda/targets/x86_64-linux/include
   OBJECT_DIR = CMakeFiles/levelSetParticleFall.dir
   OBJECT_FILE_DIR = CMakeFiles/levelSetParticleFall.dir
-  TARGET_COMPILE_PDB = CMakeFiles/levelSetParticleFall.dir/
-  TARGET_PDB = levelSetParticleFall.pdb
 
 
 # =============================================================================
@@ -424,9 +341,7 @@ build CMakeFiles/levelSetParticleFall.dir/cmake_device_link.o: CXX_EXECUTABLE_DE
   LINK_LIBRARIES = kernel/libFunDEM_kernels.a libFunDEM_app_common.a  -lcudadevrt -lcudart_static -lrt -lpthread -ldl
   LINK_PATH = -L/usr/local/cuda/targets/x86_64-linux/lib
   OBJECT_DIR = CMakeFiles/levelSetParticleFall.dir
-  TARGET_COMPILE_PDB = CMakeFiles/levelSetParticleFall.dir/
   TARGET_FILE = CMakeFiles/levelSetParticleFall.dir/cmake_device_link.o
-  TARGET_PDB = levelSetParticleFall.pdb
 
 # =============================================================================
 # Link build statements for EXECUTABLE target levelSetParticleFall
@@ -442,9 +357,8 @@ build levelSetParticleFall: CXX_EXECUTABLE_LINKER__levelSetParticleFall_Release 
   OBJECT_DIR = CMakeFiles/levelSetParticleFall.dir
   POST_BUILD = :
   PRE_LINK = :
-  TARGET_COMPILE_PDB = CMakeFiles/levelSetParticleFall.dir/
   TARGET_FILE = levelSetParticleFall
-  TARGET_PDB = levelSetParticleFall.pdb
+  TARGET_PDB = levelSetParticleFall.dbg
 
 
 #############################################
@@ -489,8 +403,6 @@ build kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/SPHNeighborSearchK
   INCLUDES = -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -isystem /usr/local/cuda/targets/x86_64-linux/include
   OBJECT_DIR = kernel/CMakeFiles/FunDEM_kernels.dir
   OBJECT_FILE_DIR = kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction
-  TARGET_COMPILE_PDB = kernel/CMakeFiles/FunDEM_kernels.dir/FunDEM_kernels.pdb
-  TARGET_PDB = kernel/libFunDEM_kernels.pdb
 
 build kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/WCSPHIntegrationKernel.cu.o: CUDA_COMPILER__FunDEM_kernels_unscanned_Release /teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/WCSPHIntegrationKernel.cu || cmake_object_order_depends_target_FunDEM_kernels
   DEP_FILE = kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/WCSPHIntegrationKernel.cu.o.d
@@ -498,8 +410,6 @@ build kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/WCSPHIntegrationKe
   INCLUDES = -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -isystem /usr/local/cuda/targets/x86_64-linux/include
   OBJECT_DIR = kernel/CMakeFiles/FunDEM_kernels.dir
   OBJECT_FILE_DIR = kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction
-  TARGET_COMPILE_PDB = kernel/CMakeFiles/FunDEM_kernels.dir/FunDEM_kernels.pdb
-  TARGET_PDB = kernel/libFunDEM_kernels.pdb
 
 build kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/ballIntegrationKernel.cu.o: CUDA_COMPILER__FunDEM_kernels_unscanned_Release /teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/ballIntegrationKernel.cu || cmake_object_order_depends_target_FunDEM_kernels
   DEP_FILE = kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/ballIntegrationKernel.cu.o.d
@@ -507,8 +417,6 @@ build kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/ballIntegrationKer
   INCLUDES = -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -isystem /usr/local/cuda/targets/x86_64-linux/include
   OBJECT_DIR = kernel/CMakeFiles/FunDEM_kernels.dir
   OBJECT_FILE_DIR = kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction
-  TARGET_COMPILE_PDB = kernel/CMakeFiles/FunDEM_kernels.dir/FunDEM_kernels.pdb
-  TARGET_PDB = kernel/libFunDEM_kernels.pdb
 
 build kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/ballNeighborSearchKernel.cu.o: CUDA_COMPILER__FunDEM_kernels_unscanned_Release /teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/ballNeighborSearchKernel.cu || cmake_object_order_depends_target_FunDEM_kernels
   DEP_FILE = kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/ballNeighborSearchKernel.cu.o.d
@@ -516,8 +424,6 @@ build kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/ballNeighborSearch
   INCLUDES = -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -isystem /usr/local/cuda/targets/x86_64-linux/include
   OBJECT_DIR = kernel/CMakeFiles/FunDEM_kernels.dir
   OBJECT_FILE_DIR = kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction
-  TARGET_COMPILE_PDB = kernel/CMakeFiles/FunDEM_kernels.dir/FunDEM_kernels.pdb
-  TARGET_PDB = kernel/libFunDEM_kernels.pdb
 
 build kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/buildHashStartEnd.cu.o: CUDA_COMPILER__FunDEM_kernels_unscanned_Release /teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/buildHashStartEnd.cu || cmake_object_order_depends_target_FunDEM_kernels
   DEP_FILE = kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/buildHashStartEnd.cu.o.d
@@ -525,8 +431,6 @@ build kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/buildHashStartEnd.
   INCLUDES = -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -isystem /usr/local/cuda/targets/x86_64-linux/include
   OBJECT_DIR = kernel/CMakeFiles/FunDEM_kernels.dir
   OBJECT_FILE_DIR = kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction
-  TARGET_COMPILE_PDB = kernel/CMakeFiles/FunDEM_kernels.dir/FunDEM_kernels.pdb
-  TARGET_PDB = kernel/libFunDEM_kernels.pdb
 
 build kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/contactKernel.cu.o: CUDA_COMPILER__FunDEM_kernels_unscanned_Release /teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/contactKernel.cu || cmake_object_order_depends_target_FunDEM_kernels
   DEP_FILE = kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/contactKernel.cu.o.d
@@ -534,8 +438,6 @@ build kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/contactKernel.cu.o
   INCLUDES = -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -isystem /usr/local/cuda/targets/x86_64-linux/include
   OBJECT_DIR = kernel/CMakeFiles/FunDEM_kernels.dir
   OBJECT_FILE_DIR = kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction
-  TARGET_COMPILE_PDB = kernel/CMakeFiles/FunDEM_kernels.dir/FunDEM_kernels.pdb
-  TARGET_PDB = kernel/libFunDEM_kernels.pdb
 
 build kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/levelSetParticleContactDetectionKernel.cu.o: CUDA_COMPILER__FunDEM_kernels_unscanned_Release /teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/levelSetParticleContactDetectionKernel.cu || cmake_object_order_depends_target_FunDEM_kernels
   DEP_FILE = kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/levelSetParticleContactDetectionKernel.cu.o.d
@@ -543,8 +445,6 @@ build kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/levelSetParticleCo
   INCLUDES = -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -isystem /usr/local/cuda/targets/x86_64-linux/include
   OBJECT_DIR = kernel/CMakeFiles/FunDEM_kernels.dir
   OBJECT_FILE_DIR = kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction
-  TARGET_COMPILE_PDB = kernel/CMakeFiles/FunDEM_kernels.dir/FunDEM_kernels.pdb
-  TARGET_PDB = kernel/libFunDEM_kernels.pdb
 
 build kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/levelSetParticleIntegrationKernel.cu.o: CUDA_COMPILER__FunDEM_kernels_unscanned_Release /teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/levelSetParticleIntegrationKernel.cu || cmake_object_order_depends_target_FunDEM_kernels
   DEP_FILE = kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/levelSetParticleIntegrationKernel.cu.o.d
@@ -552,8 +452,6 @@ build kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/levelSetParticleIn
   INCLUDES = -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -isystem /usr/local/cuda/targets/x86_64-linux/include
   OBJECT_DIR = kernel/CMakeFiles/FunDEM_kernels.dir
   OBJECT_FILE_DIR = kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction
-  TARGET_COMPILE_PDB = kernel/CMakeFiles/FunDEM_kernels.dir/FunDEM_kernels.pdb
-  TARGET_PDB = kernel/libFunDEM_kernels.pdb
 
 build kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/neighborSearchKernel.cu.o: CUDA_COMPILER__FunDEM_kernels_unscanned_Release /teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/neighborSearchKernel.cu || cmake_object_order_depends_target_FunDEM_kernels
   DEP_FILE = kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/neighborSearchKernel.cu.o.d
@@ -561,8 +459,6 @@ build kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/neighborSearchKern
   INCLUDES = -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -isystem /usr/local/cuda/targets/x86_64-linux/include
   OBJECT_DIR = kernel/CMakeFiles/FunDEM_kernels.dir
   OBJECT_FILE_DIR = kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction
-  TARGET_COMPILE_PDB = kernel/CMakeFiles/FunDEM_kernels.dir/FunDEM_kernels.pdb
-  TARGET_PDB = kernel/libFunDEM_kernels.pdb
 
 build kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/wallIntegrationKernel.cu.o: CUDA_COMPILER__FunDEM_kernels_unscanned_Release /teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/wallIntegrationKernel.cu || cmake_object_order_depends_target_FunDEM_kernels
   DEP_FILE = kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/wallIntegrationKernel.cu.o.d
@@ -570,8 +466,6 @@ build kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/wallIntegrationKer
   INCLUDES = -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -isystem /usr/local/cuda/targets/x86_64-linux/include
   OBJECT_DIR = kernel/CMakeFiles/FunDEM_kernels.dir
   OBJECT_FILE_DIR = kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction
-  TARGET_COMPILE_PDB = kernel/CMakeFiles/FunDEM_kernels.dir/FunDEM_kernels.pdb
-  TARGET_PDB = kernel/libFunDEM_kernels.pdb
 
 
 # =============================================================================
@@ -586,9 +480,8 @@ build kernel/libFunDEM_kernels.a: CUDA_STATIC_LIBRARY_LINKER__FunDEM_kernels_Rel
   OBJECT_DIR = kernel/CMakeFiles/FunDEM_kernels.dir
   POST_BUILD = :
   PRE_LINK = :
-  TARGET_COMPILE_PDB = kernel/CMakeFiles/FunDEM_kernels.dir/FunDEM_kernels.pdb
   TARGET_FILE = kernel/libFunDEM_kernels.a
-  TARGET_PDB = kernel/libFunDEM_kernels.pdb
+  TARGET_PDB = FunDEM_kernels.a.dbg
 
 
 #############################################
@@ -630,7 +523,7 @@ build libFunDEM_kernels.a: phony kernel/libFunDEM_kernels.a
 #############################################
 # Folder: /teamspace/studios/this_studio/FunDEM/build
 
-build all: phony libFunDEM_app_common.a bondedParticleBeam damBreak damBreak2 elasticBounce ice-struct levelSetParticle levelSetParticleFall kernel/all
+build all: phony libFunDEM_app_common.a bondedParticleBeam damBreak damBreak2 elasticBounce ice-struct levelSetParticleFall kernel/all
 
 # =============================================================================
 
@@ -660,14 +553,14 @@ build /teamspace/studios/this_studio/FunDEM/build/CMakeFiles/cmake.verify_globs:
 #############################################
 # Re-run CMake if any of its inputs changed.
 
-build build.ninja: RERUN_CMAKE /teamspace/studios/this_studio/FunDEM/build/CMakeFiles/cmake.verify_globs | /teamspace/studios/this_studio/FunDEM/CMakeLists.txt /teamspace/studios/this_studio/FunDEM/build/CMakeFiles/VerifyGlobs.cmake /teamspace/studios/this_studio/FunDEM/kernel/CMakeLists.txt /usr/share/cmake-3.28/Modules/CMakeCUDACompiler.cmake.in /usr/share/cmake-3.28/Modules/CMakeCUDACompilerABI.cu /usr/share/cmake-3.28/Modules/CMakeCUDAInformation.cmake /usr/share/cmake-3.28/Modules/CMakeCXXCompiler.cmake.in /usr/share/cmake-3.28/Modules/CMakeCXXCompilerABI.cpp /usr/share/cmake-3.28/Modules/CMakeCXXInformation.cmake /usr/share/cmake-3.28/Modules/CMakeCommonLanguageInclude.cmake /usr/share/cmake-3.28/Modules/CMakeCompilerIdDetection.cmake /usr/share/cmake-3.28/Modules/CMakeDetermineCUDACompiler.cmake /usr/share/cmake-3.28/Modules/CMakeDetermineCXXCompiler.cmake /usr/share/cmake-3.28/Modules/CMakeDetermineCompileFeatures.cmake /usr/share/cmake-3.28/Modules/CMakeDetermineCompiler.cmake /usr/share/cmake-3.28/Modules/CMakeDetermineCompilerABI.cmake /usr/share/cmake-3.28/Modules/CMakeDetermineCompilerId.cmake /usr/share/cmake-3.28/Modules/CMakeDetermineSystem.cmake /usr/share/cmake-3.28/Modules/CMakeFindBinUtils.cmake /usr/share/cmake-3.28/Modules/CMakeGenericSystem.cmake /usr/share/cmake-3.28/Modules/CMakeInitializeConfigs.cmake /usr/share/cmake-3.28/Modules/CMakeLanguageInformation.cmake /usr/share/cmake-3.28/Modules/CMakeNinjaFindMake.cmake /usr/share/cmake-3.28/Modules/CMakeParseImplicitIncludeInfo.cmake /usr/share/cmake-3.28/Modules/CMakeParseImplicitLinkInfo.cmake /usr/share/cmake-3.28/Modules/CMakeParseLibraryArchitecture.cmake /usr/share/cmake-3.28/Modules/CMakeSystem.cmake.in /usr/share/cmake-3.28/Modules/CMakeSystemSpecificInformation.cmake /usr/share/cmake-3.28/Modules/CMakeSystemSpecificInitialize.cmake /usr/share/cmake-3.28/Modules/CMakeTestCUDACompiler.cmake /usr/share/cmake-3.28/Modules/CMakeTestCXXCompiler.cmake /usr/share/cmake-3.28/Modules/CMakeTestCompilerCommon.cmake /usr/share/cmake-3.28/Modules/CheckCXXSourceCompiles.cmake /usr/share/cmake-3.28/Modules/CheckIncludeFileCXX.cmake /usr/share/cmake-3.28/Modules/CheckLibraryExists.cmake /usr/share/cmake-3.28/Modules/Compiler/ADSP-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/ARMCC-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/ARMClang-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/AppleClang-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/Borland-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/Bruce-C-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/CMakeCommonCompilerMacros.cmake /usr/share/cmake-3.28/Modules/Compiler/Clang-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/Clang-DetermineCompilerInternal.cmake /usr/share/cmake-3.28/Modules/Compiler/Comeau-CXX-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/Compaq-C-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/Compaq-CXX-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/Cray-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/CrayClang-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/Embarcadero-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/Fujitsu-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/FujitsuClang-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/GHS-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/GNU-C-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/GNU-CXX-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/GNU-CXX.cmake /usr/share/cmake-3.28/Modules/Compiler/GNU-FindBinUtils.cmake /usr/share/cmake-3.28/Modules/Compiler/GNU.cmake /usr/share/cmake-3.28/Modules/Compiler/HP-C-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/HP-CXX-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/IAR-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/IBMCPP-C-DetermineVersionInternal.cmake /usr/share/cmake-3.28/Modules/Compiler/IBMCPP-CXX-DetermineVersionInternal.cmake /usr/share/cmake-3.28/Modules/Compiler/IBMClang-C-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/IBMClang-CXX-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/Intel-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/IntelLLVM-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/LCC-C-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/LCC-CXX-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/MSVC-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/NVHPC-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/NVIDIA-CUDA.cmake /usr/share/cmake-3.28/Modules/Compiler/NVIDIA-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/NVIDIA.cmake /usr/share/cmake-3.28/Modules/Compiler/OpenWatcom-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/OrangeC-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/PGI-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/PathScale-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/SCO-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/SDCC-C-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/SunPro-C-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/SunPro-CXX-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/TI-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/Tasking-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/TinyCC-C-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/VisualAge-C-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/VisualAge-CXX-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/Watcom-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/XL-C-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/XL-CXX-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/XLClang-C-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/XLClang-CXX-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/zOS-C-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/zOS-CXX-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/FindCUDAToolkit.cmake /usr/share/cmake-3.28/Modules/FindPackageHandleStandardArgs.cmake /usr/share/cmake-3.28/Modules/FindPackageMessage.cmake /usr/share/cmake-3.28/Modules/FindThreads.cmake /usr/share/cmake-3.28/Modules/Internal/CMakeCUDAArchitecturesAll.cmake /usr/share/cmake-3.28/Modules/Internal/CMakeCUDAArchitecturesNative.cmake /usr/share/cmake-3.28/Modules/Internal/CMakeCUDAArchitecturesValidate.cmake /usr/share/cmake-3.28/Modules/Internal/CMakeCUDAFilterImplicitLibs.cmake /usr/share/cmake-3.28/Modules/Internal/CMakeCUDAFindToolkit.cmake /usr/share/cmake-3.28/Modules/Internal/CMakeNVCCFilterImplicitInfo.cmake /usr/share/cmake-3.28/Modules/Internal/CMakeNVCCParseImplicitInfo.cmake /usr/share/cmake-3.28/Modules/Internal/CheckSourceCompiles.cmake /usr/share/cmake-3.28/Modules/Internal/FeatureTesting.cmake /usr/share/cmake-3.28/Modules/Platform/Linux-Determine-CXX.cmake /usr/share/cmake-3.28/Modules/Platform/Linux-GNU-CXX.cmake /usr/share/cmake-3.28/Modules/Platform/Linux-GNU.cmake /usr/share/cmake-3.28/Modules/Platform/Linux-Initialize.cmake /usr/share/cmake-3.28/Modules/Platform/Linux.cmake /usr/share/cmake-3.28/Modules/Platform/UnixPaths.cmake CMakeCache.txt CMakeFiles/3.28.3/CMakeCUDACompiler.cmake CMakeFiles/3.28.3/CMakeCXXCompiler.cmake CMakeFiles/3.28.3/CMakeSystem.cmake
+build build.ninja: RERUN_CMAKE /teamspace/studios/this_studio/FunDEM/build/CMakeFiles/cmake.verify_globs | /teamspace/studios/this_studio/FunDEM/CMakeLists.txt /teamspace/studios/this_studio/FunDEM/build/CMakeFiles/VerifyGlobs.cmake /teamspace/studios/this_studio/FunDEM/kernel/CMakeLists.txt /usr/share/cmake-3.28/Modules/CMakeCUDAInformation.cmake /usr/share/cmake-3.28/Modules/CMakeCXXInformation.cmake /usr/share/cmake-3.28/Modules/CMakeCommonLanguageInclude.cmake /usr/share/cmake-3.28/Modules/CMakeGenericSystem.cmake /usr/share/cmake-3.28/Modules/CMakeInitializeConfigs.cmake /usr/share/cmake-3.28/Modules/CMakeLanguageInformation.cmake /usr/share/cmake-3.28/Modules/CMakeSystemSpecificInformation.cmake /usr/share/cmake-3.28/Modules/CMakeSystemSpecificInitialize.cmake /usr/share/cmake-3.28/Modules/CheckCXXSourceCompiles.cmake /usr/share/cmake-3.28/Modules/CheckIncludeFileCXX.cmake /usr/share/cmake-3.28/Modules/CheckLibraryExists.cmake /usr/share/cmake-3.28/Modules/Compiler/CMakeCommonCompilerMacros.cmake /usr/share/cmake-3.28/Modules/Compiler/GNU-CXX.cmake /usr/share/cmake-3.28/Modules/Compiler/GNU.cmake /usr/share/cmake-3.28/Modules/Compiler/NVIDIA-CUDA.cmake /usr/share/cmake-3.28/Modules/Compiler/NVIDIA.cmake /usr/share/cmake-3.28/Modules/FindCUDAToolkit.cmake /usr/share/cmake-3.28/Modules/FindPackageHandleStandardArgs.cmake /usr/share/cmake-3.28/Modules/FindPackageMessage.cmake /usr/share/cmake-3.28/Modules/FindThreads.cmake /usr/share/cmake-3.28/Modules/Internal/CheckSourceCompiles.cmake /usr/share/cmake-3.28/Modules/Platform/Linux-GNU-CXX.cmake /usr/share/cmake-3.28/Modules/Platform/Linux-GNU.cmake /usr/share/cmake-3.28/Modules/Platform/Linux-Initialize.cmake /usr/share/cmake-3.28/Modules/Platform/Linux.cmake /usr/share/cmake-3.28/Modules/Platform/UnixPaths.cmake CMakeCache.txt CMakeFiles/3.28.3/CMakeCUDACompiler.cmake CMakeFiles/3.28.3/CMakeCXXCompiler.cmake CMakeFiles/3.28.3/CMakeSystem.cmake
   pool = console
 
 
 #############################################
 # A missing CMake input file is not an error.
 
-build /teamspace/studios/this_studio/FunDEM/CMakeLists.txt /teamspace/studios/this_studio/FunDEM/build/CMakeFiles/VerifyGlobs.cmake /teamspace/studios/this_studio/FunDEM/kernel/CMakeLists.txt /usr/share/cmake-3.28/Modules/CMakeCUDACompiler.cmake.in /usr/share/cmake-3.28/Modules/CMakeCUDACompilerABI.cu /usr/share/cmake-3.28/Modules/CMakeCUDAInformation.cmake /usr/share/cmake-3.28/Modules/CMakeCXXCompiler.cmake.in /usr/share/cmake-3.28/Modules/CMakeCXXCompilerABI.cpp /usr/share/cmake-3.28/Modules/CMakeCXXInformation.cmake /usr/share/cmake-3.28/Modules/CMakeCommonLanguageInclude.cmake /usr/share/cmake-3.28/Modules/CMakeCompilerIdDetection.cmake /usr/share/cmake-3.28/Modules/CMakeDetermineCUDACompiler.cmake /usr/share/cmake-3.28/Modules/CMakeDetermineCXXCompiler.cmake /usr/share/cmake-3.28/Modules/CMakeDetermineCompileFeatures.cmake /usr/share/cmake-3.28/Modules/CMakeDetermineCompiler.cmake /usr/share/cmake-3.28/Modules/CMakeDetermineCompilerABI.cmake /usr/share/cmake-3.28/Modules/CMakeDetermineCompilerId.cmake /usr/share/cmake-3.28/Modules/CMakeDetermineSystem.cmake /usr/share/cmake-3.28/Modules/CMakeFindBinUtils.cmake /usr/share/cmake-3.28/Modules/CMakeGenericSystem.cmake /usr/share/cmake-3.28/Modules/CMakeInitializeConfigs.cmake /usr/share/cmake-3.28/Modules/CMakeLanguageInformation.cmake /usr/share/cmake-3.28/Modules/CMakeNinjaFindMake.cmake /usr/share/cmake-3.28/Modules/CMakeParseImplicitIncludeInfo.cmake /usr/share/cmake-3.28/Modules/CMakeParseImplicitLinkInfo.cmake /usr/share/cmake-3.28/Modules/CMakeParseLibraryArchitecture.cmake /usr/share/cmake-3.28/Modules/CMakeSystem.cmake.in /usr/share/cmake-3.28/Modules/CMakeSystemSpecificInformation.cmake /usr/share/cmake-3.28/Modules/CMakeSystemSpecificInitialize.cmake /usr/share/cmake-3.28/Modules/CMakeTestCUDACompiler.cmake /usr/share/cmake-3.28/Modules/CMakeTestCXXCompiler.cmake /usr/share/cmake-3.28/Modules/CMakeTestCompilerCommon.cmake /usr/share/cmake-3.28/Modules/CheckCXXSourceCompiles.cmake /usr/share/cmake-3.28/Modules/CheckIncludeFileCXX.cmake /usr/share/cmake-3.28/Modules/CheckLibraryExists.cmake /usr/share/cmake-3.28/Modules/Compiler/ADSP-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/ARMCC-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/ARMClang-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/AppleClang-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/Borland-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/Bruce-C-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/CMakeCommonCompilerMacros.cmake /usr/share/cmake-3.28/Modules/Compiler/Clang-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/Clang-DetermineCompilerInternal.cmake /usr/share/cmake-3.28/Modules/Compiler/Comeau-CXX-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/Compaq-C-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/Compaq-CXX-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/Cray-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/CrayClang-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/Embarcadero-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/Fujitsu-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/FujitsuClang-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/GHS-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/GNU-C-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/GNU-CXX-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/GNU-CXX.cmake /usr/share/cmake-3.28/Modules/Compiler/GNU-FindBinUtils.cmake /usr/share/cmake-3.28/Modules/Compiler/GNU.cmake /usr/share/cmake-3.28/Modules/Compiler/HP-C-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/HP-CXX-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/IAR-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/IBMCPP-C-DetermineVersionInternal.cmake /usr/share/cmake-3.28/Modules/Compiler/IBMCPP-CXX-DetermineVersionInternal.cmake /usr/share/cmake-3.28/Modules/Compiler/IBMClang-C-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/IBMClang-CXX-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/Intel-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/IntelLLVM-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/LCC-C-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/LCC-CXX-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/MSVC-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/NVHPC-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/NVIDIA-CUDA.cmake /usr/share/cmake-3.28/Modules/Compiler/NVIDIA-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/NVIDIA.cmake /usr/share/cmake-3.28/Modules/Compiler/OpenWatcom-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/OrangeC-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/PGI-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/PathScale-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/SCO-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/SDCC-C-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/SunPro-C-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/SunPro-CXX-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/TI-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/Tasking-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/TinyCC-C-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/VisualAge-C-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/VisualAge-CXX-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/Watcom-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/XL-C-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/XL-CXX-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/XLClang-C-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/XLClang-CXX-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/zOS-C-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/Compiler/zOS-CXX-DetermineCompiler.cmake /usr/share/cmake-3.28/Modules/FindCUDAToolkit.cmake /usr/share/cmake-3.28/Modules/FindPackageHandleStandardArgs.cmake /usr/share/cmake-3.28/Modules/FindPackageMessage.cmake /usr/share/cmake-3.28/Modules/FindThreads.cmake /usr/share/cmake-3.28/Modules/Internal/CMakeCUDAArchitecturesAll.cmake /usr/share/cmake-3.28/Modules/Internal/CMakeCUDAArchitecturesNative.cmake /usr/share/cmake-3.28/Modules/Internal/CMakeCUDAArchitecturesValidate.cmake /usr/share/cmake-3.28/Modules/Internal/CMakeCUDAFilterImplicitLibs.cmake /usr/share/cmake-3.28/Modules/Internal/CMakeCUDAFindToolkit.cmake /usr/share/cmake-3.28/Modules/Internal/CMakeNVCCFilterImplicitInfo.cmake /usr/share/cmake-3.28/Modules/Internal/CMakeNVCCParseImplicitInfo.cmake /usr/share/cmake-3.28/Modules/Internal/CheckSourceCompiles.cmake /usr/share/cmake-3.28/Modules/Internal/FeatureTesting.cmake /usr/share/cmake-3.28/Modules/Platform/Linux-Determine-CXX.cmake /usr/share/cmake-3.28/Modules/Platform/Linux-GNU-CXX.cmake /usr/share/cmake-3.28/Modules/Platform/Linux-GNU.cmake /usr/share/cmake-3.28/Modules/Platform/Linux-Initialize.cmake /usr/share/cmake-3.28/Modules/Platform/Linux.cmake /usr/share/cmake-3.28/Modules/Platform/UnixPaths.cmake CMakeCache.txt CMakeFiles/3.28.3/CMakeCUDACompiler.cmake CMakeFiles/3.28.3/CMakeCXXCompiler.cmake CMakeFiles/3.28.3/CMakeSystem.cmake: phony
+build /teamspace/studios/this_studio/FunDEM/CMakeLists.txt /teamspace/studios/this_studio/FunDEM/build/CMakeFiles/VerifyGlobs.cmake /teamspace/studios/this_studio/FunDEM/kernel/CMakeLists.txt /usr/share/cmake-3.28/Modules/CMakeCUDAInformation.cmake /usr/share/cmake-3.28/Modules/CMakeCXXInformation.cmake /usr/share/cmake-3.28/Modules/CMakeCommonLanguageInclude.cmake /usr/share/cmake-3.28/Modules/CMakeGenericSystem.cmake /usr/share/cmake-3.28/Modules/CMakeInitializeConfigs.cmake /usr/share/cmake-3.28/Modules/CMakeLanguageInformation.cmake /usr/share/cmake-3.28/Modules/CMakeSystemSpecificInformation.cmake /usr/share/cmake-3.28/Modules/CMakeSystemSpecificInitialize.cmake /usr/share/cmake-3.28/Modules/CheckCXXSourceCompiles.cmake /usr/share/cmake-3.28/Modules/CheckIncludeFileCXX.cmake /usr/share/cmake-3.28/Modules/CheckLibraryExists.cmake /usr/share/cmake-3.28/Modules/Compiler/CMakeCommonCompilerMacros.cmake /usr/share/cmake-3.28/Modules/Compiler/GNU-CXX.cmake /usr/share/cmake-3.28/Modules/Compiler/GNU.cmake /usr/share/cmake-3.28/Modules/Compiler/NVIDIA-CUDA.cmake /usr/share/cmake-3.28/Modules/Compiler/NVIDIA.cmake /usr/share/cmake-3.28/Modules/FindCUDAToolkit.cmake /usr/share/cmake-3.28/Modules/FindPackageHandleStandardArgs.cmake /usr/share/cmake-3.28/Modules/FindPackageMessage.cmake /usr/share/cmake-3.28/Modules/FindThreads.cmake /usr/share/cmake-3.28/Modules/Internal/CheckSourceCompiles.cmake /usr/share/cmake-3.28/Modules/Platform/Linux-GNU-CXX.cmake /usr/share/cmake-3.28/Modules/Platform/Linux-GNU.cmake /usr/share/cmake-3.28/Modules/Platform/Linux-Initialize.cmake /usr/share/cmake-3.28/Modules/Platform/Linux.cmake /usr/share/cmake-3.28/Modules/Platform/UnixPaths.cmake CMakeCache.txt CMakeFiles/3.28.3/CMakeCUDACompiler.cmake CMakeFiles/3.28.3/CMakeCXXCompiler.cmake CMakeFiles/3.28.3/CMakeSystem.cmake: phony
 
 
 #############################################

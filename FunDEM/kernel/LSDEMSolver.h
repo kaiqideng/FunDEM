@@ -1,10 +1,6 @@
 #include "DEMSolver.h"
 #include "CUDAKernelFunction/levelSetParticleContactDetectionKernel.cuh"
 #include "CUDAKernelFunction/levelSetParticleIntegrationKernel.cuh"
-#include "contactKernel.cuh"
-#include "myQua.h"
-#include "particle.h"
-#include <vector>
 
 struct LSBondedInteraction
 {

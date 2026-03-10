@@ -10,7 +10,6 @@ set(OLD_GLOB
   "/teamspace/studios/this_studio/FunDEM/damBreak2.cpp"
   "/teamspace/studios/this_studio/FunDEM/elasticBounce.cpp"
   "/teamspace/studios/this_studio/FunDEM/ice-struct.cpp"
-  "/teamspace/studios/this_studio/FunDEM/levelSetParticle.cpp"
   "/teamspace/studios/this_studio/FunDEM/levelSetParticleFall.cpp"
   )
 if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")

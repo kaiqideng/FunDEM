@@ -37,12 +37,6 @@
 },
 {
   "directory": "/teamspace/studios/this_studio/FunDEM/build",
-  "command": "/usr/bin/c++ -I/teamspace/studios/this_studio/FunDEM -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -isystem /usr/local/cuda/targets/x86_64-linux/include -O3 -DNDEBUG -std=gnu++17 -fPIE -o CMakeFiles/levelSetParticle.dir/levelSetParticle.cpp.o -c /teamspace/studios/this_studio/FunDEM/levelSetParticle.cpp",
-  "file": "/teamspace/studios/this_studio/FunDEM/levelSetParticle.cpp",
-  "output": "CMakeFiles/levelSetParticle.dir/levelSetParticle.cpp.o"
-},
-{
-  "directory": "/teamspace/studios/this_studio/FunDEM/build",
   "command": "/usr/bin/c++ -I/teamspace/studios/this_studio/FunDEM -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -isystem /usr/local/cuda/targets/x86_64-linux/include -O3 -DNDEBUG -std=gnu++17 -fPIE -o CMakeFiles/levelSetParticleFall.dir/levelSetParticleFall.cpp.o -c /teamspace/studios/this_studio/FunDEM/levelSetParticleFall.cpp",
   "file": "/teamspace/studios/this_studio/FunDEM/levelSetParticleFall.cpp",
   "output": "CMakeFiles/levelSetParticleFall.dir/levelSetParticleFall.cpp.o"
