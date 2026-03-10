@@ -7,14 +7,14 @@
 
 # =============================================================================
 # Project: FunDEM
-# Configurations: Debug
+# Configurations: Release
 # =============================================================================
 # =============================================================================
 
 #############################################
 # Rule for compiling CUDA files.
 
-rule CUDA_COMPILER__FunDEM_app_common_unscanned_Debug
+rule CUDA_COMPILER__FunDEM_app_common_unscanned_Release
   depfile = $DEP_FILE
   deps = gcc
   command = ${LAUNCHER}${CODE_CHECK}/usr/local/cuda/bin/nvcc -forward-unknown-to-host-compiler $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -x cu -rdc=true -c $in -o $out
@@ -24,7 +24,7 @@ rule CUDA_COMPILER__FunDEM_app_common_unscanned_Debug
 #############################################
 # Rule for linking CUDA static library.
 
-rule CUDA_STATIC_LIBRARY_LINKER__FunDEM_app_common_Debug
+rule CUDA_STATIC_LIBRARY_LINKER__FunDEM_app_common_Release
   command = $PRE_LINK && /usr/bin/cmake -E rm -f $TARGET_FILE && /usr/bin/ar qc $TARGET_FILE $LINK_FLAGS $in && /usr/bin/ranlib $TARGET_FILE && $POST_BUILD
   description = Linking CUDA static library $TARGET_FILE
   restat = $RESTAT
@@ -33,7 +33,7 @@ rule CUDA_STATIC_LIBRARY_LINKER__FunDEM_app_common_Debug
 #############################################
 # Rule for compiling CXX files.
 
-rule CXX_COMPILER__bondedParticleBeam_unscanned_Debug
+rule CXX_COMPILER__bondedParticleBeam_unscanned_Release
   depfile = $DEP_FILE
   deps = gcc
   command = ${LAUNCHER}${CODE_CHECK}/usr/bin/c++ $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
@@ -43,7 +43,7 @@ rule CXX_COMPILER__bondedParticleBeam_unscanned_Debug
 #############################################
 # Rule for linking CXX executable.
 
-rule CXX_EXECUTABLE_DEVICE_LINKER__bondedParticleBeam_Debug
+rule CXX_EXECUTABLE_DEVICE_LINKER__bondedParticleBeam_Release
   command = /usr/local/cuda/bin/nvcc -forward-unknown-to-host-compiler $LANGUAGE_COMPILE_FLAGS $LINK_FLAGS -Xcompiler=-fPIC -Wno-deprecated-gpu-targets -shared -dlink $in -o $TARGET_FILE $LINK_PATH $LINK_LIBRARIES
   description = Linking CXX executable $TARGET_FILE
   restat = $RESTAT
@@ -52,7 +52,7 @@ rule CXX_EXECUTABLE_DEVICE_LINKER__bondedParticleBeam_Debug
 #############################################
 # Rule for linking CXX executable.
 
-rule CXX_EXECUTABLE_LINKER__bondedParticleBeam_Debug
+rule CXX_EXECUTABLE_LINKER__bondedParticleBeam_Release
   command = $PRE_LINK && /usr/bin/c++ $FLAGS $LINK_FLAGS $in -o $TARGET_FILE $LINK_PATH $LINK_LIBRARIES && $POST_BUILD
   description = Linking CXX executable $TARGET_FILE
   restat = $RESTAT
@@ -61,7 +61,7 @@ rule CXX_EXECUTABLE_LINKER__bondedParticleBeam_Debug
 #############################################
 # Rule for compiling CXX files.
 
-rule CXX_COMPILER__damBreak_unscanned_Debug
+rule CXX_COMPILER__damBreak_unscanned_Release
   depfile = $DEP_FILE
   deps = gcc
   command = ${LAUNCHER}${CODE_CHECK}/usr/bin/c++ $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
@@ -71,7 +71,7 @@ rule CXX_COMPILER__damBreak_unscanned_Debug
 #############################################
 # Rule for linking CXX executable.
 
-rule CXX_EXECUTABLE_DEVICE_LINKER__damBreak_Debug
+rule CXX_EXECUTABLE_DEVICE_LINKER__damBreak_Release
   command = /usr/local/cuda/bin/nvcc -forward-unknown-to-host-compiler $LANGUAGE_COMPILE_FLAGS $LINK_FLAGS -Xcompiler=-fPIC -Wno-deprecated-gpu-targets -shared -dlink $in -o $TARGET_FILE $LINK_PATH $LINK_LIBRARIES
   description = Linking CXX executable $TARGET_FILE
   restat = $RESTAT
@@ -80,7 +80,7 @@ rule CXX_EXECUTABLE_DEVICE_LINKER__damBreak_Debug
 #############################################
 # Rule for linking CXX executable.
 
-rule CXX_EXECUTABLE_LINKER__damBreak_Debug
+rule CXX_EXECUTABLE_LINKER__damBreak_Release
   command = $PRE_LINK && /usr/bin/c++ $FLAGS $LINK_FLAGS $in -o $TARGET_FILE $LINK_PATH $LINK_LIBRARIES && $POST_BUILD
   description = Linking CXX executable $TARGET_FILE
   restat = $RESTAT
@@ -89,7 +89,7 @@ rule CXX_EXECUTABLE_LINKER__damBreak_Debug
 #############################################
 # Rule for compiling CXX files.
 
-rule CXX_COMPILER__damBreak2_unscanned_Debug
+rule CXX_COMPILER__damBreak2_unscanned_Release
   depfile = $DEP_FILE
   deps = gcc
   command = ${LAUNCHER}${CODE_CHECK}/usr/bin/c++ $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
@@ -99,7 +99,7 @@ rule CXX_COMPILER__damBreak2_unscanned_Debug
 #############################################
 # Rule for linking CXX executable.
 
-rule CXX_EXECUTABLE_DEVICE_LINKER__damBreak2_Debug
+rule CXX_EXECUTABLE_DEVICE_LINKER__damBreak2_Release
   command = /usr/local/cuda/bin/nvcc -forward-unknown-to-host-compiler $LANGUAGE_COMPILE_FLAGS $LINK_FLAGS -Xcompiler=-fPIC -Wno-deprecated-gpu-targets -shared -dlink $in -o $TARGET_FILE $LINK_PATH $LINK_LIBRARIES
   description = Linking CXX executable $TARGET_FILE
   restat = $RESTAT
@@ -108,7 +108,7 @@ rule CXX_EXECUTABLE_DEVICE_LINKER__damBreak2_Debug
 #############################################
 # Rule for linking CXX executable.
 
-rule CXX_EXECUTABLE_LINKER__damBreak2_Debug
+rule CXX_EXECUTABLE_LINKER__damBreak2_Release
   command = $PRE_LINK && /usr/bin/c++ $FLAGS $LINK_FLAGS $in -o $TARGET_FILE $LINK_PATH $LINK_LIBRARIES && $POST_BUILD
   description = Linking CXX executable $TARGET_FILE
   restat = $RESTAT
@@ -117,7 +117,7 @@ rule CXX_EXECUTABLE_LINKER__damBreak2_Debug
 #############################################
 # Rule for compiling CXX files.
 
-rule CXX_COMPILER__elasticBounce_unscanned_Debug
+rule CXX_COMPILER__elasticBounce_unscanned_Release
   depfile = $DEP_FILE
   deps = gcc
   command = ${LAUNCHER}${CODE_CHECK}/usr/bin/c++ $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
@@ -127,7 +127,7 @@ rule CXX_COMPILER__elasticBounce_unscanned_Debug
 #############################################
 # Rule for linking CXX executable.
 
-rule CXX_EXECUTABLE_DEVICE_LINKER__elasticBounce_Debug
+rule CXX_EXECUTABLE_DEVICE_LINKER__elasticBounce_Release
   command = /usr/local/cuda/bin/nvcc -forward-unknown-to-host-compiler $LANGUAGE_COMPILE_FLAGS $LINK_FLAGS -Xcompiler=-fPIC -Wno-deprecated-gpu-targets -shared -dlink $in -o $TARGET_FILE $LINK_PATH $LINK_LIBRARIES
   description = Linking CXX executable $TARGET_FILE
   restat = $RESTAT
@@ -136,7 +136,7 @@ rule CXX_EXECUTABLE_DEVICE_LINKER__elasticBounce_Debug
 #############################################
 # Rule for linking CXX executable.
 
-rule CXX_EXECUTABLE_LINKER__elasticBounce_Debug
+rule CXX_EXECUTABLE_LINKER__elasticBounce_Release
   command = $PRE_LINK && /usr/bin/c++ $FLAGS $LINK_FLAGS $in -o $TARGET_FILE $LINK_PATH $LINK_LIBRARIES && $POST_BUILD
   description = Linking CXX executable $TARGET_FILE
   restat = $RESTAT
@@ -145,7 +145,7 @@ rule CXX_EXECUTABLE_LINKER__elasticBounce_Debug
 #############################################
 # Rule for compiling CXX files.
 
-rule CXX_COMPILER__ice-struct_unscanned_Debug
+rule CXX_COMPILER__ice-struct_unscanned_Release
   depfile = $DEP_FILE
   deps = gcc
   command = ${LAUNCHER}${CODE_CHECK}/usr/bin/c++ $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
@@ -155,7 +155,7 @@ rule CXX_COMPILER__ice-struct_unscanned_Debug
 #############################################
 # Rule for linking CXX executable.
 
-rule CXX_EXECUTABLE_DEVICE_LINKER__ice-struct_Debug
+rule CXX_EXECUTABLE_DEVICE_LINKER__ice-struct_Release
   command = /usr/local/cuda/bin/nvcc -forward-unknown-to-host-compiler $LANGUAGE_COMPILE_FLAGS $LINK_FLAGS -Xcompiler=-fPIC -Wno-deprecated-gpu-targets -shared -dlink $in -o $TARGET_FILE $LINK_PATH $LINK_LIBRARIES
   description = Linking CXX executable $TARGET_FILE
   restat = $RESTAT
@@ -164,7 +164,7 @@ rule CXX_EXECUTABLE_DEVICE_LINKER__ice-struct_Debug
 #############################################
 # Rule for linking CXX executable.
 
-rule CXX_EXECUTABLE_LINKER__ice-struct_Debug
+rule CXX_EXECUTABLE_LINKER__ice-struct_Release
   command = $PRE_LINK && /usr/bin/c++ $FLAGS $LINK_FLAGS $in -o $TARGET_FILE $LINK_PATH $LINK_LIBRARIES && $POST_BUILD
   description = Linking CXX executable $TARGET_FILE
   restat = $RESTAT
@@ -173,7 +173,7 @@ rule CXX_EXECUTABLE_LINKER__ice-struct_Debug
 #############################################
 # Rule for compiling CXX files.
 
-rule CXX_COMPILER__levelSetParticle_unscanned_Debug
+rule CXX_COMPILER__levelSetParticle_unscanned_Release
   depfile = $DEP_FILE
   deps = gcc
   command = ${LAUNCHER}${CODE_CHECK}/usr/bin/c++ $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
@@ -183,7 +183,7 @@ rule CXX_COMPILER__levelSetParticle_unscanned_Debug
 #############################################
 # Rule for linking CXX executable.
 
-rule CXX_EXECUTABLE_DEVICE_LINKER__levelSetParticle_Debug
+rule CXX_EXECUTABLE_DEVICE_LINKER__levelSetParticle_Release
   command = /usr/local/cuda/bin/nvcc -forward-unknown-to-host-compiler $LANGUAGE_COMPILE_FLAGS $LINK_FLAGS -Xcompiler=-fPIC -Wno-deprecated-gpu-targets -shared -dlink $in -o $TARGET_FILE $LINK_PATH $LINK_LIBRARIES
   description = Linking CXX executable $TARGET_FILE
   restat = $RESTAT
@@ -192,7 +192,7 @@ rule CXX_EXECUTABLE_DEVICE_LINKER__levelSetParticle_Debug
 #############################################
 # Rule for linking CXX executable.
 
-rule CXX_EXECUTABLE_LINKER__levelSetParticle_Debug
+rule CXX_EXECUTABLE_LINKER__levelSetParticle_Release
   command = $PRE_LINK && /usr/bin/c++ $FLAGS $LINK_FLAGS $in -o $TARGET_FILE $LINK_PATH $LINK_LIBRARIES && $POST_BUILD
   description = Linking CXX executable $TARGET_FILE
   restat = $RESTAT
@@ -201,7 +201,7 @@ rule CXX_EXECUTABLE_LINKER__levelSetParticle_Debug
 #############################################
 # Rule for compiling CXX files.
 
-rule CXX_COMPILER__levelSetParticleFall_unscanned_Debug
+rule CXX_COMPILER__levelSetParticleFall_unscanned_Release
   depfile = $DEP_FILE
   deps = gcc
   command = ${LAUNCHER}${CODE_CHECK}/usr/bin/c++ $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
@@ -211,7 +211,7 @@ rule CXX_COMPILER__levelSetParticleFall_unscanned_Debug
 #############################################
 # Rule for linking CXX executable.
 
-rule CXX_EXECUTABLE_DEVICE_LINKER__levelSetParticleFall_Debug
+rule CXX_EXECUTABLE_DEVICE_LINKER__levelSetParticleFall_Release
   command = /usr/local/cuda/bin/nvcc -forward-unknown-to-host-compiler $LANGUAGE_COMPILE_FLAGS $LINK_FLAGS -Xcompiler=-fPIC -Wno-deprecated-gpu-targets -shared -dlink $in -o $TARGET_FILE $LINK_PATH $LINK_LIBRARIES
   description = Linking CXX executable $TARGET_FILE
   restat = $RESTAT
@@ -220,7 +220,7 @@ rule CXX_EXECUTABLE_DEVICE_LINKER__levelSetParticleFall_Debug
 #############################################
 # Rule for linking CXX executable.
 
-rule CXX_EXECUTABLE_LINKER__levelSetParticleFall_Debug
+rule CXX_EXECUTABLE_LINKER__levelSetParticleFall_Release
   command = $PRE_LINK && /usr/bin/c++ $FLAGS $LINK_FLAGS $in -o $TARGET_FILE $LINK_PATH $LINK_LIBRARIES && $POST_BUILD
   description = Linking CXX executable $TARGET_FILE
   restat = $RESTAT
@@ -237,7 +237,7 @@ rule CUSTOM_COMMAND
 #############################################
 # Rule for compiling CUDA files.
 
-rule CUDA_COMPILER__FunDEM_kernels_unscanned_Debug
+rule CUDA_COMPILER__FunDEM_kernels_unscanned_Release
   depfile = $DEP_FILE
   deps = gcc
   command = ${LAUNCHER}${CODE_CHECK}/usr/local/cuda/bin/nvcc -forward-unknown-to-host-compiler $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -x cu -rdc=true -c $in -o $out
@@ -247,7 +247,7 @@ rule CUDA_COMPILER__FunDEM_kernels_unscanned_Debug
 #############################################
 # Rule for linking CUDA static library.
 
-rule CUDA_STATIC_LIBRARY_LINKER__FunDEM_kernels_Debug
+rule CUDA_STATIC_LIBRARY_LINKER__FunDEM_kernels_Release
   command = $PRE_LINK && /usr/bin/cmake -E rm -f $TARGET_FILE && /usr/bin/ar qc $TARGET_FILE $LINK_FLAGS $in && /usr/bin/ranlib $TARGET_FILE && $POST_BUILD
   description = Linking CUDA static library $TARGET_FILE
   restat = $RESTAT

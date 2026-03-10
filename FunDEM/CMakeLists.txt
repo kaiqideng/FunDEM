@@ -26,6 +26,11 @@ option(FUNDEM_ENABLE_PIC "Build position independent code (PIC)" ON)
 # ------------------------------------------------------------
 set(FUNDEM_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 
+if (NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
+    set(CMAKE_CUDA_ARCHITECTURES 75)
+endif()
+message(STATUS "CMAKE_CUDA_ARCHITECTURES = ${CMAKE_CUDA_ARCHITECTURES}")
+
 # ------------------------------------------------------------
 # Add kernel subdirectory (defines target FunDEM_kernels)
 # ------------------------------------------------------------

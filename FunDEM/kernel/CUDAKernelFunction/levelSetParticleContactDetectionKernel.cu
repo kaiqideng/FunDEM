@@ -1,5 +1,6 @@
 #include "levelSetParticleContactDetectionKernel.cuh"
 #include "buildHashStartEnd.cuh"
+#include "myVec.h"
 #include "neighborSearchKernel.cuh"
 
 __global__ void countLevelSetBoundaryNodeInteractionsKernel(int* neighborCount_bNode,
@@ -58,7 +59,7 @@ const size_t numBoundaryNode)
                     if (idxA >= idxB) continue;
                     if (inverseMass_p[idxA] == 0. && inverseMass_p[idxB] == 0.) continue;
                     const double3 r_idxidxB = globalPosition_idx - position_p[idxB];
-                    if (length(r_idxidxB) > radii_p[idxB]) continue;
+                    if (lengthSquared(r_idxidxB) > radii_p[idxB] * radii_p[idxB]) continue;
 
                     const double3 localPositionFrameB_idx = reverseRotateVectorByQuaternion(r_idxidxB, orientation_p[idxB]);
                     const double3 gridNodeLocalOriginB = gridNodeLocalOrigin_p[idxB];
@@ -199,7 +200,7 @@ const size_t numBoundaryNode)
                     if (idxA >= idxB) continue;
                     if (inverseMass_p[idxA] == 0. && inverseMass_p[idxB] == 0.) continue;
                     const double3 r_idxidxB = globalPosition_idx - position_p[idxB];
-                    if (length(r_idxidxB) > radii_p[idxB]) continue;
+                    if (lengthSquared(r_idxidxB) > radii_p[idxB] * radii_p[idxB]) continue;
 
                     const double3 localPositionFrameB_idx = reverseRotateVectorByQuaternion(r_idxidxB, orientation_p[idxB]);
                     const double3 gridNodeLocalOriginB = gridNodeLocalOrigin_p[idxB];

@@ -1,3 +1,5 @@
+# RUN YOUR OWN FUNDEM
+
 # 1) compilation env
 # update
 sudo apt-get update
@@ -35,17 +37,19 @@ source ~/.bashrc
 # check
 nvidia-smi
 
-# 4）release or debug (Ninja)
+# 4）release or debug (Ninja, Default DCMAKE_CUDA_ARCHITECTURES=75)
 cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
 cmake --build build -j
 
 cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug
 cmake --build build -j
 
-# CUDA_ARCHITECTURES
-cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_CUDA_ARCHITECTURES=86
+# CUDA_ARCHITECTURES (V100: 70, T4: 75, A100: 80, RTX 30xx: 86, L4: 89, H100: 90)
+cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_CUDA_ARCHITECTURES=75
+cmake --build build -j
 
 cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_CUDA_ARCHITECTURES="75;86"
+cmake --build build -j
 
 # 5) run
 ./build/...

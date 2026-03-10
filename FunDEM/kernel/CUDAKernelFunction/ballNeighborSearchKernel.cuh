@@ -1,4 +1,5 @@
 #pragma once
+#include <vector_functions.h>
 
 extern "C" void launchCountBallInteractions(double3* position, 
 double* radius,

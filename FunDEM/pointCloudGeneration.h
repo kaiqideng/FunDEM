@@ -1,6 +1,5 @@
 #include "kernel/CUDAKernelFunction/myUtility/myVec.h"
 #include <cassert>
-#include <cuda_runtime.h>
 #include <vector>
 #include <cmath>
 

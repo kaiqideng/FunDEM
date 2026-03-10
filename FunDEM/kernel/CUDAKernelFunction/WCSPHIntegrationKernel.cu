@@ -1,5 +1,4 @@
 #include "WCSPHIntegrationKernel.cuh"
-#include "myUtility/myVec.h"
 
 __global__ void calDummyParticleNormalKernel(double3* normal,
 const double3* position,
