@@ -1,7 +1,6 @@
 #include "DEMSolver.h"
 #include "CUDAKernelFunction/levelSetParticleContactDetectionKernel.cuh"
 #include "CUDAKernelFunction/levelSetParticleIntegrationKernel.cuh"
-#include <vector>
 
 class LSDEMSolver
 {

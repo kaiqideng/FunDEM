@@ -1,16 +1,12 @@
 #include "kernel/LSDEMSolver.h"
-#include "buildLevelSetParticle.h"
 
 int main()
 {
     LSDEMSolver test(0);
-    superellipsoidParams s;
-    LevelSetParticleGridInfo ls = buildLevelSetSuperellipsoidGridGlobal(s, make_double3(0., 0., 0.));
-    std::vector<double3> sp = generateSuperellipsoidSurfacePointsGlobal_Uniform10k(s, make_double3(0., 0., 0.));
+    test.addLSSuperellipsoid(0.42, 1.0, 0.83, 0.1, 1.0, 
+    0, 1000., make_double3(0., 0., 0.), make_double3(0., 0., 0.), make_double3(0., 0., 0.));
     test.setLinearStiffness(0, 0, 6.e5, 1.8e5);
     test.setFriction(0, 0, 0.577);
-    test.addLSParticle(sp, ls.gridNodeLSF, ls.gridMin, ls.gridNodeSize, ls.gridSpacing, 
-    0, 1000., make_double3(0., 0., 0.), make_double3(0., 0, 0.));
 
     std::vector<double3> sp1;
     sp1.push_back(make_double3(-1., -1., -1.));
