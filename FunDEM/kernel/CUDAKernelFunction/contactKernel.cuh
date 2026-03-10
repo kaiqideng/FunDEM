@@ -1,5 +1,5 @@
 #pragma once
-#include "myUtility/myVec.h"
+#include "myUtility/myQua.h"
 
 __device__ __forceinline__ int ParallelBondedContact(double& bondNormalForce, 
 double& bondTorsionalTorque, 
@@ -48,6 +48,66 @@ const double bondFrictionCoefficient)
 	const double3 tangentialRotationIncrement = relativeAngularVelocity * timeStep - normalRotationIncrement;
 	bondTorsionalTorque -= dot(normalRotationIncrement * shearStiffnessUnitArea * bondPolarInertiaMoment, contactNormal);
 	bondBendingTorque -= tangentialRotationIncrement * normalStiffnessUnitArea * bondInertiaMoment;
+
+	maxNormalStress = -bondNormalForce / bondArea + length(bondBendingTorque) / bondInertiaMoment * bondRadius;// maximum tension stress
+	maxShearStress = length(bondShearForce) / bondArea + fabs(bondTorsionalTorque) / bondPolarInertiaMoment * bondRadius;// maximum shear stress
+
+	int isBonded = 1;
+	if (bondTensileStrength > 0 && maxNormalStress > bondTensileStrength)
+	{
+		isBonded = 0;
+	}
+	else if (bondCohesion > 0 && maxShearStress > bondCohesion - bondFrictionCoefficient * maxNormalStress)
+	{
+		isBonded = 0;
+	}
+	return isBonded;
+}
+
+__device__ __forceinline__ int ParallelBondedContact2(double& bondNormalForce, 
+double& bondTorsionalTorque, 
+double3& bondShearForce, 
+double3& bondBendingTorque,
+double& maxNormalStress,
+double& maxShearStress,
+const double3 contactNormalPrev,
+const double3 contactNormal,
+const double3 relativeVelocityAtContact,
+const double3 angularVelocityA,
+const double3 angularVelocityB,
+const double timeStep,
+const double bondRadius,
+const double normalStiffness,
+const double shearStiffness,
+const double bendingStiffness,
+const double torsionStiffness,
+const double bondTensileStrength,
+const double bondCohesion,
+const double bondFrictionCoefficient)
+{
+	const double3 n0 = normalize(contactNormalPrev);
+	const double3 n1 = normalize(contactNormal);
+	const double3 axis1 = cross(n0, n1);
+	const double sinTheta1 = length(axis1);
+	bondShearForce = rotateVectorAxisSin(bondShearForce, axis1, sinTheta1);
+	bondBendingTorque = rotateVectorAxisSin(bondBendingTorque, axis1, sinTheta1);
+	const double3 theta2 = dot(0.5 * (angularVelocityA + angularVelocityB) * timeStep, contactNormal) * contactNormal;
+	bondShearForce = rotateVector(bondShearForce, theta2);
+	bondBendingTorque = rotateVector(bondBendingTorque, theta2);
+
+	const double bondArea = bondRadius * bondRadius * pi();// cross-section area of beam of the bond
+	const double bondInertiaMoment = bondRadius * bondRadius * bondRadius * bondRadius / 4. * pi();// inertia moment
+	const double bondPolarInertiaMoment = 2 * bondInertiaMoment;// polar inertia moment
+
+	const double3 normalTranslationIncrement = dot(relativeVelocityAtContact, contactNormal) * contactNormal * timeStep;
+	const double3 tangentialTranslationIncrement = relativeVelocityAtContact * timeStep - normalTranslationIncrement;
+	bondNormalForce -= dot(normalTranslationIncrement * normalStiffness, contactNormal);
+	bondShearForce -= tangentialTranslationIncrement * shearStiffness;
+	const double3 relativeAngularVelocity = angularVelocityA - angularVelocityB;
+	const double3 normalRotationIncrement = dot(relativeAngularVelocity, contactNormal) * contactNormal * timeStep;
+	const double3 tangentialRotationIncrement = relativeAngularVelocity * timeStep - normalRotationIncrement;
+	bondTorsionalTorque -= dot(normalRotationIncrement * torsionStiffness, contactNormal);
+	bondBendingTorque -= tangentialRotationIncrement * bendingStiffness;
 
 	maxNormalStress = -bondNormalForce / bondArea + length(bondBendingTorque) / bondInertiaMoment * bondRadius;// maximum tension stress
 	maxShearStress = length(bondShearForce) / bondArea + fabs(bondTorsionalTorque) / bondPolarInertiaMoment * bondRadius;// maximum shear stress
@@ -659,6 +719,37 @@ const int* materialID_p,
 const double dt,
 
 const size_t numInteraction,
+const size_t gridD,
+const size_t blockD,
+cudaStream_t stream);
+
+extern "C" void launchAddLevelSetParticleBondedForceTorque(double3* bondPoint,
+double3* bondNormal,
+double3* shearForce,
+double3* bendingTorque,
+double* normalForce,
+double* torsionTorque,
+double* maxNormalStress,
+double* maxShearStress,
+int* isBonded,
+const double3* localPointA_b,
+const double3* localPointB_b,
+const double* length_b,
+const double* radius_b,
+const int* objectPointed_b,
+const int* objectPointing_b,
+
+double3* force,
+double3* torque,
+const double3* position,
+const double3* velocity,
+const double3* angularVelocity,
+const quaternion* orientation,
+const int* materialID,
+
+const double dt,
+
+const size_t numBondedInteraction,
 const size_t gridD,
 const size_t blockD,
 cudaStream_t stream);

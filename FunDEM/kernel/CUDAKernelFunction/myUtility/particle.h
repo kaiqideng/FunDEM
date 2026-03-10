@@ -1398,10 +1398,8 @@ public:
     double3* angularVelocity() { return angularVelocity_.d_ptr; }
     double3* force() { return force_.d_ptr; }
     double3* torque() { return torque_.d_ptr; }
-
     double* radii() { return radii_.d_ptr; }
     double* inverseMass() { return inverseMass_.d_ptr; }
-
     quaternion* orientation() { return orientation_.d_ptr; }
     symMatrix* inverseInertiaTensor() { return inverseInertiaTensor_.d_ptr; }
 
@@ -1433,11 +1431,8 @@ public:
 
     const std::vector<double>& radiiHostRef() const { return radii_.hostRef(); }
     const std::vector<double>& inverseMassHostRef() const { return inverseMass_.hostRef(); }
-    
     const std::vector<symMatrix>& inverseInertiaTensorHostRef() const { return inverseInertiaTensor_.hostRef(); }
-
     const std::vector<int>& materialIDHostRef() const { return materialID_.hostRef(); }
-
     const std::vector<double3>& gridNodeLocalOriginHostRef() const { return gridNodeLocalOrigin_.hostRef(); }
     const std::vector<double>& gridSpacingHostRef() const { return gridSpacing_.hostRef(); }
     const std::vector<int3>& gridNodeSizeHostRef() const { return gridNodeSize_.hostRef(); }

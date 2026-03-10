@@ -1596,8 +1596,6 @@ protected:
     {
         bondedInteraction_.bond_.copyDeviceToHost(stream_);
         bondedInteraction_.add(objectPointed, objectPointing, ball_.positionHostCopy());
-        bondedInteraction_.pair_.copyHostToDevice(stream_);
-        bondedInteraction_.bond_.copyHostToDevice(stream_);
     }
 
     std::vector<double3> getBallPosition()
@@ -1845,8 +1843,7 @@ public:
         row.frictionCoefficient = 0.;
         if (bondRadiusMultiplier > 0.) row.bondRadiusMultiplier = bondRadiusMultiplier;
         if (bondYoungsModulus > 0.) row.bondYoungsModulus = bondYoungsModulus;
-        if (normalToShearStiffnessRatio <= 0.) row.normalToShearStiffnessRatio = 1.;
-        else row.normalToShearStiffnessRatio = normalToShearStiffnessRatio;
+        if (normalToShearStiffnessRatio > 0.) row.normalToShearStiffnessRatio = normalToShearStiffnessRatio;
         if (tensileStrength > 0.) row.tensileStrength = tensileStrength;
         if (cohesion > 0.) row.cohesion = cohesion;
         if (frictionCoefficient > 0.) row.frictionCoefficient = frictionCoefficient;
@@ -2056,8 +2053,22 @@ public:
             double3 v0 = vertexLocalPosition[triIndex0[i]] + position;
             double3 v1 = vertexLocalPosition[triIndex1[i]] + position;
             double3 v2 = vertexLocalPosition[triIndex2[i]] + position;
-
-            double3 c = triangleCircumcenter(v0, v1, v2);
+            auto getTriangleCircumcenter = [&](const double3& a, const double3& b, const double3& c)->double3
+            {
+                double3 ab = b - a;
+                double3 ac = c - a;
+                double3 n  = cross(ab, ac);
+                double n2  = dot(n, n);
+                if (n2 < 1e-30)
+                {
+                    return (a + b + c) / 3.0;
+                }
+                double3 term1 = cross(n,  ab) * dot(ac, ac);
+                double3 term2 = cross(ac, n ) * dot(ab, ab);
+                double invDen = 1.0 / (2.0 * n2);
+                return a + (term1 + term2) * invDen;
+            };
+            double3 c = getTriangleCircumcenter(v0, v1, v2);
             meshWall_.triangle_.addHost(triIndex0[i], 
             triIndex1[i], 
             triIndex2[i], 

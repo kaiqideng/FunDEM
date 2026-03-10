@@ -1,6 +1,20 @@
 #include "DEMSolver.h"
 #include "CUDAKernelFunction/levelSetParticleContactDetectionKernel.cuh"
 #include "CUDAKernelFunction/levelSetParticleIntegrationKernel.cuh"
+#include "contactKernel.cuh"
+#include "myQua.h"
+#include "particle.h"
+#include <vector>
+
+struct LSBondedInteraction
+{
+    pair pair_;
+    bond bond_;
+    HostDeviceArray1D<double> bondLength_;
+    HostDeviceArray1D<double> bondRadius_;
+    HostDeviceArray1D<double3> localbondPointA_;
+    HostDeviceArray1D<double3> localbondPointB_;
+};
 
 class LSDEMSolver
 {
@@ -314,6 +328,13 @@ private:
         levelSetGridNode_.copyHostToDevice(stream_);
         levelSetParticle_.copyHostToDevice(stream_);
 
+        LSBondedInteraction_.pair_.copyHostToDevice(stream_);
+        LSBondedInteraction_.bond_.copyHostToDevice(stream_);
+        LSBondedInteraction_.bondRadius_.copyHostToDevice(stream_);
+        LSBondedInteraction_.bondLength_.copyHostToDevice(stream_);
+        LSBondedInteraction_.localbondPointA_.copyHostToDevice(stream_);
+        LSBondedInteraction_.localbondPointB_.copyHostToDevice(stream_);
+
         if (levelSetParticle_.deviceSize() > 0 && LSParticleInteraction_.numActivated_ == 0)
         {
             LSParticleInteraction_.objectPointed_.allocateDevice(levelSetBoundaryNode_.deviceSize(), stream_);
@@ -482,6 +503,46 @@ CUDA_CHECK(cudaMemsetAsync(levelSetParticle_.torque(), 0, levelSetParticle_.devi
 CUDA_CHECK(cudaGetLastError());
 #endif
         }
+
+        size_t numBondedInteraction = LSBondedInteraction_.bond_.deviceSize();
+        if (numBondedInteraction > 0)
+        {
+            size_t blockD = maxThread_;
+            if (numBondedInteraction < maxThread_) blockD = numBondedInteraction;
+            size_t gridD = (numBondedInteraction + blockD - 1) / blockD;
+
+            launchAddLevelSetParticleBondedForceTorque(LSBondedInteraction_.bond_.point(),
+            LSBondedInteraction_.bond_.normal(),
+            LSBondedInteraction_.bond_.shearForce(),
+            LSBondedInteraction_.bond_.bendingTorque(),
+            LSBondedInteraction_.bond_.normalForce(),
+            LSBondedInteraction_.bond_.torsionTorque(),
+            LSBondedInteraction_.bond_.maxNormalStress(),
+            LSBondedInteraction_.bond_.maxShearStress(),
+            LSBondedInteraction_.bond_.isBonded(),
+            LSBondedInteraction_.localbondPointA_.d_ptr, 
+            LSBondedInteraction_.localbondPointB_.d_ptr, 
+            LSBondedInteraction_.bondLength_.d_ptr, 
+            LSBondedInteraction_.bondRadius_.d_ptr, 
+            LSBondedInteraction_.pair_.objectPointed(), 
+            LSBondedInteraction_.pair_.objectPointing(), 
+            levelSetParticle_.force(), 
+            levelSetParticle_.torque(), 
+            levelSetParticle_.position(), 
+            levelSetParticle_.velocity(), 
+            levelSetParticle_.angularVelocity(), 
+            levelSetParticle_.orientation(), 
+            levelSetParticle_.materialID(), 
+            timeStep, 
+            numBondedInteraction, 
+            gridD, 
+            blockD, 
+            stream_);
+
+#ifndef NDEBUG
+CUDA_CHECK(cudaGetLastError());
+#endif
+        }
     }
 
     void LSParticleIntegration1stHalf(const double3 gravity, const double halfTimeStep)
@@ -632,7 +693,6 @@ CUDA_CHECK(cudaGetLastError());
         std::vector<double> o = LSParticleInteraction_.contact_.overlapHostCopy();
         std::vector<double3> n = LSParticleInteraction_.contact_.normalHostCopy();
         std::vector<double3> f_c = LSParticleInteraction_.contact_.forceHostCopy();
-        std::vector<double3> t_c = LSParticleInteraction_.contact_.torqueHostCopy();
         std::vector<double3> s_s = LSParticleInteraction_.spring_.slidingHostCopy();
         
         out << "<?xml version=\"1.0\"?>\n"
@@ -681,7 +741,6 @@ CUDA_CHECK(cudaGetLastError());
         } vec3s[] = {
             { "contact normal" , n     },
             { "contact force"  , f_c   },
-            { "contact torque" , t_c   },
             { "sliding spring" , s_s   }
         };
 
@@ -723,6 +782,62 @@ CUDA_CHECK(cudaGetLastError());
     double3* getLSParticleTorqueDevicePtr()
     {
         return levelSetParticle_.torque();
+    }
+
+    std::vector<int> getLevelSetParticlePairA()
+    { 
+        std::vector<int> a = LSParticleInteraction_.pair_.objectPointingHostCopy();
+        std::vector<int> a1(a.begin(), a.begin() + LSParticleInteraction_.numActivated_);
+        for (auto& aa: a1) aa = levelSetBoundaryNode_.particleIDHostRef()[aa];
+        return a1;
+    }
+
+    std::vector<int> getLevelSetParticlePairB()
+    { 
+        std::vector<int> b = LSParticleInteraction_.pair_.objectPointingHostCopy();
+        std::vector<int> b1(b.begin(), b.begin() + LSParticleInteraction_.numActivated_);
+        return b1;
+    }
+
+    std::vector<double3> getContactPoint() 
+    { 
+        std::vector<double3> p = LSParticleInteraction_.contact_.pointHostCopy();
+        std::vector<double3> p1(p.begin(), p.begin() + LSParticleInteraction_.numActivated_);
+        return p1;
+    }
+
+    std::vector<double3> getContactNormal() 
+    { 
+        std::vector<double3> n = LSParticleInteraction_.contact_.normalHostCopy();
+        std::vector<double3> n1(n.begin(), n.begin() + LSParticleInteraction_.numActivated_);
+        return n1;
+    }
+
+    void addLSBondedInteraction(std::vector<int> particleA, 
+    std::vector<int> particleB, 
+    std::vector<double3> point_b, 
+    std::vector<double3> normal_b, 
+    std::vector<double> radius_b,
+    std::vector<double> length_b)
+    {
+        std::vector<quaternion> orientation_p = levelSetParticle_.orientationHostCopy();
+        std::vector<double3> position_p = levelSetParticle_.positionHostCopy();
+        for (size_t i = 0; i < particleA.size(); i++)
+        {
+            int idxA = particleA[i], idxB = particleB[i];
+            if (idxA >= orientation_p.size()) continue;
+            if (idxB >= orientation_p.size()) continue;
+            LSBondedInteraction_.pair_.addHost(idxA, idxB);
+            LSBondedInteraction_.bond_.addHost(point_b[i], normal_b[i]);
+            LSBondedInteraction_.bondRadius_.pushHost(radius_b[i]);
+            LSBondedInteraction_.bondLength_.pushHost(length_b[i]);
+            double3 pointA_global = point_b[i] + 0.5 * length_b[i] * normal_b[i];
+            double3 pointB_global = point_b[i] - 0.5 * length_b[i] * normal_b[i];
+            double3 pointA_local = reverseRotateVectorByQuaternion(pointA_global - position_p[idxA], orientation_p[idxA]);
+            double3 pointB_local = reverseRotateVectorByQuaternion(pointB_global - position_p[idxB], orientation_p[idxB]);
+            LSBondedInteraction_.localbondPointA_.pushHost(pointA_local);
+            LSBondedInteraction_.localbondPointB_.pushHost(pointB_local);
+        }
     }
 
     virtual void addExternalForceTorque(const double time) 
@@ -768,6 +883,32 @@ public:
         if (normalStiffness > 0.) row.normalStiffness = normalStiffness;
         if (slidingStiffness > 0.) row.slidingStiffness = slidingStiffness;
         linearStiffnessTable_.push_back(row);
+    }
+
+    void setBond(const int materialIndexA,
+    const int materialIndexB,
+    const double bondYoungsModulus,
+    const double bondPoissonRatio,
+    const double tensileStrength,
+    const double cohesion,
+    const double frictionCoefficient)
+    {
+        if (materialIndexA < 0) return;
+        if (materialIndexB < 0) return;
+        bondRow row;
+        row.materialIndexA = materialIndexA;
+        row.materialIndexB = materialIndexB;
+        row.bondYoungsModulus = 0.;
+        row.normalToShearStiffnessRatio = 1.;
+        row.tensileStrength = 0.;
+        row.cohesion = 0.;
+        row.frictionCoefficient = 0.;
+        if (bondYoungsModulus > 0.) row.bondYoungsModulus = bondYoungsModulus;
+        if (bondPoissonRatio > -0.5) row.normalToShearStiffnessRatio = 1 + 2. * bondPoissonRatio;
+        if (tensileStrength > 0.) row.tensileStrength = tensileStrength;
+        if (cohesion > 0.) row.cohesion = cohesion;
+        if (frictionCoefficient > 0.) row.frictionCoefficient = frictionCoefficient;
+        bondTable_.push_back(row);
     }
 
     void addLSParticle(const std::vector<double3>& globalPosition_boundaryNode,
@@ -1062,4 +1203,5 @@ private:
     spatialGrid spatialGrid_;
 
     solidInteraction LSParticleInteraction_;
+    LSBondedInteraction LSBondedInteraction_;
 };

@@ -1,5 +1,7 @@
 #include "contactKernel.cuh"
+#include "myQua.h"
 #include "myUtility/contactParameters.h"
+#include "myVec.h"
 
 __constant__ paramsDevice para;
 
@@ -11,30 +13,28 @@ cudaStream_t stream)
 {
 	const int nMat = inferNumberOfMaterials_(materialTable, frictionTable, linearStiffnessTable, bondTable);
 	numberOfMaterials_ = static_cast<std::size_t>(nMat);
-	if (nMat > 0)
+
+	for (std::size_t i = 0; i < nMat; i++)
 	{
-		for (std::size_t i = 0; i < materialTable.size(); i++)
+		if (i < materialTable.size())
 		{
 			YoungsModulus_.pushHost(materialTable[i].YoungsModulus);
 			poissonRatio_.pushHost(materialTable[i].poissonRatio);
 			restitutionCoefficient_.pushHost(materialTable[i].restitutionCoefficient);
 		}
-
-		if (materialTable.size() < nMat)
+		else 
 		{
-			for (std::size_t i = 0; i < nMat + 1 - materialTable.size(); i++)
-			{
-				YoungsModulus_.pushHost(0.);
-				poissonRatio_.pushHost(0.);
-				restitutionCoefficient_.pushHost(1.0);
-			}
+			YoungsModulus_.pushHost(0.);
+			poissonRatio_.pushHost(0.);
+			restitutionCoefficient_.pushHost(1.0);
 		}
-		YoungsModulus_.copyHostToDevice(stream);
-		poissonRatio_.copyHostToDevice(stream);
-		restitutionCoefficient_.copyHostToDevice(stream);	
 	}
 
-    pairTableSize_ = computePairTableSize_(nMat);
+	YoungsModulus_.copyHostToDevice(stream);
+	poissonRatio_.copyHostToDevice(stream);
+	restitutionCoefficient_.copyHostToDevice(stream);	
+
+    pairTableSize_ = computePairTableSize_(numberOfMaterials_);
     if (pairTableSize_ > 0)
 	{
 		std::vector<double> f(static_cast<std::size_t>(f_COUNT) * pairTableSize_, 0.0);
@@ -661,6 +661,108 @@ const size_t numBondedInteraction)
 	contactTorque[idx_c] += T_t * n_ij + T_b;
 }
 
+__global__ void addLevelSetParticleBondedForceTorqueKernel(double3* bondPoint,
+double3* bondNormal,
+double3* shearForce, 
+double3* bendingTorque,
+double* normalForce, 
+double* torsionTorque, 
+double* maxNormalStress,
+double* maxShearStress,
+int* isBonded, 
+
+double3* force, 
+double3* torque, 
+
+const double3* localPointA_b,
+const double3* localPointB_b,
+const double* length_b,
+const double* radius_b,
+const int* objectPointed_b,
+const int* objectPointing_b,
+
+const double3* position, 
+const double3* velocity, 
+const double3* angularVelocity, 
+const quaternion* orientation,
+const int* materialID, 
+
+const double dt,
+const size_t numBondedInteraction)
+{
+	size_t idx = blockIdx.x * blockDim.x + threadIdx.x;
+	if (idx >= numBondedInteraction) return;
+
+	if (isBonded[idx] == 0)
+	{
+		normalForce[idx] = 0;
+		torsionTorque[idx] = 0;
+		shearForce[idx] = make_double3(0, 0, 0);
+		bendingTorque[idx] = make_double3(0, 0, 0);
+		return;
+	}
+
+	const int idx_i = objectPointed_b[idx];
+	const int idx_j = objectPointing_b[idx];
+	const double3 n_ij0 = bondNormal[idx];
+
+    const double3 r_i = position[idx_i];
+	const double3 r_j = position[idx_j];
+	const double3 rb_i = rotateVectorByQuaternion(orientation[idx_i], localPointA_b[idx]) + r_i;
+	const double3 rb_j = rotateVectorByQuaternion(orientation[idx_j], localPointB_b[idx]) + r_j;
+	const double3 r_c = 0.5 * (rb_i + rb_j);
+	const double3 n_ij = normalize(rb_i - rb_j);
+	const double3 v_i = velocity[idx_i];
+	const double3 v_j = velocity[idx_j];
+	const double3 w_i = angularVelocity[idx_i];
+	const double3 w_j = angularVelocity[idx_j];
+	const double3 v_c_ij = v_i + cross(w_i, r_c - r_i) - (v_j + cross(w_j, r_c - r_j));
+
+	bondPoint[idx] = r_c;
+    bondNormal[idx] = n_ij;
+
+	const int ip = contactParameterIndex(materialID[idx_i], materialID[idx_j], para.nMaterials, para.cap);
+    const double E = getBondParam(ip, b_E);
+    const double k_n_k_s = getBondParam(ip, b_KNKS);
+	const double sigma_s = getBondParam(ip, b_SIGMAS);
+    const double C = getBondParam(ip, b_C);
+    const double mu = getBondParam(ip, b_MU);
+
+	const double G = E / k_n_k_s;
+	const double l_b = length_b[idx];
+	const double rad_b = radius_b[idx];
+	const double A_b = pi() * rad_b * rad_b;
+	const double I_b = pi() * rad_b * rad_b * rad_b * rad_b / 4.;
+	const double J_b = 2. * I_b;
+	const double k_n = E * A_b / l_b;
+    const double k_s = 12. * E * I_b / (l_b * l_b * l_b);
+    const double k_b = E * I_b / l_b;
+    const double k_t = G * J_b / l_b;
+
+	double F_n = normalForce[idx];
+	double3 F_s = shearForce[idx];
+	double T_t = torsionTorque[idx];
+	double3 T_b = bendingTorque[idx];
+	double sigma_max = maxNormalStress[idx];
+	double tau_max = maxShearStress[idx];
+
+	isBonded[idx] = ParallelBondedContact2(F_n, T_t, F_s, T_b, sigma_max, tau_max,
+	n_ij0, n_ij, v_c_ij, w_i, w_j, dt, rad_b, k_n, k_s, k_b, k_t, 
+	sigma_s, C, mu);
+
+	normalForce[idx] = F_n;
+	shearForce[idx] = F_s;
+	torsionTorque[idx] = T_t;
+	bendingTorque[idx] = T_b;
+	maxNormalStress[idx] = sigma_max;
+	maxShearStress[idx] = tau_max;
+
+	atomicAddDouble3(force, idx_i, F_n * n_ij + F_s);
+	atomicAddDouble3(torque, idx_i, T_t * n_ij + T_b + cross(r_c - r_i, F_s));
+	atomicAddDouble3(force, idx_j, -F_n * n_ij - F_s);
+	atomicAddDouble3(torque, idx_j, -T_t * n_ij - T_b + cross(r_c - r_j, -F_s));
+}
+
 __global__ void calLevelSetParticleContactForceTorqueKernel(double3* contactForce, 
 double3* slidingSpring, 
 double3* force_p,
@@ -1070,4 +1172,61 @@ cudaStream_t stream)
 	materialID_p,
 	timeStep,
 	numInteraction);
+}
+
+extern "C" void launchAddLevelSetParticleBondedForceTorque(double3* bondPoint,
+double3* bondNormal,
+double3* shearForce,
+double3* bendingTorque,
+double* normalForce,
+double* torsionTorque,
+double* maxNormalStress,
+double* maxShearStress,
+int* isBonded,
+const double3* localPointA_b,
+const double3* localPointB_b,
+const double* length_b,
+const double* radius_b,
+const int* objectPointed_b,
+const int* objectPointing_b,
+
+double3* force,
+double3* torque,
+const double3* position,
+const double3* velocity,
+const double3* angularVelocity,
+const quaternion* orientation,
+const int* materialID,
+
+const double dt,
+
+const size_t numBondedInteraction,
+const size_t gridD,
+const size_t blockD,
+cudaStream_t stream)
+{
+    addLevelSetParticleBondedForceTorqueKernel<<<gridD, blockD, 0, stream>>>(bondPoint,
+    bondNormal,
+    shearForce,
+    bendingTorque,
+    normalForce,
+    torsionTorque,
+    maxNormalStress,
+    maxShearStress,
+    isBonded,
+    force,
+    torque,
+    localPointA_b,
+    localPointB_b,
+    length_b,
+    radius_b,
+    objectPointed_b,
+    objectPointing_b,
+    position,
+    velocity,
+    angularVelocity,
+    orientation,
+    materialID,
+    dt,
+    numBondedInteraction);
 }
