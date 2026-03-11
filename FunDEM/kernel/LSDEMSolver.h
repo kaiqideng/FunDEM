@@ -1181,6 +1181,8 @@ public:
                 outputLevelSetParticleInteractionVTU(dir, iFrame, iStep, time);
             }
         }
+        levelSetParticle_.copyDeviceToHost(stream_);
+        LSBondedInteraction_.bond_.copyDeviceToHost(stream_);
     }
 
 private:
