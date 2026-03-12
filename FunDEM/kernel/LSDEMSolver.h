@@ -1116,6 +1116,112 @@ public:
         angularvelocity);
     }
 
+    void setLevelSetBox(const double3 boxMin_global,
+    const double3 boxMax_global,
+    const int paddingLayers = 2)
+    {
+        const double3 bmin = make_double3(std::min(boxMin_global.x, boxMax_global.x),
+        std::min(boxMin_global.y, boxMax_global.y),
+        std::min(boxMin_global.z, boxMax_global.z));
+
+        const double3 bmax = make_double3(std::max(boxMin_global.x, boxMax_global.x),
+        std::max(boxMin_global.y, boxMax_global.y),
+        std::max(boxMin_global.z, boxMax_global.z));
+
+        const double dx = bmax.x - bmin.x;
+        const double dy = bmax.y - bmin.y;
+        const double dz = bmax.z - bmin.z;
+
+        const double diameter = std::max(dx, std::max(dy, dz));
+        if (diameter <= 0.0) return;
+
+        LevelSetParticleGridInfo info;
+        const double h = diameter / 20.0;
+        info.gridSpacing = h;
+
+        const double pad = double(std::max(1, paddingLayers)) * h;
+
+        double3 gmin = make_double3(bmin.x - pad, bmin.y - pad, bmin.z - pad);
+        double3 gmax = make_double3(bmax.x + pad, bmax.y + pad, bmax.z + pad);
+
+        auto snapDown = [&](double a) { return h * std::floor(a / h); };
+        auto snapUp = [&](double a) { return h * std::ceil (a / h); };
+
+        gmin.x = snapDown(gmin.x); gmin.y = snapDown(gmin.y); gmin.z = snapDown(gmin.z);
+        gmax.x = snapUp  (gmax.x); gmax.y = snapUp (gmax.y); gmax.z = snapUp  (gmax.z);
+
+        const int nx = int(std::llround((gmax.x - gmin.x) / h)) + 1;
+        const int ny = int(std::llround((gmax.y - gmin.y) / h)) + 1;
+        const int nz = int(std::llround((gmax.z - gmin.z) / h)) + 1;
+
+        if (nx <= 0 || ny <= 0 || nz <= 0) return info;
+
+        info.gridMin = gmin;
+        info.gridNodeSize = make_int3(nx, ny, nz);
+        info.gridNodeLSF.assign(size_t(nx) * size_t(ny) * size_t(nz), 0.0);
+
+        auto idx3 = [&](int i, int j, int k) -> size_t
+        {
+            return size_t((k * ny + j) * nx + i);
+        };
+
+        // ---------------------------------------------------------
+        // Signed distance to an axis-aligned box (SDF)
+        // Reference: iq's box SDF (adapted to "inside positive")
+        // We first compute outside distance (>=0) and inside distance (<=0),
+        // then flip sign so that inside is positive.
+        // ---------------------------------------------------------
+        for (int k = 0; k < nz; ++k)
+        {
+            const double z = gmin.z + double(k) * h;
+
+            for (int j = 0; j < ny; ++j)
+            {
+                const double y = gmin.y + double(j) * h;
+
+                for (int i = 0; i < nx; ++i)
+                {
+                    const double x = gmin.x + double(i) * h;
+                    const double3 p = make_double3(x, y, z);
+
+                    // Box center and half extents
+                    const double3 c = 0.5 * (bmin + bmax);
+                    const double3 e = 0.5 * (bmax - bmin);
+
+                    // q = abs(p - c) - e
+                    const double3 d = make_double3(std::fabs(p.x - c.x) - e.x,
+                                                std::fabs(p.y - c.y) - e.y,
+                                                std::fabs(p.z - c.z) - e.z);
+
+                    // outside distance
+                    const double3 d_out = make_double3(std::max(d.x, 0.0),
+                                                    std::max(d.y, 0.0),
+                                                    std::max(d.z, 0.0));
+                    const double outside = length(d_out);
+
+                    // inside distance (negative or zero)
+                    const double inside = std::min(std::max(d.x, std::max(d.y, d.z)), 0.0);
+
+                    // Standard box SDF: sdf = outside + inside (inside <= 0)
+                    const double sdf = outside + inside;
+
+                    // Convention required:
+                    //   inside  -> positive
+                    //   outside -> negative
+                    info.gridNodeLSF[idx3(i, j, k)] = -sdf;
+                }
+            }
+        }
+
+        for (const auto& ptr: info.gridNodeLSF)
+        {
+            wallLSFV_.pushHost(ptr);
+        }
+        wallGridNodeOrigin_ = info.gridMin;
+        wallGridNodeSize_ = info.gridNodeSize;
+        wallGridSpacing_ = info.gridSpacing;
+    }
+
     void solve(const double3 minBoundary, 
     const double3 maxBoundary, 
     const double3 gravity, 
