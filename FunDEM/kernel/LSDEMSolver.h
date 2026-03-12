@@ -336,6 +336,8 @@ private:
             LSParticleInteraction_.objectPointed_.allocateDevice(levelSetBoundaryNode_.deviceSize(), stream_);
             LSParticleInteraction_.objectPointing_.allocateDevice(levelSetParticle_.deviceSize(), stream_);
         }
+
+        wallLSFV_.copyHostToDevice(stream_);
     }
 
     void initializeSpatialGrid(const double3 minBoundary, const double3 maxBoundary)
@@ -538,6 +540,25 @@ CUDA_CHECK(cudaGetLastError());
 #ifndef NDEBUG
 CUDA_CHECK(cudaGetLastError());
 #endif
+        }
+
+        if (wallLSFV_.deviceSize() >= 8)
+        {
+            launchAddLevelSetParticleWallForce(levelSetParticle_.force(),
+            levelSetParticle_.position(),
+            levelSetParticle_.orientation(), 
+            levelSetParticle_.inverseMass(),
+            levelSetParticle_.materialID(),
+            levelSetBoundaryNode_.localPosition(),
+            levelSetBoundaryNode_.particleID(),
+            wallLSFV_.d_ptr,
+            wallGridSpacing_,
+            wallGridNodeOrigin_,
+            wallGridNodeSize_,
+            levelSetBoundaryNode_.deviceSize(),
+            levelSetBoundaryNode_.gridDim(),
+            levelSetBoundaryNode_.blockDim(),
+            stream_);
         }
     }
 
@@ -780,6 +801,21 @@ CUDA_CHECK(cudaGetLastError());
         return levelSetParticle_.torque();
     }
 
+    std::vector<double3> getLSParticlePosition()
+    {
+        return levelSetParticle_.positionHostCopy();
+    }
+
+    std::vector<double3> getLSParticleVelocity()
+    {
+        return levelSetParticle_.velocityHostCopy();
+    }
+
+    std::vector<double3> getLSParticleAngularVelocity()
+    {
+        return levelSetParticle_.angularVelocityHostCopy();
+    }
+
     std::vector<int> getLevelSetParticlePairA()
     { 
         std::vector<int> a = LSParticleInteraction_.pair_.objectPointingHostCopy();
@@ -908,7 +944,7 @@ public:
     }
 
     void addLSParticle(const std::vector<double3>& globalPosition_boundaryNode,
-    const std::vector<double>& gridNodeLSFV, //The grid number is calculated by gN_x + gridNodeSize.x * (gN_y + gridNodeSize.y * gN_z)
+    const std::vector<double>& gridNodeLSFV, //The grid node index is calculated by gN_x + gridNodeSize.x * (gN_y + gridNodeSize.y * gN_z)
     const double3 gridNodeGlobalOrigin,
     const int3 gridNodeSize,
     const double gridSpacing,
@@ -1080,31 +1116,6 @@ public:
         angularvelocity);
     }
 
-    void addFixedLSSuperellipsoid(const double rx, 
-    const double ry, 
-    const double rz, 
-    const double ee, 
-    const double en,
-    const double3 position,
-    const int materialID,
-    const int nPoints = 10000)
-    {
-        superellipsoidParams s;
-        s.rx = rx;
-        s.ry = ry;
-        s.rz = rz;
-        s.ee = ee;
-        s.en = en;
-        LevelSetParticleGridInfo ls = buildLevelSetSuperellipsoidGridGlobal(s, position);
-        std::vector<double3> sp = generateSuperellipsoidSurfacePointsGlobal_Uniform(s, position, nPoints);
-        addFixedLSParticle(sp, 
-        ls.gridNodeLSF, 
-        ls.gridMin, 
-        ls.gridNodeSize, 
-        ls.gridSpacing, 
-        materialID);
-    }
-
     void solve(const double3 minBoundary, 
     const double3 maxBoundary, 
     const double3 gravity, 
@@ -1202,4 +1213,9 @@ private:
 
     solidInteraction LSParticleInteraction_;
     LSBondedInteraction LSBondedInteraction_;
+
+    HostDeviceArray1D<double> wallLSFV_;
+    double3 wallGridNodeOrigin_;
+    int3 wallGridNodeSize_;
+    double wallGridSpacing_;
 };

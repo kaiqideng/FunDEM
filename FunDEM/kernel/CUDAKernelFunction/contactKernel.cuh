@@ -138,7 +138,7 @@ const double timeStep)
 	{
 		double3 springPrev1 = springPrev - dot(springPrev, contactNormal) * contactNormal;
 		double absoluteSpringPrev1 = length(springPrev1);
-		if (absoluteSpringPrev1 > 1.e-10)
+		if (absoluteSpringPrev1 > 1e-10)
 		{
 			springPrev1 *= length(springPrev) / absoluteSpringPrev1;
 		}
@@ -417,31 +417,43 @@ double& tOut)
 
 // ------------------------------------------------------------
 // Edge-contact test (strictly edge interior, not vertices)
+// Optimized: fewer temporaries + early exits + scale-aware eps
 // ------------------------------------------------------------
-__device__ __forceinline__ bool isSphereEdgeContact(const double3& edgeP0,
-const double3& edgeP1,
-const double3& sphereCenter,
-const double sphereRadius)
+__device__ __forceinline__ bool isSphereEdgeContact(const double3& p0,
+const double3& p1,
+const double3& c,
+const double  r)
 {
-    const double3 e = edgeP1 - edgeP0;
-    const double e2 = dot(e, e);
+    const double3 e = p1 - p0;
+    const double  e2 = dot(e, e);
     if (e2 <= 1e-30) return false;
 
-    const double3 v = sphereCenter - edgeP0;
-    const double t = dot(v, e) / e2;
+    // Project center onto edge line: t in R
+    const double3 v = c - p0;
+    const double  t = dot(v, e) / e2;
 
-    // Interior only: exclude endpoints (t<=0 or t>=1 => vertex contact)
-    // Use a tiny margin to avoid numerical flicker near vertices.
-    const double tEps = 1e-14;
+    // Interior only (exclude endpoints) with a scale-aware margin.
+    // A good choice: epsilon in parameter space roughly corresponds to
+    // a small physical length along the edge.
+    const double edgeLen = sqrt(e2);
+    const double physEps = 1e-12 * fmax(1.0, edgeLen); // physical tiny length
+    const double tEps = physEps / edgeLen; // convert to [0,1] param
+    // (edgeLen>0 ensured above)
     if (t <= tEps || t >= 1.0 - tEps) return false;
 
-    const double3 q = edgeP0 + e * t;
-    const double r2 = sphereRadius * sphereRadius;
+    // Closest point q = p0 + t*e
+    const double3 q = p0 + e * t;
 
-    // Scale-aware epsilon on distance^2
+    // Distance^2 check (inline, no helper call)
+    const double3 d  = c - q;
+    const double  d2 = dot(d, d);
+
+    const double r2 = r * r;
+
+    // Scale-aware tolerance on d2
     const double eps2 = 1e-12 * fmax(1.0, r2);
 
-    return dist2(sphereCenter, q) <= r2 + eps2;
+    return d2 <= r2 + eps2;
 }
 
 // ------------------------------------------------------------
@@ -750,6 +762,25 @@ const int* materialID,
 const double dt,
 
 const size_t numBondedInteraction,
+const size_t gridD,
+const size_t blockD,
+cudaStream_t stream);
+
+extern "C" void launchAddLevelSetParticleWallForce(double3* force_p,
+const double3* position_p,
+const quaternion* orientation_p,
+const double* inverseMass_p,
+const int* materialID_p,
+
+const double3* localPosition_bNode,
+const int* particleID_bNode,
+
+const double* LSFV_w,
+const double gridSpacing_w,
+const double3 gridNodeGlobalOrigin_w,
+const int3 gridNodeSize_w,
+
+const size_t numBoundaryNode,
 const size_t gridD,
 const size_t blockD,
 cudaStream_t stream);

@@ -1,7 +1,7 @@
 #include "contactKernel.cuh"
-#include "myQua.h"
+#include "levelSetParticleContactDetectionKernel.cuh"
+#include "myUtility/myQua.h"
 #include "myUtility/contactParameters.h"
-#include "myVec.h"
 
 __constant__ paramsDevice para;
 
@@ -227,7 +227,7 @@ const size_t numInteraction)
     const double mu_r = getFrictionParam(ip, f_MUR);
     const double mu_t = getFrictionParam(ip, f_MUT);
     const double k_n = getLinearStiffnessParam(ip, l_KN);
-    if (k_n > 1.e-20)
+    if (k_n > 1.e-10)
     {
         const double k_s = getLinearStiffnessParam(ip, l_KS);
         const double k_r = getLinearStiffnessParam(ip, l_KR);
@@ -241,7 +241,7 @@ const size_t numInteraction)
     {
 		const double E_i = getYoungsModulusParam(mat_i);
 		const double E_j = getYoungsModulusParam(mat_j);
-		if (E_i < 1.e-20 || E_j < 1.e-20) return;
+		if (E_i < 1.e-10 || E_j < 1.e-10) return;
 		const double nu_i = getPoissonRatioParam(mat_i);
 		const double nu_j = getPoissonRatioParam(mat_j);
 		const double G_i = E_i / (2. * (1. + nu_i));
@@ -345,7 +345,7 @@ const size_t numBall)
 				if (type1 == SphereTriangleContactType::None) continue;
 				else if (type1 == SphereTriangleContactType::Face)
 				{
-					if (lengthSquared(cross(r_c - p01, p11 - p01)) < 1.e-20) 
+					if (lengthSquared(cross(r_c - p01, p11 - p01)) < 1.e-10) 
 					{
 						slidingSpring[idx_c] = slidingSpring[idx_c1];
 						rollingSpring[idx_c] = rollingSpring[idx_c1];
@@ -353,7 +353,7 @@ const size_t numBall)
 						cancelFlag[idx_c] = 1;
 						break;
 					}
-					if (lengthSquared(cross(r_c - p11, p21 - p11)) < 1.e-20)
+					if (lengthSquared(cross(r_c - p11, p21 - p11)) < 1.e-10)
 					{
 						slidingSpring[idx_c] = slidingSpring[idx_c1];
 						rollingSpring[idx_c] = rollingSpring[idx_c1];
@@ -361,7 +361,7 @@ const size_t numBall)
 						cancelFlag[idx_c] = 1;
 						break;
 					}
-					if (lengthSquared(cross(r_c - p01, p21 - p01)) < 1.e-20) 
+					if (lengthSquared(cross(r_c - p01, p21 - p01)) < 1.e-10) 
 					{
 						slidingSpring[idx_c] = slidingSpring[idx_c1];
 						rollingSpring[idx_c] = rollingSpring[idx_c1];
@@ -376,7 +376,7 @@ const size_t numBall)
 					{
 						if (idx_c1 < idx_c)
 						{
-							if (lengthSquared(r_c - r_c1) < 1.e-20)
+							if (lengthSquared(r_c - r_c1) < 1.e-10)
 							{
 								slidingSpring[idx_c] = slidingSpring[idx_c1];
 								rollingSpring[idx_c] = rollingSpring[idx_c1];
@@ -388,7 +388,7 @@ const size_t numBall)
 					}
 					else 
 					{
-						if (lengthSquared(r_c - r_c1) < 1.e-20)
+						if (lengthSquared(r_c - r_c1) < 1.e-10)
 						{
 							slidingSpring[idx_c] = slidingSpring[idx_c1];
 							rollingSpring[idx_c] = rollingSpring[idx_c1];
@@ -404,7 +404,7 @@ const size_t numBall)
 					{
 						if (idx_c1 < idx_c)
 						{
-							if (lengthSquared(r_c - r_c1) < 1.e-20)
+							if (lengthSquared(r_c - r_c1) < 1.e-10)
 							{
 								slidingSpring[idx_c] = slidingSpring[idx_c1];
 								rollingSpring[idx_c] = rollingSpring[idx_c1];
@@ -450,7 +450,7 @@ const size_t numBall)
 {
     size_t idx_i = blockIdx.x * blockDim.x + threadIdx.x;
 	if (idx_i >= numBall) return;
-	if (inverseMass[idx_i] < 1.e-20) return;
+	if (inverseMass[idx_i] < 1.e-10) return;
 
 	const int mat_i = materialID[idx_i];
 	const double E_i = getYoungsModulusParam(mat_i);
@@ -504,7 +504,7 @@ const size_t numBall)
 		const double mu_r = getFrictionParam(ip, f_MUR);
 		const double mu_t = getFrictionParam(ip, f_MUT);
 		const double k_n = getLinearStiffnessParam(ip, l_KN);
-		if (k_n > 1.e-20)
+		if (k_n > 1.e-10)
 		{
 			const double k_s = getLinearStiffnessParam(ip, l_KS);
 			const double k_r = getLinearStiffnessParam(ip, l_KR);
@@ -517,7 +517,7 @@ const size_t numBall)
 		else
 		{
 			const double E_j = getYoungsModulusParam(mat_j);
-			if (E_i < 1.e-20 && E_j < 1.e-20) return;
+			if (E_i < 1.e-10 && E_j < 1.e-10) return;
 			const double nu_j = getPoissonRatioParam(mat_j);
 			const double G_j = E_j / (2. * (1. + nu_j));
 			const double E_ij = E_i * E_j / (E_j * (1. +  nu_i * nu_i) + E_i * (1. +  nu_j * nu_j));
@@ -661,6 +661,73 @@ const size_t numBondedInteraction)
 	contactTorque[idx_c] += T_t * n_ij + T_b;
 }
 
+__global__ void calLevelSetParticleContactForceTorqueKernel(double3* contactForce, 
+double3* slidingSpring, 
+double3* force_p,
+double3* torque_p,
+
+const double3* contactPoint,
+const double3* contactNormal,
+const double* overlap,
+const int* objectPointed, 
+const int* objectPointing, 
+
+const int* particleID_bNode,
+
+const double3* position_p, 
+const double3* velocity_p, 
+const double3* angularVelocity_p,
+const int* materialID_p,
+const double dt,
+const size_t numInteraction)
+{
+    size_t idx = blockIdx.x * blockDim.x + threadIdx.x;
+	if (idx >= numInteraction) return;
+
+	contactForce[idx] = make_double3(0., 0., 0.);
+
+	const int idx_i = particleID_bNode[objectPointed[idx]];
+	const int idx_j = objectPointing[idx];
+
+    const double3 r_c = contactPoint[idx];
+    const double3 n_ij = contactNormal[idx];
+	const double delta = overlap[idx];
+	
+    const double3 r_i = position_p[idx_i];
+	const double3 r_j = position_p[idx_j];
+
+	const double3 v_i = velocity_p[idx_i];
+	const double3 v_j = velocity_p[idx_j];
+	const double3 w_i = angularVelocity_p[idx_i];
+	const double3 w_j = angularVelocity_p[idx_j];
+	const double3 v_c_ij = v_i + cross(w_i, r_c - r_i) - (v_j + cross(w_j, r_c - r_j));
+	const double3 w_ij = w_i - w_j;
+
+	double3 F_c = make_double3(0, 0, 0);
+	double3 epsilon_s = slidingSpring[idx];
+
+    const int mat_i = materialID_p[idx_i];
+	const int mat_j = materialID_p[idx_j];
+    const int ip = contactParameterIndex(mat_i, mat_j, para.nMaterials, para.cap);
+
+	const double mu_s = getFrictionParam(ip, f_MUS);
+
+    const double k_n = getLinearStiffnessParam(ip, l_KN);
+    const double k_s = getLinearStiffnessParam(ip, l_KS);
+
+	LinearContactForLevelSetParticle(F_c, epsilon_s, 
+	v_c_ij, w_ij, n_ij, delta, dt, 
+	k_n, k_s, mu_s);
+
+    contactForce[idx] = F_c;
+	slidingSpring[idx] = epsilon_s;
+
+	atomicAddDouble3(force_p, idx_i, F_c);
+	atomicAddDouble3(torque_p, idx_i, cross(r_c - r_i, F_c));
+	atomicAddDouble3(force_p, idx_j, -F_c);
+	atomicAddDouble3(torque_p, idx_j, cross(r_c - r_j, -F_c));
+}
+
 __global__ void addLevelSetParticleBondedForceTorqueKernel(double3* bondPoint,
 double3* bondNormal,
 double3* shearForce, 
@@ -763,71 +830,103 @@ const size_t numBondedInteraction)
 	atomicAddDouble3(torque, idx_j, -T_t * n_ij - T_b + cross(r_c - r_j, -F_s));
 }
 
-__global__ void calLevelSetParticleContactForceTorqueKernel(double3* contactForce, 
-double3* slidingSpring, 
-double3* force_p,
-double3* torque_p,
+__global__ void addLevelSetParticleWallForce(double3* force_p,
 
-const double3* contactPoint,
-const double3* contactNormal,
-const double* overlap,
-const int* objectPointed, 
-const int* objectPointing, 
-
-const int* particleID_bNode,
-
-const double3* position_p, 
-const double3* velocity_p, 
-const double3* angularVelocity_p,
+const double3* position_p,
+const quaternion* orientation_p,
+const double* inverseMass_p,
 const int* materialID_p,
-const double dt,
-const size_t numInteraction)
+
+const double3* localPosition_bNode, 
+const int* particleID_bNode, 
+
+const double* LSFV_w, 
+const double gridSpacing_w,
+const double3 gridNodeGlobalOrigin_w,
+const int3 gridNodeSize_w,
+
+const size_t numBoundaryNode)
 {
-    size_t idx = blockIdx.x * blockDim.x + threadIdx.x;
-	if (idx >= numInteraction) return;
+    int idx = blockIdx.x * blockDim.x + threadIdx.x;
+    if (idx >= numBoundaryNode) return;
 
-	contactForce[idx] = make_double3(0., 0., 0.);
+    const int idx_i = particleID_bNode[idx];
+	if (inverseMass_p[idx_i] <= 0.) return;
 
-	const int idx_i = particleID_bNode[objectPointed[idx]];
-	const int idx_j = objectPointing[idx];
+    const double3 globalPosition_idx = rotateVectorByQuaternion(orientation_p[idx_i], localPosition_bNode[idx]) + position_p[idx_i];
+    const double gx = (globalPosition_idx.x - gridNodeGlobalOrigin_w.x) / gridSpacing_w;
+    const double gy = (globalPosition_idx.y - gridNodeGlobalOrigin_w.y) / gridSpacing_w;
+    const double gz = (globalPosition_idx.z - gridNodeGlobalOrigin_w.z) / gridSpacing_w;
 
-    const double3 r_c = contactPoint[idx];
-    const double3 n_ij = contactNormal[idx];
-	const double delta = overlap[idx];
-	
-    const double3 r_i = position_p[idx_i];
-	const double3 r_j = position_p[idx_j];
+    int i0 = (int)floor(gx);
+    int j0 = (int)floor(gy);
+    int k0 = (int)floor(gz);
 
-	const double3 v_i = velocity_p[idx_i];
-	const double3 v_j = velocity_p[idx_j];
-	const double3 w_i = angularVelocity_p[idx_i];
-	const double3 w_j = angularVelocity_p[idx_j];
-	const double3 v_c_ij = v_i + cross(w_i, r_c - r_i) - (v_j + cross(w_j, r_c - r_j));
-	const double3 w_ij = w_i - w_j;
+    if (i0 < 0) return;
+    if (j0 < 0) return;
+    if (k0 < 0) return;
 
-	double3 F_c = make_double3(0, 0, 0);
-	double3 epsilon_s = slidingSpring[idx];
+    if (i0 >= gridNodeSize_w.x - 1) return;
+    if (j0 >= gridNodeSize_w.y - 1) return;
+    if (k0 >= gridNodeSize_w.z - 1) return;
 
-    const int mat_i = materialID_p[idx_i];
-	const int mat_j = materialID_p[idx_j];
-    const int ip = contactParameterIndex(mat_i, mat_j, para.nMaterials, para.cap);
+    const int i1 = i0 + 1;
+    const int j1 = j0 + 1;
+    const int k1 = k0 + 1;
 
-	const double mu_s = getFrictionParam(ip, f_MUS);
+    const double x = gx - static_cast<double>(i0);
+    const double y = gy - static_cast<double>(j0);
+    const double z = gz - static_cast<double>(k0);
 
-    const double k_n = getLinearStiffnessParam(ip, l_KN);
-    const double k_s = getLinearStiffnessParam(ip, l_KS);
+    const double phi000 = LSFV_w[(i0 + gridNodeSize_w.x * (j0 + gridNodeSize_w.y * k0))];
+    const double phi100 = LSFV_w[(i1 + gridNodeSize_w.x * (j0 + gridNodeSize_w.y * k0))];
+    const double phi010 = LSFV_w[(i0 + gridNodeSize_w.x * (j1 + gridNodeSize_w.y * k0))];
+    const double phi110 = LSFV_w[(i1 + gridNodeSize_w.x * (j1 + gridNodeSize_w.y * k0))];
+    const double phi001 = LSFV_w[(i0 + gridNodeSize_w.x * (j0 + gridNodeSize_w.y * k1))];
+    const double phi101 = LSFV_w[(i1 + gridNodeSize_w.x * (j0 + gridNodeSize_w.y * k1))];
+    const double phi011 = LSFV_w[(i0 + gridNodeSize_w.x * (j1 + gridNodeSize_w.y * k1))];
+    const double phi111 = LSFV_w[(i1 + gridNodeSize_w.x * (j1 + gridNodeSize_w.y * k1))];
 
-	LinearContactForLevelSetParticle(F_c, epsilon_s, 
-	v_c_ij, w_ij, n_ij, delta, dt, 
-	k_n, k_s, mu_s);
+    const double ovelap = -interpolateLevelSetFunctionValue(x, 
+    y, 
+    z, 
+    phi000,
+    phi100,
+    phi010,
+    phi110,
+    phi001,
+    phi101, 
+    phi011,
+    phi111);
 
-    contactForce[idx] = F_c;
-	slidingSpring[idx] = epsilon_s;
+    if (ovelap > 0.) 
+    {
+        neighborCount_bNode[idx] = 1;
+        const double3 n_c = interpolateLevelSetFunctionGradient(x, 
+        y, 
+        z, 
+        g,
+        phi000,
+        phi100,
+        phi010,
+        phi110,
+        phi001,
+        phi101, 
+        phi011,
+        phi111);
+        const double3 p_c = globalPosition_idx + 0.5 * ovelap * n_c;
 
-	atomicAddDouble3(force_p, idx_i, F_c);
-	atomicAddDouble3(torque_p, idx_i, cross(r_c - r_i, F_c));
-	atomicAddDouble3(force_p, idx_j, -F_c);
-	atomicAddDouble3(torque_p, idx_j, cross(r_c - r_j, -F_c));
+		const double3 r_i = position[idx_i];
+		const double3 v_i = velocity[idx_i];
+		const double3 w_i = angularVelocity[idx_i];
+		const double3 v_c = v_i + cross(w_i, r_c - r_i);
+
+		const int ip = contactParameterIndex(materialID[idx_i], materialID[idx_i], para.nMaterials, para.cap);
+		const double k_n = getLinearStiffnessParam(ip, l_KN);
+		const double3 force_n = kn * ovelap * n_c;
+
+		atomicAddDouble3(force, idx_i, force_n);
+    }
 }
 
 __global__ void sumObjectPointedForceTorqueFromInteractionKernel(double3* force, 
@@ -1229,4 +1328,41 @@ cudaStream_t stream)
     materialID,
     dt,
     numBondedInteraction);
+}
+
+extern "C" void launchAddLevelSetParticleWallForce(double3* force_p,
+const double3* position_p,
+const quaternion* orientation_p,
+const double* inverseMass_p,
+const int* materialID_p,
+
+const double3* localPosition_bNode,
+const int* particleID_bNode,
+
+const double* LSFV_w,
+const double gridSpacing_w,
+const double3 gridNodeGlobalOrigin_w,
+const int3 gridNodeSize_w,
+
+const size_t numBoundaryNode,
+const size_t gridD,
+const size_t blockD,
+cudaStream_t stream)
+{
+    addLevelSetParticleWallForce<<<gridD, blockD, 0, stream>>>(force_p,
+
+    position_p,
+    orientation_p,
+    inverseMass_p,
+    materialID_p,
+
+    localPosition_bNode,
+    particleID_bNode,
+
+    LSFV_w,
+    gridSpacing_w,
+    gridNodeGlobalOrigin_w,
+    gridNodeSize_w,
+
+    numBoundaryNode);
 }

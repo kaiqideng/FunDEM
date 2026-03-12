@@ -1,7 +1,7 @@
 #include "levelSetParticleContactDetectionKernel.cuh"
+#include "neighborSearchKernel.cuh"
 #include "buildHashStartEnd.cuh"
 #include "myVec.h"
-#include "neighborSearchKernel.cuh"
 
 __global__ void countLevelSetBoundaryNodeInteractionsKernel(int* neighborCount_bNode,
 const double3* localPosition_bNode, 
@@ -270,7 +270,7 @@ const size_t numBoundaryNode)
                         phi111);
                         n_c = rotateVectorByQuaternion(orientation_p[idxB], n_c); // boundary node is pointed
                         n_c = normalize(n_c);
-                        const double3 p_c = globalPosition_idx + 0.5 * ovelap * n_c;
+                        double3 p_c = globalPosition_idx + 0.5 * ovelap * n_c;
                         const int index_w = base_w + count;
                         contactPoint[index_w] = p_c;
                         contactNormal[index_w] = n_c;
