@@ -1,7 +1,7 @@
 #include "contactKernel.cuh"
 #include "levelSetParticleContactDetectionKernel.cuh"
 #include "myUtility/myQua.h"
-#include "myUtility/contactParameters.h"
+#include "myUtility/myContactParameters.h"
 
 __constant__ paramsDevice para;
 
@@ -43,7 +43,7 @@ cudaStream_t stream)
 
 		auto pairIdx = [&](int a, int b) -> std::size_t
 		{
-			return static_cast<std::size_t>(contactParameterIndex(a, b, nMat, static_cast<int>(pairTableSize_)));
+			return static_cast<std::size_t>(upperTriangularIndex(a, b, nMat, static_cast<int>(pairTableSize_)));
 		};
 
 		for (const auto& row : frictionTable)
@@ -216,7 +216,7 @@ const size_t numInteraction)
 
     const int mat_i = materialID[idx_i];
 	const int mat_j = materialID[idx_j];
-    const int ip = contactParameterIndex(mat_i, mat_j, para.nMaterials, para.cap);
+    const int ip = upperTriangularIndex(mat_i, mat_j, para.nMaterials, para.cap);
 
 	const double e_i = getRestitutionCoefficientParam(mat_i);
 	const double e_j = getRestitutionCoefficientParam(mat_j);
@@ -494,7 +494,7 @@ const size_t numBall)
 		double3 epsilon_t = torsionSpring[idx_c];
 
         const int mat_j = materialID_w[idx_w];
-		const int ip = contactParameterIndex(mat_i, mat_j, para.nMaterials, para.cap);
+		const int ip = upperTriangularIndex(mat_i, mat_j, para.nMaterials, para.cap);
 
 		const double e_j = getRestitutionCoefficientParam(mat_j);
 		const double e_ij = 2. * e_i * e_j / (e_i + e_j);
@@ -623,7 +623,7 @@ const size_t numBondedInteraction)
 	const double3 w_j = angularVelocity[idx_j];
 	const double3 v_c_ij = v_i + cross(w_i, r_c - r_i) - (v_j + cross(w_j, r_c - r_j));
 
-    const int ip = contactParameterIndex(materialID[idx_i], materialID[idx_j], para.nMaterials, para.cap);
+    const int ip = upperTriangularIndex(materialID[idx_i], materialID[idx_j], para.nMaterials, para.cap);
 	const double gamma = getBondParam(ip, b_GAMMA);
     const double E = getBondParam(ip, b_E);
     const double k_n_k_s = getBondParam(ip, b_KNKS);
@@ -650,10 +650,12 @@ const size_t numBondedInteraction)
 
 	if (!flag)
 	{
-		atomicAddDouble3(force, idx_i, F_n * n_ij + F_s);
-		atomicAddDouble3(torque, idx_i, T_t * n_ij + T_b + cross(r_c - r_i, F_s));
-		atomicAddDouble3(force, idx_j, -F_n * n_ij - F_s);
-		atomicAddDouble3(torque, idx_j, -T_t * n_ij - T_b + cross(r_c - r_j, -F_s));
+		const double3 F_c = F_n * n_ij + F_s;
+		const double3 T_c = T_t * n_ij + T_b;
+		atomicAddDouble3(force, idx_i, F_c);
+		atomicAddDouble3(torque, idx_i, T_c + cross(r_c - r_i, F_c));
+		atomicAddDouble3(force, idx_j, -F_c);
+		atomicAddDouble3(torque, idx_j, -T_c + cross(r_c - r_j, -F_c));
 		return;
 	}
 
@@ -708,7 +710,7 @@ const size_t numInteraction)
 
     const int mat_i = materialID_p[idx_i];
 	const int mat_j = materialID_p[idx_j];
-    const int ip = contactParameterIndex(mat_i, mat_j, para.nMaterials, para.cap);
+    const int ip = upperTriangularIndex(mat_i, mat_j, para.nMaterials, para.cap);
 
 	const double mu_s = getFrictionParam(ip, f_MUS);
 
@@ -788,7 +790,7 @@ const size_t numBondedInteraction)
 	bondPoint[idx] = r_c;
     bondNormal[idx] = n_ij;
 
-	const int ip = contactParameterIndex(materialID[idx_i], materialID[idx_j], para.nMaterials, para.cap);
+	const int ip = upperTriangularIndex(materialID[idx_i], materialID[idx_j], para.nMaterials, para.cap);
     const double E = getBondParam(ip, b_E);
     const double k_n_k_s = getBondParam(ip, b_KNKS);
 	const double sigma_s = getBondParam(ip, b_SIGMAS);
@@ -824,13 +826,16 @@ const size_t numBondedInteraction)
 	maxNormalStress[idx] = sigma_max;
 	maxShearStress[idx] = tau_max;
 
-	atomicAddDouble3(force, idx_i, F_n * n_ij + F_s);
-	atomicAddDouble3(torque, idx_i, T_t * n_ij + T_b + cross(r_c - r_i, F_s));
-	atomicAddDouble3(force, idx_j, -F_n * n_ij - F_s);
-	atomicAddDouble3(torque, idx_j, -T_t * n_ij - T_b + cross(r_c - r_j, -F_s));
+    const double3 F_c = F_n * n_ij + F_s;
+	const double3 T_c = T_t * n_ij + T_b;
+	atomicAddDouble3(force, idx_i, F_c);
+	atomicAddDouble3(torque, idx_i, T_c + cross(r_c - r_i, F_c));
+	atomicAddDouble3(force, idx_j, -F_c);
+	atomicAddDouble3(torque, idx_j, -T_c + cross(r_c - r_j, -F_c));
 }
 
 __global__ void addLevelSetParticleWallForce(double3* force_p,
+double3* torque_p,
 
 const double3* position_p,
 const quaternion* orientation_p,
@@ -853,7 +858,8 @@ const size_t numBoundaryNode)
     const int idx_i = particleID_bNode[idx];
 	if (inverseMass_p[idx_i] <= 0.) return;
 
-    const double3 globalPosition_idx = rotateVectorByQuaternion(orientation_p[idx_i], localPosition_bNode[idx]) + position_p[idx_i];
+    const double3 r_i = position_p[idx_i];
+    const double3 globalPosition_idx = rotateVectorByQuaternion(orientation_p[idx_i], localPosition_bNode[idx]) + r_i;
     const double gx = (globalPosition_idx.x - gridNodeGlobalOrigin_w.x) / gridSpacing_w;
     const double gy = (globalPosition_idx.y - gridNodeGlobalOrigin_w.y) / gridSpacing_w;
     const double gz = (globalPosition_idx.z - gridNodeGlobalOrigin_w.z) / gridSpacing_w;
@@ -878,14 +884,14 @@ const size_t numBoundaryNode)
     const double y = gy - static_cast<double>(j0);
     const double z = gz - static_cast<double>(k0);
 
-    const double phi000 = LSFV_w[(i0 + gridNodeSize_w.x * (j0 + gridNodeSize_w.y * k0))];
-    const double phi100 = LSFV_w[(i1 + gridNodeSize_w.x * (j0 + gridNodeSize_w.y * k0))];
-    const double phi010 = LSFV_w[(i0 + gridNodeSize_w.x * (j1 + gridNodeSize_w.y * k0))];
-    const double phi110 = LSFV_w[(i1 + gridNodeSize_w.x * (j1 + gridNodeSize_w.y * k0))];
-    const double phi001 = LSFV_w[(i0 + gridNodeSize_w.x * (j0 + gridNodeSize_w.y * k1))];
-    const double phi101 = LSFV_w[(i1 + gridNodeSize_w.x * (j0 + gridNodeSize_w.y * k1))];
-    const double phi011 = LSFV_w[(i0 + gridNodeSize_w.x * (j1 + gridNodeSize_w.y * k1))];
-    const double phi111 = LSFV_w[(i1 + gridNodeSize_w.x * (j1 + gridNodeSize_w.y * k1))];
+	const double phi000 = LSFV_w[linearIndex3D(make_int3(i0, j0, k0), gridNodeSize_w)];
+	const double phi100 = LSFV_w[linearIndex3D(make_int3(i1, j0, k0), gridNodeSize_w)];
+	const double phi010 = LSFV_w[linearIndex3D(make_int3(i0, j1, k0), gridNodeSize_w)];
+	const double phi110 = LSFV_w[linearIndex3D(make_int3(i1, j1, k0), gridNodeSize_w)];
+	const double phi001 = LSFV_w[linearIndex3D(make_int3(i0, j0, k1), gridNodeSize_w)];
+	const double phi101 = LSFV_w[linearIndex3D(make_int3(i1, j0, k1), gridNodeSize_w)];
+	const double phi011 = LSFV_w[linearIndex3D(make_int3(i0, j1, k1), gridNodeSize_w)];
+	const double phi111 = LSFV_w[linearIndex3D(make_int3(i1, j1, k1), gridNodeSize_w)];
 
     const double ovelap = -interpolateLevelSetFunctionValue(x, 
     y, 
@@ -901,11 +907,9 @@ const size_t numBoundaryNode)
 
     if (ovelap > 0.) 
     {
-        neighborCount_bNode[idx] = 1;
-        const double3 n_c = interpolateLevelSetFunctionGradient(x, 
+        double3 n_c = interpolateLevelSetFunctionGradient(x, 
         y, 
         z, 
-        g,
         phi000,
         phi100,
         phi010,
@@ -914,18 +918,16 @@ const size_t numBoundaryNode)
         phi101, 
         phi011,
         phi111);
-        const double3 p_c = globalPosition_idx + 0.5 * ovelap * n_c;
 
-		const double3 r_i = position[idx_i];
-		const double3 v_i = velocity[idx_i];
-		const double3 w_i = angularVelocity[idx_i];
-		const double3 v_c = v_i + cross(w_i, r_c - r_i);
+		n_c = normalize(n_c);
+		const double3 r_c = globalPosition_idx + 0.5 * n_c * ovelap;
 
-		const int ip = contactParameterIndex(materialID[idx_i], materialID[idx_i], para.nMaterials, para.cap);
+		const int ip = upperTriangularIndex(materialID_p[idx_i], materialID_p[idx_i], para.nMaterials, para.cap);
 		const double k_n = getLinearStiffnessParam(ip, l_KN);
-		const double3 force_n = kn * ovelap * n_c;
+		double3 F_c = k_n * ovelap * n_c;
 
-		atomicAddDouble3(force, idx_i, force_n);
+		atomicAddDouble3(force_p, idx_i, F_c);
+		atomicAddDouble3(torque_p, idx_i, cross(r_c - r_i, F_c));
     }
 }
 
@@ -1331,6 +1333,7 @@ cudaStream_t stream)
 }
 
 extern "C" void launchAddLevelSetParticleWallForce(double3* force_p,
+double3* torque_p,
 const double3* position_p,
 const quaternion* orientation_p,
 const double* inverseMass_p,
@@ -1350,6 +1353,7 @@ const size_t blockD,
 cudaStream_t stream)
 {
     addLevelSetParticleWallForce<<<gridD, blockD, 0, stream>>>(force_p,
+	torque_p,
 
     position_p,
     orientation_p,

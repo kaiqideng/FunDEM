@@ -4,7 +4,7 @@ int main()
 {
     LSDEMSolver test(0);
     test.addLSSuperellipsoid(0.42, 1.0, 0.83, 0.1, 1.0, 
-    0, 1000., make_double3(0., 0., 0.), make_double3(0., 0., 0.), make_double3(0., 0., 0.));
+    0, 1000., make_double3(0., 0., 0.), make_double3(0., 0., 0.), make_double3(0., 0., 0.), make_quaternion(1., 0., 0., 0.));
     test.setLinearStiffness(0, 0, 6.e5, 1.8e5);
     test.setFriction(0, 0, 0.577);
 
@@ -29,7 +29,7 @@ int main()
             }
         }
     }
-    test.addFixedLSParticle(sp1, gridNodeLSF1, grdMin1, gridNodeSize1, gridSpacing1, 0);
+    test.addFixedLSParticle(sp1, gridNodeLSF1, grdMin1, gridNodeSize1, gridSpacing1, 0, make_double3(0., 0., 0.), make_quaternion(1., 0., 0., 0.));
 
     test.solve(make_double3(-1., -1., -2.), make_double3(1., 1., 1.), make_double3(0., 0., -9.81), 1.e-5, 1., 20, "levelSetParticleFall");
 }

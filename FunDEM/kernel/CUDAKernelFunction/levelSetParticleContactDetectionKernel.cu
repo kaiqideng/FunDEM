@@ -1,7 +1,6 @@
 #include "levelSetParticleContactDetectionKernel.cuh"
 #include "neighborSearchKernel.cuh"
 #include "buildHashStartEnd.cuh"
-#include "myVec.h"
 
 __global__ void countLevelSetBoundaryNodeInteractionsKernel(int* neighborCount_bNode,
 const double3* localPosition_bNode, 
@@ -49,7 +48,7 @@ const size_t numBoundaryNode)
             for (int xx = gridStart.x; xx <= gridEnd.x; xx++)
             {
                 const int3 gridPositionB = make_int3(gridPositionA.x + xx, gridPositionA.y + yy, gridPositionA.z + zz);
-                const int hashB = calculateHash(gridPositionB, gridSize);
+                const int hashB = linearIndex3D(gridPositionB, gridSize);
                 const int startIndex = cellHashStart[hashB];
                 if (startIndex == -1) continue;
                 const int endIndex = cellHashEnd[hashB];
@@ -92,14 +91,14 @@ const size_t numBoundaryNode)
 
                     int gridNodeStartB = 0;
                     if (idxB > 0) gridNodeStartB = gridNodePrefixSum_p[idxB - 1];
-                    const double phi000 = LSFV_gNode[gridNodeStartB + (i0 + gridNodeSizeB.x * (j0 + gridNodeSizeB.y * k0))];
-                    const double phi100 = LSFV_gNode[gridNodeStartB + (i1 + gridNodeSizeB.x * (j0 + gridNodeSizeB.y * k0))];
-                    const double phi010 = LSFV_gNode[gridNodeStartB + (i0 + gridNodeSizeB.x * (j1 + gridNodeSizeB.y * k0))];
-                    const double phi110 = LSFV_gNode[gridNodeStartB + (i1 + gridNodeSizeB.x * (j1 + gridNodeSizeB.y * k0))];
-                    const double phi001 = LSFV_gNode[gridNodeStartB + (i0 + gridNodeSizeB.x * (j0 + gridNodeSizeB.y * k1))];
-                    const double phi101 = LSFV_gNode[gridNodeStartB + (i1 + gridNodeSizeB.x * (j0 + gridNodeSizeB.y * k1))];
-                    const double phi011 = LSFV_gNode[gridNodeStartB + (i0 + gridNodeSizeB.x * (j1 + gridNodeSizeB.y * k1))];
-                    const double phi111 = LSFV_gNode[gridNodeStartB + (i1 + gridNodeSizeB.x * (j1 + gridNodeSizeB.y * k1))];
+                    const double phi000 = LSFV_gNode[gridNodeStartB + linearIndex3D(make_int3(i0, j0, k0), gridNodeSizeB)];
+                    const double phi100 = LSFV_gNode[gridNodeStartB + linearIndex3D(make_int3(i1, j0, k0), gridNodeSizeB)];
+                    const double phi010 = LSFV_gNode[gridNodeStartB + linearIndex3D(make_int3(i0, j1, k0), gridNodeSizeB)];
+                    const double phi110 = LSFV_gNode[gridNodeStartB + linearIndex3D(make_int3(i1, j1, k0), gridNodeSizeB)];
+                    const double phi001 = LSFV_gNode[gridNodeStartB + linearIndex3D(make_int3(i0, j0, k1), gridNodeSizeB)];
+                    const double phi101 = LSFV_gNode[gridNodeStartB + linearIndex3D(make_int3(i1, j0, k1), gridNodeSizeB)];
+                    const double phi011 = LSFV_gNode[gridNodeStartB + linearIndex3D(make_int3(i0, j1, k1), gridNodeSizeB)];
+                    const double phi111 = LSFV_gNode[gridNodeStartB + linearIndex3D(make_int3(i1, j1, k1), gridNodeSizeB)];
 
                     const double ovelap = -interpolateLevelSetFunctionValue(x, 
                     y, 
@@ -190,7 +189,7 @@ const size_t numBoundaryNode)
             for (int xx = gridStart.x; xx <= gridEnd.x; xx++)
             {
                 const int3 gridPositionB = make_int3(gridPositionA.x + xx, gridPositionA.y + yy, gridPositionA.z + zz);
-                const int hashB = calculateHash(gridPositionB, gridSize);
+                const int hashB = linearIndex3D(gridPositionB, gridSize);
                 const int startIndex = cellHashStart[hashB];
                 if (startIndex == -1) continue;
                 const int endIndex = cellHashEnd[hashB];
@@ -233,15 +232,15 @@ const size_t numBoundaryNode)
 
                     int gridNodeStartB = 0;
                     if (idxB > 0) gridNodeStartB = gridNodePrefixSum_p[idxB - 1];
-                    const double phi000 = LSFV_gNode[gridNodeStartB + (i0 + gridNodeSizeB.x * (j0 + gridNodeSizeB.y * k0))];
-                    const double phi100 = LSFV_gNode[gridNodeStartB + (i1 + gridNodeSizeB.x * (j0 + gridNodeSizeB.y * k0))];
-                    const double phi010 = LSFV_gNode[gridNodeStartB + (i0 + gridNodeSizeB.x * (j1 + gridNodeSizeB.y * k0))];
-                    const double phi110 = LSFV_gNode[gridNodeStartB + (i1 + gridNodeSizeB.x * (j1 + gridNodeSizeB.y * k0))];
-                    const double phi001 = LSFV_gNode[gridNodeStartB + (i0 + gridNodeSizeB.x * (j0 + gridNodeSizeB.y * k1))];
-                    const double phi101 = LSFV_gNode[gridNodeStartB + (i1 + gridNodeSizeB.x * (j0 + gridNodeSizeB.y * k1))];
-                    const double phi011 = LSFV_gNode[gridNodeStartB + (i0 + gridNodeSizeB.x * (j1 + gridNodeSizeB.y * k1))];
-                    const double phi111 = LSFV_gNode[gridNodeStartB + (i1 + gridNodeSizeB.x * (j1 + gridNodeSizeB.y * k1))];
-
+                    const double phi000 = LSFV_gNode[gridNodeStartB + linearIndex3D(make_int3(i0, j0, k0), gridNodeSizeB)];
+                    const double phi100 = LSFV_gNode[gridNodeStartB + linearIndex3D(make_int3(i1, j0, k0), gridNodeSizeB)];
+                    const double phi010 = LSFV_gNode[gridNodeStartB + linearIndex3D(make_int3(i0, j1, k0), gridNodeSizeB)];
+                    const double phi110 = LSFV_gNode[gridNodeStartB + linearIndex3D(make_int3(i1, j1, k0), gridNodeSizeB)];
+                    const double phi001 = LSFV_gNode[gridNodeStartB + linearIndex3D(make_int3(i0, j0, k1), gridNodeSizeB)];
+                    const double phi101 = LSFV_gNode[gridNodeStartB + linearIndex3D(make_int3(i1, j0, k1), gridNodeSizeB)];
+                    const double phi011 = LSFV_gNode[gridNodeStartB + linearIndex3D(make_int3(i0, j1, k1), gridNodeSizeB)];
+                    const double phi111 = LSFV_gNode[gridNodeStartB + linearIndex3D(make_int3(i1, j1, k1), gridNodeSizeB)];
+                    
                     const double ovelap = -interpolateLevelSetFunctionValue(x, 
                     y, 
                     z, 
@@ -259,7 +258,6 @@ const size_t numBoundaryNode)
                         double3 n_c = interpolateLevelSetFunctionGradient(x, 
                         y, 
                         z, 
-                        g,
                         phi000,
                         phi100,
                         phi010,

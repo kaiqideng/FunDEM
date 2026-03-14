@@ -34,7 +34,6 @@ const double phi111)
 __device__ __forceinline__ double3 interpolateLevelSetFunctionGradient(const int x, 
 const double y, 
 const double z, 
-const double g,
 const double phi000, 
 const double phi100,
 const double phi010,
@@ -72,11 +71,9 @@ const double phi111)
     (phi011 - phi010) * wx0 * wy1 +
     (phi111 - phi110) * wx1 * wy1;
 
-    const double invG = 1.0 / g;
-
-    return make_double3(dphidx_n * invG,
-    dphidy_n * invG,
-    dphidz_n * invG);
+    return make_double3(dphidx_n,
+    dphidy_n,
+    dphidz_n);
 }
 
 extern "C" void launchCountLevelSetBoundaryNodeInteractions(int* neighborCount_bNode,

@@ -767,6 +767,7 @@ const size_t blockD,
 cudaStream_t stream);
 
 extern "C" void launchAddLevelSetParticleWallForce(double3* force_p,
+double3* torque_p,
 const double3* position_p,
 const quaternion* orientation_p,
 const double* inverseMass_p,

@@ -198,3 +198,29 @@ HOST_DEVICE inline double3 rotateVectorAxisSin(const double3 v, const double3 ax
 
     return v * c + kxv * s + k * (kDotV * oneMinusC);
 }
+
+// Symmetric pair -> packed upper-triangular index (with fallback to last slot).
+// - (a,b) and (b,a) map to the same index.
+// - If a/b out of range, returns (capacity-1) as fallback.
+HOST_DEVICE inline int upperTriangularIndex(int row, int col, int n, int capacity)
+{
+    if (n <= 0 || capacity <= 0) return 0;
+    if (row < 0 || col < 0 || row >= n || col >= n) return capacity - 1;
+
+    int i = row;
+    int j = col;
+    if (i > j) { int t = i; i = j; j = t; }
+
+    long long idx = (static_cast<long long>(i) * (2LL * n - i + 1LL)) / 2LL + static_cast<long long>(j - i);
+
+    if (idx < 0) idx = 0;
+    if (idx >= capacity) idx = capacity - 1;
+
+    return static_cast<int>(idx);
+}
+
+// 3D index (ix,iy,iz) -> 1D linear index (row-major)
+HOST_DEVICE inline int linearIndex3D(const int3 ijk, const int3 dims)
+{
+    return ijk.z * dims.y * dims.x + ijk.y * dims.x + ijk.x;
+}

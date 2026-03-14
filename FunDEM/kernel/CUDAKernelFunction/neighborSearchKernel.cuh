@@ -8,11 +8,6 @@ __device__ __forceinline__ int3 calculateGridPosition(double3 position, const do
     int((position.z - minBoundary.z) / cellSize.z));
 }
 
-__device__ __forceinline__ int calculateHash(int3 gridPosition, const int3 gridSize)
-{
-    return gridPosition.z * gridSize.y * gridSize.x + gridPosition.y * gridSize.x + gridPosition.x;
-}
-
 extern "C" void launchUpdateSpatialGridCellHashStartEnd(double3* position, 
 int* hashIndex, 
 int* hashValue, 

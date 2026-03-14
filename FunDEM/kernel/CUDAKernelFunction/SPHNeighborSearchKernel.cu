@@ -36,7 +36,7 @@ const size_t numSPH)
             for (int xx = gridStart.x; xx <= gridEnd.x; xx++)
             {
                 int3 gridPositionB = make_int3(gridPositionA.x + xx, gridPositionA.y + yy, gridPositionA.z + zz);
-                int hashB = calculateHash(gridPositionB, gridSize);
+                int hashB = linearIndex3D(gridPositionB, gridSize);
                 int startIndex = cellHashStart[hashB];
                 if (startIndex == -1) continue;
                 int endIndex = cellHashEnd[hashB];
@@ -91,7 +91,7 @@ const size_t numSPH)
             for (int xx = gridStart.x; xx <= gridEnd.x; xx++)
             {
                 int3 gridPositionB = make_int3(gridPositionA.x + xx, gridPositionA.y + yy, gridPositionA.z + zz);
-                int hashB = calculateHash(gridPositionB, gridSize);
+                int hashB = linearIndex3D(gridPositionB, gridSize);
                 int startIndex = cellHashStart[hashB];
                 if (startIndex == -1) continue;
                 int endIndex = cellHashEnd[hashB];
@@ -148,7 +148,7 @@ const size_t numDummy)
             for (int xx = gridStart.x; xx <= gridEnd.x; xx++)
             {
                 int3 gridPositionB = make_int3(gridPositionA.x + xx, gridPositionA.y + yy, gridPositionA.z + zz);
-                int hashB = calculateHash(gridPositionB, gridSize);
+                int hashB = linearIndex3D(gridPositionB, gridSize);
                 int startIndex = cellHashStart[hashB];
                 if (startIndex == -1) continue;
                 int endIndex = cellHashEnd[hashB];
@@ -205,7 +205,7 @@ const size_t numDummy)
             for (int xx = gridStart.x; xx <= gridEnd.x; xx++)
             {
                 int3 gridPositionB = make_int3(gridPositionA.x + xx, gridPositionA.y + yy, gridPositionA.z + zz);
-                int hashB = calculateHash(gridPositionB, gridSize);
+                int hashB = linearIndex3D(gridPositionB, gridSize);
                 int startIndex = cellHashStart[hashB];
                 if (startIndex == -1) continue;
                 int endIndex = cellHashEnd[hashB];
@@ -264,7 +264,7 @@ const size_t numSPH)
             for (int xx = gridStart.x; xx <= gridEnd.x; xx++)
             {
                 int3 gridPositionB = make_int3(gridPositionA.x + xx, gridPositionA.y + yy, gridPositionA.z + zz);
-                int hashB = calculateHash(gridPositionB, gridSize);
+                int hashB = linearIndex3D(gridPositionB, gridSize);
                 int startIndex = cellHashStart[hashB];
                 if (startIndex == -1) continue;
                 int endIndex = cellHashEnd[hashB];
@@ -320,7 +320,7 @@ const size_t numSPH)
             for (int xx = gridStart.x; xx <= gridEnd.x; xx++)
             {
                 int3 gridPositionB = make_int3(gridPositionA.x + xx, gridPositionA.y + yy, gridPositionA.z + zz);
-                int hashB = calculateHash(gridPositionB, gridSize);
+                int hashB = linearIndex3D(gridPositionB, gridSize);
                 int startIndex = cellHashStart[hashB];
                 if (startIndex == -1) continue;
                 int endIndex = cellHashEnd[hashB];

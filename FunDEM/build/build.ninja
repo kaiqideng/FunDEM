@@ -40,326 +40,6 @@ include CMakeFiles/rules.ninja
 # Logical path to working directory; prefix for absolute paths.
 
 cmake_ninja_workdir = /teamspace/studios/this_studio/FunDEM/build/
-# =============================================================================
-# Object build statements for STATIC_LIBRARY target FunDEM_app_common
-
-
-#############################################
-# Order-only phony target for FunDEM_app_common
-
-build cmake_object_order_depends_target_FunDEM_app_common: phony || cmake_object_order_depends_target_FunDEM_kernels
-
-build CMakeFiles/FunDEM_app_common.dir/externalForceTorque.cu.o: CUDA_COMPILER__FunDEM_app_common_unscanned_Release /teamspace/studios/this_studio/FunDEM/externalForceTorque.cu || cmake_object_order_depends_target_FunDEM_app_common
-  DEP_FILE = CMakeFiles/FunDEM_app_common.dir/externalForceTorque.cu.o.d
-  FLAGS = -O3 -DNDEBUG -std=c++17 "--generate-code=arch=compute_75,code=[compute_75,sm_75]" -Xcompiler=-fPIC
-  INCLUDES = -I/teamspace/studios/this_studio/FunDEM -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -isystem /usr/local/cuda/targets/x86_64-linux/include
-  OBJECT_DIR = CMakeFiles/FunDEM_app_common.dir
-  OBJECT_FILE_DIR = CMakeFiles/FunDEM_app_common.dir
-
-
-# =============================================================================
-# Link build statements for STATIC_LIBRARY target FunDEM_app_common
-
-
-#############################################
-# Link the static library libFunDEM_app_common.a
-
-build libFunDEM_app_common.a: CUDA_STATIC_LIBRARY_LINKER__FunDEM_app_common_Release CMakeFiles/FunDEM_app_common.dir/externalForceTorque.cu.o || kernel/libFunDEM_kernels.a
-  LANGUAGE_COMPILE_FLAGS = -O3 -DNDEBUG "--generate-code=arch=compute_75,code=[compute_75,sm_75]"
-  OBJECT_DIR = CMakeFiles/FunDEM_app_common.dir
-  POST_BUILD = :
-  PRE_LINK = :
-  TARGET_FILE = libFunDEM_app_common.a
-  TARGET_PDB = FunDEM_app_common.a.dbg
-
-# =============================================================================
-# Object build statements for EXECUTABLE target bondedParticleBeam
-
-
-#############################################
-# Order-only phony target for bondedParticleBeam
-
-build cmake_object_order_depends_target_bondedParticleBeam: phony || cmake_object_order_depends_target_FunDEM_app_common cmake_object_order_depends_target_FunDEM_kernels
-
-build CMakeFiles/bondedParticleBeam.dir/bondedParticleBeam.cpp.o: CXX_COMPILER__bondedParticleBeam_unscanned_Release /teamspace/studios/this_studio/FunDEM/bondedParticleBeam.cpp || cmake_object_order_depends_target_bondedParticleBeam
-  DEP_FILE = CMakeFiles/bondedParticleBeam.dir/bondedParticleBeam.cpp.o.d
-  FLAGS = -O3 -DNDEBUG -std=gnu++17 -fPIE
-  INCLUDES = -I/teamspace/studios/this_studio/FunDEM -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -isystem /usr/local/cuda/targets/x86_64-linux/include
-  OBJECT_DIR = CMakeFiles/bondedParticleBeam.dir
-  OBJECT_FILE_DIR = CMakeFiles/bondedParticleBeam.dir
-
-
-# =============================================================================
-# Device Link build statements for EXECUTABLE target bondedParticleBeam
-
-
-#############################################
-# Link the executable CMakeFiles/bondedParticleBeam.dir/cmake_device_link.o
-
-build CMakeFiles/bondedParticleBeam.dir/cmake_device_link.o: CXX_EXECUTABLE_DEVICE_LINKER__bondedParticleBeam_Release CMakeFiles/bondedParticleBeam.dir/bondedParticleBeam.cpp.o | kernel/libFunDEM_kernels.a libFunDEM_app_common.a kernel/libFunDEM_kernels.a /usr/local/cuda-12.6/targets/x86_64-linux/lib/libcudart.so || kernel/libFunDEM_kernels.a libFunDEM_app_common.a
-  LANGUAGE_COMPILE_FLAGS = -O3 -DNDEBUG "--generate-code=arch=compute_75,code=[compute_75,sm_75]"
-  LINK_LIBRARIES = kernel/libFunDEM_kernels.a libFunDEM_app_common.a  -lcudadevrt -lcudart_static -lrt -lpthread -ldl
-  LINK_PATH = -L/usr/local/cuda/targets/x86_64-linux/lib
-  OBJECT_DIR = CMakeFiles/bondedParticleBeam.dir
-  TARGET_FILE = CMakeFiles/bondedParticleBeam.dir/cmake_device_link.o
-
-# =============================================================================
-# Link build statements for EXECUTABLE target bondedParticleBeam
-
-
-#############################################
-# Link the executable bondedParticleBeam
-
-build bondedParticleBeam: CXX_EXECUTABLE_LINKER__bondedParticleBeam_Release CMakeFiles/bondedParticleBeam.dir/bondedParticleBeam.cpp.o CMakeFiles/bondedParticleBeam.dir/cmake_device_link.o | kernel/libFunDEM_kernels.a libFunDEM_app_common.a kernel/libFunDEM_kernels.a /usr/local/cuda-12.6/targets/x86_64-linux/lib/libcudart.so || kernel/libFunDEM_kernels.a libFunDEM_app_common.a
-  FLAGS = -O3 -DNDEBUG
-  LINK_LIBRARIES = -Wl,-rpath,/usr/local/cuda-12.6/targets/x86_64-linux/lib  kernel/libFunDEM_kernels.a  libFunDEM_app_common.a  kernel/libFunDEM_kernels.a  /usr/local/cuda-12.6/targets/x86_64-linux/lib/libcudart.so  -lcudadevrt  -lcudart_static  -lrt  -lpthread  -ldl
-  LINK_PATH = -L/usr/local/cuda/targets/x86_64-linux/lib
-  OBJECT_DIR = CMakeFiles/bondedParticleBeam.dir
-  POST_BUILD = :
-  PRE_LINK = :
-  TARGET_FILE = bondedParticleBeam
-  TARGET_PDB = bondedParticleBeam.dbg
-
-# =============================================================================
-# Object build statements for EXECUTABLE target damBreak
-
-
-#############################################
-# Order-only phony target for damBreak
-
-build cmake_object_order_depends_target_damBreak: phony || cmake_object_order_depends_target_FunDEM_app_common cmake_object_order_depends_target_FunDEM_kernels
-
-build CMakeFiles/damBreak.dir/damBreak.cpp.o: CXX_COMPILER__damBreak_unscanned_Release /teamspace/studios/this_studio/FunDEM/damBreak.cpp || cmake_object_order_depends_target_damBreak
-  DEP_FILE = CMakeFiles/damBreak.dir/damBreak.cpp.o.d
-  FLAGS = -O3 -DNDEBUG -std=gnu++17 -fPIE
-  INCLUDES = -I/teamspace/studios/this_studio/FunDEM -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -isystem /usr/local/cuda/targets/x86_64-linux/include
-  OBJECT_DIR = CMakeFiles/damBreak.dir
-  OBJECT_FILE_DIR = CMakeFiles/damBreak.dir
-
-
-# =============================================================================
-# Device Link build statements for EXECUTABLE target damBreak
-
-
-#############################################
-# Link the executable CMakeFiles/damBreak.dir/cmake_device_link.o
-
-build CMakeFiles/damBreak.dir/cmake_device_link.o: CXX_EXECUTABLE_DEVICE_LINKER__damBreak_Release CMakeFiles/damBreak.dir/damBreak.cpp.o | kernel/libFunDEM_kernels.a libFunDEM_app_common.a kernel/libFunDEM_kernels.a /usr/local/cuda-12.6/targets/x86_64-linux/lib/libcudart.so || kernel/libFunDEM_kernels.a libFunDEM_app_common.a
-  LANGUAGE_COMPILE_FLAGS = -O3 -DNDEBUG "--generate-code=arch=compute_75,code=[compute_75,sm_75]"
-  LINK_LIBRARIES = kernel/libFunDEM_kernels.a libFunDEM_app_common.a  -lcudadevrt -lcudart_static -lrt -lpthread -ldl
-  LINK_PATH = -L/usr/local/cuda/targets/x86_64-linux/lib
-  OBJECT_DIR = CMakeFiles/damBreak.dir
-  TARGET_FILE = CMakeFiles/damBreak.dir/cmake_device_link.o
-
-# =============================================================================
-# Link build statements for EXECUTABLE target damBreak
-
-
-#############################################
-# Link the executable damBreak
-
-build damBreak: CXX_EXECUTABLE_LINKER__damBreak_Release CMakeFiles/damBreak.dir/damBreak.cpp.o CMakeFiles/damBreak.dir/cmake_device_link.o | kernel/libFunDEM_kernels.a libFunDEM_app_common.a kernel/libFunDEM_kernels.a /usr/local/cuda-12.6/targets/x86_64-linux/lib/libcudart.so || kernel/libFunDEM_kernels.a libFunDEM_app_common.a
-  FLAGS = -O3 -DNDEBUG
-  LINK_LIBRARIES = -Wl,-rpath,/usr/local/cuda-12.6/targets/x86_64-linux/lib  kernel/libFunDEM_kernels.a  libFunDEM_app_common.a  kernel/libFunDEM_kernels.a  /usr/local/cuda-12.6/targets/x86_64-linux/lib/libcudart.so  -lcudadevrt  -lcudart_static  -lrt  -lpthread  -ldl
-  LINK_PATH = -L/usr/local/cuda/targets/x86_64-linux/lib
-  OBJECT_DIR = CMakeFiles/damBreak.dir
-  POST_BUILD = :
-  PRE_LINK = :
-  TARGET_FILE = damBreak
-  TARGET_PDB = damBreak.dbg
-
-# =============================================================================
-# Object build statements for EXECUTABLE target damBreak2
-
-
-#############################################
-# Order-only phony target for damBreak2
-
-build cmake_object_order_depends_target_damBreak2: phony || cmake_object_order_depends_target_FunDEM_app_common cmake_object_order_depends_target_FunDEM_kernels
-
-build CMakeFiles/damBreak2.dir/damBreak2.cpp.o: CXX_COMPILER__damBreak2_unscanned_Release /teamspace/studios/this_studio/FunDEM/damBreak2.cpp || cmake_object_order_depends_target_damBreak2
-  DEP_FILE = CMakeFiles/damBreak2.dir/damBreak2.cpp.o.d
-  FLAGS = -O3 -DNDEBUG -std=gnu++17 -fPIE
-  INCLUDES = -I/teamspace/studios/this_studio/FunDEM -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -isystem /usr/local/cuda/targets/x86_64-linux/include
-  OBJECT_DIR = CMakeFiles/damBreak2.dir
-  OBJECT_FILE_DIR = CMakeFiles/damBreak2.dir
-
-
-# =============================================================================
-# Device Link build statements for EXECUTABLE target damBreak2
-
-
-#############################################
-# Link the executable CMakeFiles/damBreak2.dir/cmake_device_link.o
-
-build CMakeFiles/damBreak2.dir/cmake_device_link.o: CXX_EXECUTABLE_DEVICE_LINKER__damBreak2_Release CMakeFiles/damBreak2.dir/damBreak2.cpp.o | kernel/libFunDEM_kernels.a libFunDEM_app_common.a kernel/libFunDEM_kernels.a /usr/local/cuda-12.6/targets/x86_64-linux/lib/libcudart.so || kernel/libFunDEM_kernels.a libFunDEM_app_common.a
-  LANGUAGE_COMPILE_FLAGS = -O3 -DNDEBUG "--generate-code=arch=compute_75,code=[compute_75,sm_75]"
-  LINK_LIBRARIES = kernel/libFunDEM_kernels.a libFunDEM_app_common.a  -lcudadevrt -lcudart_static -lrt -lpthread -ldl
-  LINK_PATH = -L/usr/local/cuda/targets/x86_64-linux/lib
-  OBJECT_DIR = CMakeFiles/damBreak2.dir
-  TARGET_FILE = CMakeFiles/damBreak2.dir/cmake_device_link.o
-
-# =============================================================================
-# Link build statements for EXECUTABLE target damBreak2
-
-
-#############################################
-# Link the executable damBreak2
-
-build damBreak2: CXX_EXECUTABLE_LINKER__damBreak2_Release CMakeFiles/damBreak2.dir/damBreak2.cpp.o CMakeFiles/damBreak2.dir/cmake_device_link.o | kernel/libFunDEM_kernels.a libFunDEM_app_common.a kernel/libFunDEM_kernels.a /usr/local/cuda-12.6/targets/x86_64-linux/lib/libcudart.so || kernel/libFunDEM_kernels.a libFunDEM_app_common.a
-  FLAGS = -O3 -DNDEBUG
-  LINK_LIBRARIES = -Wl,-rpath,/usr/local/cuda-12.6/targets/x86_64-linux/lib  kernel/libFunDEM_kernels.a  libFunDEM_app_common.a  kernel/libFunDEM_kernels.a  /usr/local/cuda-12.6/targets/x86_64-linux/lib/libcudart.so  -lcudadevrt  -lcudart_static  -lrt  -lpthread  -ldl
-  LINK_PATH = -L/usr/local/cuda/targets/x86_64-linux/lib
-  OBJECT_DIR = CMakeFiles/damBreak2.dir
-  POST_BUILD = :
-  PRE_LINK = :
-  TARGET_FILE = damBreak2
-  TARGET_PDB = damBreak2.dbg
-
-# =============================================================================
-# Object build statements for EXECUTABLE target elasticBounce
-
-
-#############################################
-# Order-only phony target for elasticBounce
-
-build cmake_object_order_depends_target_elasticBounce: phony || cmake_object_order_depends_target_FunDEM_app_common cmake_object_order_depends_target_FunDEM_kernels
-
-build CMakeFiles/elasticBounce.dir/elasticBounce.cpp.o: CXX_COMPILER__elasticBounce_unscanned_Release /teamspace/studios/this_studio/FunDEM/elasticBounce.cpp || cmake_object_order_depends_target_elasticBounce
-  DEP_FILE = CMakeFiles/elasticBounce.dir/elasticBounce.cpp.o.d
-  FLAGS = -O3 -DNDEBUG -std=gnu++17 -fPIE
-  INCLUDES = -I/teamspace/studios/this_studio/FunDEM -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -isystem /usr/local/cuda/targets/x86_64-linux/include
-  OBJECT_DIR = CMakeFiles/elasticBounce.dir
-  OBJECT_FILE_DIR = CMakeFiles/elasticBounce.dir
-
-
-# =============================================================================
-# Device Link build statements for EXECUTABLE target elasticBounce
-
-
-#############################################
-# Link the executable CMakeFiles/elasticBounce.dir/cmake_device_link.o
-
-build CMakeFiles/elasticBounce.dir/cmake_device_link.o: CXX_EXECUTABLE_DEVICE_LINKER__elasticBounce_Release CMakeFiles/elasticBounce.dir/elasticBounce.cpp.o | kernel/libFunDEM_kernels.a libFunDEM_app_common.a kernel/libFunDEM_kernels.a /usr/local/cuda-12.6/targets/x86_64-linux/lib/libcudart.so || kernel/libFunDEM_kernels.a libFunDEM_app_common.a
-  LANGUAGE_COMPILE_FLAGS = -O3 -DNDEBUG "--generate-code=arch=compute_75,code=[compute_75,sm_75]"
-  LINK_LIBRARIES = kernel/libFunDEM_kernels.a libFunDEM_app_common.a  -lcudadevrt -lcudart_static -lrt -lpthread -ldl
-  LINK_PATH = -L/usr/local/cuda/targets/x86_64-linux/lib
-  OBJECT_DIR = CMakeFiles/elasticBounce.dir
-  TARGET_FILE = CMakeFiles/elasticBounce.dir/cmake_device_link.o
-
-# =============================================================================
-# Link build statements for EXECUTABLE target elasticBounce
-
-
-#############################################
-# Link the executable elasticBounce
-
-build elasticBounce: CXX_EXECUTABLE_LINKER__elasticBounce_Release CMakeFiles/elasticBounce.dir/elasticBounce.cpp.o CMakeFiles/elasticBounce.dir/cmake_device_link.o | kernel/libFunDEM_kernels.a libFunDEM_app_common.a kernel/libFunDEM_kernels.a /usr/local/cuda-12.6/targets/x86_64-linux/lib/libcudart.so || kernel/libFunDEM_kernels.a libFunDEM_app_common.a
-  FLAGS = -O3 -DNDEBUG
-  LINK_LIBRARIES = -Wl,-rpath,/usr/local/cuda-12.6/targets/x86_64-linux/lib  kernel/libFunDEM_kernels.a  libFunDEM_app_common.a  kernel/libFunDEM_kernels.a  /usr/local/cuda-12.6/targets/x86_64-linux/lib/libcudart.so  -lcudadevrt  -lcudart_static  -lrt  -lpthread  -ldl
-  LINK_PATH = -L/usr/local/cuda/targets/x86_64-linux/lib
-  OBJECT_DIR = CMakeFiles/elasticBounce.dir
-  POST_BUILD = :
-  PRE_LINK = :
-  TARGET_FILE = elasticBounce
-  TARGET_PDB = elasticBounce.dbg
-
-# =============================================================================
-# Object build statements for EXECUTABLE target ice-struct
-
-
-#############################################
-# Order-only phony target for ice-struct
-
-build cmake_object_order_depends_target_ice-struct: phony || cmake_object_order_depends_target_FunDEM_app_common cmake_object_order_depends_target_FunDEM_kernels
-
-build CMakeFiles/ice-struct.dir/ice-struct.cpp.o: CXX_COMPILER__ice-struct_unscanned_Release /teamspace/studios/this_studio/FunDEM/ice-struct.cpp || cmake_object_order_depends_target_ice-struct
-  DEP_FILE = CMakeFiles/ice-struct.dir/ice-struct.cpp.o.d
-  FLAGS = -O3 -DNDEBUG -std=gnu++17 -fPIE
-  INCLUDES = -I/teamspace/studios/this_studio/FunDEM -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -isystem /usr/local/cuda/targets/x86_64-linux/include
-  OBJECT_DIR = CMakeFiles/ice-struct.dir
-  OBJECT_FILE_DIR = CMakeFiles/ice-struct.dir
-
-
-# =============================================================================
-# Device Link build statements for EXECUTABLE target ice-struct
-
-
-#############################################
-# Link the executable CMakeFiles/ice-struct.dir/cmake_device_link.o
-
-build CMakeFiles/ice-struct.dir/cmake_device_link.o: CXX_EXECUTABLE_DEVICE_LINKER__ice-struct_Release CMakeFiles/ice-struct.dir/ice-struct.cpp.o | kernel/libFunDEM_kernels.a libFunDEM_app_common.a kernel/libFunDEM_kernels.a /usr/local/cuda-12.6/targets/x86_64-linux/lib/libcudart.so || kernel/libFunDEM_kernels.a libFunDEM_app_common.a
-  LANGUAGE_COMPILE_FLAGS = -O3 -DNDEBUG "--generate-code=arch=compute_75,code=[compute_75,sm_75]"
-  LINK_LIBRARIES = kernel/libFunDEM_kernels.a libFunDEM_app_common.a  -lcudadevrt -lcudart_static -lrt -lpthread -ldl
-  LINK_PATH = -L/usr/local/cuda/targets/x86_64-linux/lib
-  OBJECT_DIR = CMakeFiles/ice-struct.dir
-  TARGET_FILE = CMakeFiles/ice-struct.dir/cmake_device_link.o
-
-# =============================================================================
-# Link build statements for EXECUTABLE target ice-struct
-
-
-#############################################
-# Link the executable ice-struct
-
-build ice-struct: CXX_EXECUTABLE_LINKER__ice-struct_Release CMakeFiles/ice-struct.dir/ice-struct.cpp.o CMakeFiles/ice-struct.dir/cmake_device_link.o | kernel/libFunDEM_kernels.a libFunDEM_app_common.a kernel/libFunDEM_kernels.a /usr/local/cuda-12.6/targets/x86_64-linux/lib/libcudart.so || kernel/libFunDEM_kernels.a libFunDEM_app_common.a
-  FLAGS = -O3 -DNDEBUG
-  LINK_LIBRARIES = -Wl,-rpath,/usr/local/cuda-12.6/targets/x86_64-linux/lib  kernel/libFunDEM_kernels.a  libFunDEM_app_common.a  kernel/libFunDEM_kernels.a  /usr/local/cuda-12.6/targets/x86_64-linux/lib/libcudart.so  -lcudadevrt  -lcudart_static  -lrt  -lpthread  -ldl
-  LINK_PATH = -L/usr/local/cuda/targets/x86_64-linux/lib
-  OBJECT_DIR = CMakeFiles/ice-struct.dir
-  POST_BUILD = :
-  PRE_LINK = :
-  TARGET_FILE = ice-struct
-  TARGET_PDB = ice-struct.dbg
-
-# =============================================================================
-# Object build statements for EXECUTABLE target levelSetParticleFall
-
-
-#############################################
-# Order-only phony target for levelSetParticleFall
-
-build cmake_object_order_depends_target_levelSetParticleFall: phony || cmake_object_order_depends_target_FunDEM_app_common cmake_object_order_depends_target_FunDEM_kernels
-
-build CMakeFiles/levelSetParticleFall.dir/levelSetParticleFall.cpp.o: CXX_COMPILER__levelSetParticleFall_unscanned_Release /teamspace/studios/this_studio/FunDEM/levelSetParticleFall.cpp || cmake_object_order_depends_target_levelSetParticleFall
-  DEP_FILE = CMakeFiles/levelSetParticleFall.dir/levelSetParticleFall.cpp.o.d
-  FLAGS = -O3 -DNDEBUG -std=gnu++17 -fPIE
-  INCLUDES = -I/teamspace/studios/this_studio/FunDEM -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -isystem /usr/local/cuda/targets/x86_64-linux/include
-  OBJECT_DIR = CMakeFiles/levelSetParticleFall.dir
-  OBJECT_FILE_DIR = CMakeFiles/levelSetParticleFall.dir
-
-
-# =============================================================================
-# Device Link build statements for EXECUTABLE target levelSetParticleFall
-
-
-#############################################
-# Link the executable CMakeFiles/levelSetParticleFall.dir/cmake_device_link.o
-
-build CMakeFiles/levelSetParticleFall.dir/cmake_device_link.o: CXX_EXECUTABLE_DEVICE_LINKER__levelSetParticleFall_Release CMakeFiles/levelSetParticleFall.dir/levelSetParticleFall.cpp.o | kernel/libFunDEM_kernels.a libFunDEM_app_common.a kernel/libFunDEM_kernels.a /usr/local/cuda-12.6/targets/x86_64-linux/lib/libcudart.so || kernel/libFunDEM_kernels.a libFunDEM_app_common.a
-  LANGUAGE_COMPILE_FLAGS = -O3 -DNDEBUG "--generate-code=arch=compute_75,code=[compute_75,sm_75]"
-  LINK_LIBRARIES = kernel/libFunDEM_kernels.a libFunDEM_app_common.a  -lcudadevrt -lcudart_static -lrt -lpthread -ldl
-  LINK_PATH = -L/usr/local/cuda/targets/x86_64-linux/lib
-  OBJECT_DIR = CMakeFiles/levelSetParticleFall.dir
-  TARGET_FILE = CMakeFiles/levelSetParticleFall.dir/cmake_device_link.o
-
-# =============================================================================
-# Link build statements for EXECUTABLE target levelSetParticleFall
-
-
-#############################################
-# Link the executable levelSetParticleFall
-
-build levelSetParticleFall: CXX_EXECUTABLE_LINKER__levelSetParticleFall_Release CMakeFiles/levelSetParticleFall.dir/levelSetParticleFall.cpp.o CMakeFiles/levelSetParticleFall.dir/cmake_device_link.o | kernel/libFunDEM_kernels.a libFunDEM_app_common.a kernel/libFunDEM_kernels.a /usr/local/cuda-12.6/targets/x86_64-linux/lib/libcudart.so || kernel/libFunDEM_kernels.a libFunDEM_app_common.a
-  FLAGS = -O3 -DNDEBUG
-  LINK_LIBRARIES = -Wl,-rpath,/usr/local/cuda-12.6/targets/x86_64-linux/lib  kernel/libFunDEM_kernels.a  libFunDEM_app_common.a  kernel/libFunDEM_kernels.a  /usr/local/cuda-12.6/targets/x86_64-linux/lib/libcudart.so  -lcudadevrt  -lcudart_static  -lrt  -lpthread  -ldl
-  LINK_PATH = -L/usr/local/cuda/targets/x86_64-linux/lib
-  OBJECT_DIR = CMakeFiles/levelSetParticleFall.dir
-  POST_BUILD = :
-  PRE_LINK = :
-  TARGET_FILE = levelSetParticleFall
-  TARGET_PDB = levelSetParticleFall.dbg
-
 
 #############################################
 # Utility command for edit_cache
@@ -400,70 +80,70 @@ build cmake_object_order_depends_target_FunDEM_kernels: phony || kernel/CMakeFil
 build kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/SPHNeighborSearchKernel.cu.o: CUDA_COMPILER__FunDEM_kernels_unscanned_Release /teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/SPHNeighborSearchKernel.cu || cmake_object_order_depends_target_FunDEM_kernels
   DEP_FILE = kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/SPHNeighborSearchKernel.cu.o.d
   FLAGS = -O3 -DNDEBUG -std=c++17 "--generate-code=arch=compute_75,code=[compute_75,sm_75]" -Xcompiler=-fPIC
-  INCLUDES = -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -isystem /usr/local/cuda/targets/x86_64-linux/include
+  INCLUDES = -I/teamspace/studios/this_studio/FunDEM -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -isystem /usr/local/cuda/targets/x86_64-linux/include
   OBJECT_DIR = kernel/CMakeFiles/FunDEM_kernels.dir
   OBJECT_FILE_DIR = kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction
 
 build kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/WCSPHIntegrationKernel.cu.o: CUDA_COMPILER__FunDEM_kernels_unscanned_Release /teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/WCSPHIntegrationKernel.cu || cmake_object_order_depends_target_FunDEM_kernels
   DEP_FILE = kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/WCSPHIntegrationKernel.cu.o.d
   FLAGS = -O3 -DNDEBUG -std=c++17 "--generate-code=arch=compute_75,code=[compute_75,sm_75]" -Xcompiler=-fPIC
-  INCLUDES = -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -isystem /usr/local/cuda/targets/x86_64-linux/include
+  INCLUDES = -I/teamspace/studios/this_studio/FunDEM -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -isystem /usr/local/cuda/targets/x86_64-linux/include
   OBJECT_DIR = kernel/CMakeFiles/FunDEM_kernels.dir
   OBJECT_FILE_DIR = kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction
 
 build kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/ballIntegrationKernel.cu.o: CUDA_COMPILER__FunDEM_kernels_unscanned_Release /teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/ballIntegrationKernel.cu || cmake_object_order_depends_target_FunDEM_kernels
   DEP_FILE = kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/ballIntegrationKernel.cu.o.d
   FLAGS = -O3 -DNDEBUG -std=c++17 "--generate-code=arch=compute_75,code=[compute_75,sm_75]" -Xcompiler=-fPIC
-  INCLUDES = -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -isystem /usr/local/cuda/targets/x86_64-linux/include
+  INCLUDES = -I/teamspace/studios/this_studio/FunDEM -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -isystem /usr/local/cuda/targets/x86_64-linux/include
   OBJECT_DIR = kernel/CMakeFiles/FunDEM_kernels.dir
   OBJECT_FILE_DIR = kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction
 
 build kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/ballNeighborSearchKernel.cu.o: CUDA_COMPILER__FunDEM_kernels_unscanned_Release /teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/ballNeighborSearchKernel.cu || cmake_object_order_depends_target_FunDEM_kernels
   DEP_FILE = kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/ballNeighborSearchKernel.cu.o.d
   FLAGS = -O3 -DNDEBUG -std=c++17 "--generate-code=arch=compute_75,code=[compute_75,sm_75]" -Xcompiler=-fPIC
-  INCLUDES = -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -isystem /usr/local/cuda/targets/x86_64-linux/include
+  INCLUDES = -I/teamspace/studios/this_studio/FunDEM -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -isystem /usr/local/cuda/targets/x86_64-linux/include
   OBJECT_DIR = kernel/CMakeFiles/FunDEM_kernels.dir
   OBJECT_FILE_DIR = kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction
 
 build kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/buildHashStartEnd.cu.o: CUDA_COMPILER__FunDEM_kernels_unscanned_Release /teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/buildHashStartEnd.cu || cmake_object_order_depends_target_FunDEM_kernels
   DEP_FILE = kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/buildHashStartEnd.cu.o.d
   FLAGS = -O3 -DNDEBUG -std=c++17 "--generate-code=arch=compute_75,code=[compute_75,sm_75]" -Xcompiler=-fPIC
-  INCLUDES = -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -isystem /usr/local/cuda/targets/x86_64-linux/include
+  INCLUDES = -I/teamspace/studios/this_studio/FunDEM -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -isystem /usr/local/cuda/targets/x86_64-linux/include
   OBJECT_DIR = kernel/CMakeFiles/FunDEM_kernels.dir
   OBJECT_FILE_DIR = kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction
 
 build kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/contactKernel.cu.o: CUDA_COMPILER__FunDEM_kernels_unscanned_Release /teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/contactKernel.cu || cmake_object_order_depends_target_FunDEM_kernels
   DEP_FILE = kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/contactKernel.cu.o.d
   FLAGS = -O3 -DNDEBUG -std=c++17 "--generate-code=arch=compute_75,code=[compute_75,sm_75]" -Xcompiler=-fPIC
-  INCLUDES = -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -isystem /usr/local/cuda/targets/x86_64-linux/include
+  INCLUDES = -I/teamspace/studios/this_studio/FunDEM -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -isystem /usr/local/cuda/targets/x86_64-linux/include
   OBJECT_DIR = kernel/CMakeFiles/FunDEM_kernels.dir
   OBJECT_FILE_DIR = kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction
 
 build kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/levelSetParticleContactDetectionKernel.cu.o: CUDA_COMPILER__FunDEM_kernels_unscanned_Release /teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/levelSetParticleContactDetectionKernel.cu || cmake_object_order_depends_target_FunDEM_kernels
   DEP_FILE = kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/levelSetParticleContactDetectionKernel.cu.o.d
   FLAGS = -O3 -DNDEBUG -std=c++17 "--generate-code=arch=compute_75,code=[compute_75,sm_75]" -Xcompiler=-fPIC
-  INCLUDES = -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -isystem /usr/local/cuda/targets/x86_64-linux/include
+  INCLUDES = -I/teamspace/studios/this_studio/FunDEM -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -isystem /usr/local/cuda/targets/x86_64-linux/include
   OBJECT_DIR = kernel/CMakeFiles/FunDEM_kernels.dir
   OBJECT_FILE_DIR = kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction
 
 build kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/levelSetParticleIntegrationKernel.cu.o: CUDA_COMPILER__FunDEM_kernels_unscanned_Release /teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/levelSetParticleIntegrationKernel.cu || cmake_object_order_depends_target_FunDEM_kernels
   DEP_FILE = kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/levelSetParticleIntegrationKernel.cu.o.d
   FLAGS = -O3 -DNDEBUG -std=c++17 "--generate-code=arch=compute_75,code=[compute_75,sm_75]" -Xcompiler=-fPIC
-  INCLUDES = -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -isystem /usr/local/cuda/targets/x86_64-linux/include
+  INCLUDES = -I/teamspace/studios/this_studio/FunDEM -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -isystem /usr/local/cuda/targets/x86_64-linux/include
   OBJECT_DIR = kernel/CMakeFiles/FunDEM_kernels.dir
   OBJECT_FILE_DIR = kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction
 
 build kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/neighborSearchKernel.cu.o: CUDA_COMPILER__FunDEM_kernels_unscanned_Release /teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/neighborSearchKernel.cu || cmake_object_order_depends_target_FunDEM_kernels
   DEP_FILE = kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/neighborSearchKernel.cu.o.d
   FLAGS = -O3 -DNDEBUG -std=c++17 "--generate-code=arch=compute_75,code=[compute_75,sm_75]" -Xcompiler=-fPIC
-  INCLUDES = -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -isystem /usr/local/cuda/targets/x86_64-linux/include
+  INCLUDES = -I/teamspace/studios/this_studio/FunDEM -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -isystem /usr/local/cuda/targets/x86_64-linux/include
   OBJECT_DIR = kernel/CMakeFiles/FunDEM_kernels.dir
   OBJECT_FILE_DIR = kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction
 
 build kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/wallIntegrationKernel.cu.o: CUDA_COMPILER__FunDEM_kernels_unscanned_Release /teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/wallIntegrationKernel.cu || cmake_object_order_depends_target_FunDEM_kernels
   DEP_FILE = kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/wallIntegrationKernel.cu.o.d
   FLAGS = -O3 -DNDEBUG -std=c++17 "--generate-code=arch=compute_75,code=[compute_75,sm_75]" -Xcompiler=-fPIC
-  INCLUDES = -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -isystem /usr/local/cuda/targets/x86_64-linux/include
+  INCLUDES = -I/teamspace/studios/this_studio/FunDEM -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -isystem /usr/local/cuda/targets/x86_64-linux/include
   OBJECT_DIR = kernel/CMakeFiles/FunDEM_kernels.dir
   OBJECT_FILE_DIR = kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction
 
@@ -507,13 +187,125 @@ build kernel/CMakeFiles/rebuild_cache.util: CUSTOM_COMMAND
 build kernel/rebuild_cache: phony kernel/CMakeFiles/rebuild_cache.util
 
 # =============================================================================
+# Write statements declared in CMakeLists.txt:
+# /teamspace/studios/this_studio/FunDEM/CMakeLists.txt
+# =============================================================================
+
+# =============================================================================
+# Object build statements for STATIC_LIBRARY target FunDEM_apps_common
+
+
+#############################################
+# Order-only phony target for FunDEM_apps_common
+
+build cmake_object_order_depends_target_FunDEM_apps_common: phony || cmake_object_order_depends_target_FunDEM_kernels
+
+build apps/CMakeFiles/FunDEM_apps_common.dir/tutorial-bondedLevelSetParticles/globalDamping.cu.o: CUDA_COMPILER__FunDEM_apps_common_unscanned_Release /teamspace/studios/this_studio/FunDEM/apps/tutorial-bondedLevelSetParticles/globalDamping.cu || cmake_object_order_depends_target_FunDEM_apps_common
+  DEP_FILE = apps/CMakeFiles/FunDEM_apps_common.dir/tutorial-bondedLevelSetParticles/globalDamping.cu.o.d
+  FLAGS = -O3 -DNDEBUG -std=c++17 "--generate-code=arch=compute_75,code=[compute_75,sm_75]" -Xcompiler=-fPIC
+  INCLUDES = -I/teamspace/studios/this_studio/FunDEM/apps -I/teamspace/studios/this_studio/FunDEM -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -isystem /usr/local/cuda/targets/x86_64-linux/include
+  OBJECT_DIR = apps/CMakeFiles/FunDEM_apps_common.dir
+  OBJECT_FILE_DIR = apps/CMakeFiles/FunDEM_apps_common.dir/tutorial-bondedLevelSetParticles
+
+
+# =============================================================================
+# Link build statements for STATIC_LIBRARY target FunDEM_apps_common
+
+
+#############################################
+# Link the static library apps/libFunDEM_apps_common.a
+
+build apps/libFunDEM_apps_common.a: CUDA_STATIC_LIBRARY_LINKER__FunDEM_apps_common_Release apps/CMakeFiles/FunDEM_apps_common.dir/tutorial-bondedLevelSetParticles/globalDamping.cu.o || kernel/libFunDEM_kernels.a
+  LANGUAGE_COMPILE_FLAGS = -O3 -DNDEBUG "--generate-code=arch=compute_75,code=[compute_75,sm_75]"
+  OBJECT_DIR = apps/CMakeFiles/FunDEM_apps_common.dir
+  POST_BUILD = :
+  PRE_LINK = :
+  TARGET_FILE = apps/libFunDEM_apps_common.a
+  TARGET_PDB = FunDEM_apps_common.a.dbg
+
+# =============================================================================
+# Object build statements for EXECUTABLE target tutorial-bondedLevelSetParticles__bondedLevelSetParticles
+
+
+#############################################
+# Order-only phony target for tutorial-bondedLevelSetParticles__bondedLevelSetParticles
+
+build cmake_object_order_depends_target_tutorial-bondedLevelSetParticles__bondedLevelSetParticles: phony || cmake_object_order_depends_target_FunDEM_apps_common cmake_object_order_depends_target_FunDEM_kernels
+
+build apps/CMakeFiles/tutorial-bondedLevelSetParticles__bondedLevelSetParticles.dir/tutorial-bondedLevelSetParticles/bondedLevelSetParticles.cpp.o: CXX_COMPILER__tutorial-bondedLevelSetParticles__bondedLevelSetParticles_unscanned_Release /teamspace/studios/this_studio/FunDEM/apps/tutorial-bondedLevelSetParticles/bondedLevelSetParticles.cpp || cmake_object_order_depends_target_tutorial-bondedLevelSetParticles__bondedLevelSetParticles
+  DEP_FILE = apps/CMakeFiles/tutorial-bondedLevelSetParticles__bondedLevelSetParticles.dir/tutorial-bondedLevelSetParticles/bondedLevelSetParticles.cpp.o.d
+  FLAGS = -O3 -DNDEBUG -std=gnu++17 -fPIE
+  INCLUDES = -I/teamspace/studios/this_studio/FunDEM/apps -I/teamspace/studios/this_studio/FunDEM -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -isystem /usr/local/cuda/targets/x86_64-linux/include
+  OBJECT_DIR = apps/CMakeFiles/tutorial-bondedLevelSetParticles__bondedLevelSetParticles.dir
+  OBJECT_FILE_DIR = apps/CMakeFiles/tutorial-bondedLevelSetParticles__bondedLevelSetParticles.dir/tutorial-bondedLevelSetParticles
+
+
+# =============================================================================
+# Device Link build statements for EXECUTABLE target tutorial-bondedLevelSetParticles__bondedLevelSetParticles
+
+
+#############################################
+# Link the executable CMakeFiles/tutorial-bondedLevelSetParticles__bondedLevelSetParticles.dir/cmake_device_link.o
+
+build CMakeFiles/tutorial-bondedLevelSetParticles__bondedLevelSetParticles.dir/cmake_device_link.o: CXX_EXECUTABLE_DEVICE_LINKER__tutorial-bondedLevelSetParticles__bondedLevelSetParticles_Release apps/CMakeFiles/tutorial-bondedLevelSetParticles__bondedLevelSetParticles.dir/tutorial-bondedLevelSetParticles/bondedLevelSetParticles.cpp.o | kernel/libFunDEM_kernels.a apps/libFunDEM_apps_common.a kernel/libFunDEM_kernels.a /usr/local/cuda-12.6/targets/x86_64-linux/lib/libcudart.so || apps/libFunDEM_apps_common.a kernel/libFunDEM_kernels.a
+  LANGUAGE_COMPILE_FLAGS = -O3 -DNDEBUG "--generate-code=arch=compute_75,code=[compute_75,sm_75]"
+  LINK_LIBRARIES = kernel/libFunDEM_kernels.a apps/libFunDEM_apps_common.a  -lcudadevrt -lcudart_static -lrt -lpthread -ldl
+  LINK_PATH = -L/usr/local/cuda/targets/x86_64-linux/lib
+  OBJECT_DIR = apps/CMakeFiles/tutorial-bondedLevelSetParticles__bondedLevelSetParticles.dir
+  TARGET_FILE = CMakeFiles/tutorial-bondedLevelSetParticles__bondedLevelSetParticles.dir/cmake_device_link.o
+
+# =============================================================================
+# Link build statements for EXECUTABLE target tutorial-bondedLevelSetParticles__bondedLevelSetParticles
+
+
+#############################################
+# Link the executable apps/tutorial-bondedLevelSetParticles__bondedLevelSetParticles
+
+build apps/tutorial-bondedLevelSetParticles__bondedLevelSetParticles: CXX_EXECUTABLE_LINKER__tutorial-bondedLevelSetParticles__bondedLevelSetParticles_Release apps/CMakeFiles/tutorial-bondedLevelSetParticles__bondedLevelSetParticles.dir/tutorial-bondedLevelSetParticles/bondedLevelSetParticles.cpp.o CMakeFiles/tutorial-bondedLevelSetParticles__bondedLevelSetParticles.dir/cmake_device_link.o | kernel/libFunDEM_kernels.a apps/libFunDEM_apps_common.a kernel/libFunDEM_kernels.a /usr/local/cuda-12.6/targets/x86_64-linux/lib/libcudart.so || apps/libFunDEM_apps_common.a kernel/libFunDEM_kernels.a
+  FLAGS = -O3 -DNDEBUG
+  LINK_LIBRARIES = -Wl,-rpath,/usr/local/cuda-12.6/targets/x86_64-linux/lib  kernel/libFunDEM_kernels.a  apps/libFunDEM_apps_common.a  kernel/libFunDEM_kernels.a  /usr/local/cuda-12.6/targets/x86_64-linux/lib/libcudart.so  -lcudadevrt  -lcudart_static  -lrt  -lpthread  -ldl
+  LINK_PATH = -L/usr/local/cuda/targets/x86_64-linux/lib
+  OBJECT_DIR = apps/CMakeFiles/tutorial-bondedLevelSetParticles__bondedLevelSetParticles.dir
+  POST_BUILD = :
+  PRE_LINK = :
+  TARGET_FILE = apps/tutorial-bondedLevelSetParticles__bondedLevelSetParticles
+  TARGET_PDB = tutorial-bondedLevelSetParticles__bondedLevelSetParticles.dbg
+
+
+#############################################
+# Utility command for edit_cache
+
+build apps/CMakeFiles/edit_cache.util: CUSTOM_COMMAND
+  COMMAND = cd /teamspace/studios/this_studio/FunDEM/build/apps && /usr/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
+  DESC = No interactive CMake dialog available...
+  restat = 1
+
+build apps/edit_cache: phony apps/CMakeFiles/edit_cache.util
+
+
+#############################################
+# Utility command for rebuild_cache
+
+build apps/CMakeFiles/rebuild_cache.util: CUSTOM_COMMAND
+  COMMAND = cd /teamspace/studios/this_studio/FunDEM/build/apps && /usr/bin/cmake --regenerate-during-build -S/teamspace/studios/this_studio/FunDEM -B/teamspace/studios/this_studio/FunDEM/build
+  DESC = Running CMake to regenerate build system...
+  pool = console
+  restat = 1
+
+build apps/rebuild_cache: phony apps/CMakeFiles/rebuild_cache.util
+
+# =============================================================================
 # Target aliases.
 
-build FunDEM_app_common: phony libFunDEM_app_common.a
+build FunDEM_apps_common: phony apps/libFunDEM_apps_common.a
 
 build FunDEM_kernels: phony kernel/libFunDEM_kernels.a
 
+build libFunDEM_apps_common.a: phony apps/libFunDEM_apps_common.a
+
 build libFunDEM_kernels.a: phony kernel/libFunDEM_kernels.a
+
+build tutorial-bondedLevelSetParticles__bondedLevelSetParticles: phony apps/tutorial-bondedLevelSetParticles__bondedLevelSetParticles
 
 # =============================================================================
 # Folder targets.
@@ -523,7 +315,14 @@ build libFunDEM_kernels.a: phony kernel/libFunDEM_kernels.a
 #############################################
 # Folder: /teamspace/studios/this_studio/FunDEM/build
 
-build all: phony libFunDEM_app_common.a bondedParticleBeam damBreak damBreak2 elasticBounce ice-struct levelSetParticleFall kernel/all
+build all: phony kernel/all apps/all
+
+# =============================================================================
+
+#############################################
+# Folder: /teamspace/studios/this_studio/FunDEM/build/apps
+
+build apps/all: phony apps/libFunDEM_apps_common.a apps/tutorial-bondedLevelSetParticles__bondedLevelSetParticles
 
 # =============================================================================
 
@@ -553,14 +352,14 @@ build /teamspace/studios/this_studio/FunDEM/build/CMakeFiles/cmake.verify_globs:
 #############################################
 # Re-run CMake if any of its inputs changed.
 
-build build.ninja: RERUN_CMAKE /teamspace/studios/this_studio/FunDEM/build/CMakeFiles/cmake.verify_globs | /teamspace/studios/this_studio/FunDEM/CMakeLists.txt /teamspace/studios/this_studio/FunDEM/build/CMakeFiles/VerifyGlobs.cmake /teamspace/studios/this_studio/FunDEM/kernel/CMakeLists.txt /usr/share/cmake-3.28/Modules/CMakeCUDAInformation.cmake /usr/share/cmake-3.28/Modules/CMakeCXXInformation.cmake /usr/share/cmake-3.28/Modules/CMakeCommonLanguageInclude.cmake /usr/share/cmake-3.28/Modules/CMakeGenericSystem.cmake /usr/share/cmake-3.28/Modules/CMakeInitializeConfigs.cmake /usr/share/cmake-3.28/Modules/CMakeLanguageInformation.cmake /usr/share/cmake-3.28/Modules/CMakeSystemSpecificInformation.cmake /usr/share/cmake-3.28/Modules/CMakeSystemSpecificInitialize.cmake /usr/share/cmake-3.28/Modules/CheckCXXSourceCompiles.cmake /usr/share/cmake-3.28/Modules/CheckIncludeFileCXX.cmake /usr/share/cmake-3.28/Modules/CheckLibraryExists.cmake /usr/share/cmake-3.28/Modules/Compiler/CMakeCommonCompilerMacros.cmake /usr/share/cmake-3.28/Modules/Compiler/GNU-CXX.cmake /usr/share/cmake-3.28/Modules/Compiler/GNU.cmake /usr/share/cmake-3.28/Modules/Compiler/NVIDIA-CUDA.cmake /usr/share/cmake-3.28/Modules/Compiler/NVIDIA.cmake /usr/share/cmake-3.28/Modules/FindCUDAToolkit.cmake /usr/share/cmake-3.28/Modules/FindPackageHandleStandardArgs.cmake /usr/share/cmake-3.28/Modules/FindPackageMessage.cmake /usr/share/cmake-3.28/Modules/FindThreads.cmake /usr/share/cmake-3.28/Modules/Internal/CheckSourceCompiles.cmake /usr/share/cmake-3.28/Modules/Platform/Linux-GNU-CXX.cmake /usr/share/cmake-3.28/Modules/Platform/Linux-GNU.cmake /usr/share/cmake-3.28/Modules/Platform/Linux-Initialize.cmake /usr/share/cmake-3.28/Modules/Platform/Linux.cmake /usr/share/cmake-3.28/Modules/Platform/UnixPaths.cmake CMakeCache.txt CMakeFiles/3.28.3/CMakeCUDACompiler.cmake CMakeFiles/3.28.3/CMakeCXXCompiler.cmake CMakeFiles/3.28.3/CMakeSystem.cmake
+build build.ninja: RERUN_CMAKE /teamspace/studios/this_studio/FunDEM/build/CMakeFiles/cmake.verify_globs | /teamspace/studios/this_studio/FunDEM/CMakeLists.txt /teamspace/studios/this_studio/FunDEM/apps/CMakeLists.txt /teamspace/studios/this_studio/FunDEM/build/CMakeFiles/VerifyGlobs.cmake /teamspace/studios/this_studio/FunDEM/kernel/CMakeLists.txt /usr/share/cmake-3.28/Modules/CMakeCUDAInformation.cmake /usr/share/cmake-3.28/Modules/CMakeCXXInformation.cmake /usr/share/cmake-3.28/Modules/CMakeCommonLanguageInclude.cmake /usr/share/cmake-3.28/Modules/CMakeGenericSystem.cmake /usr/share/cmake-3.28/Modules/CMakeInitializeConfigs.cmake /usr/share/cmake-3.28/Modules/CMakeLanguageInformation.cmake /usr/share/cmake-3.28/Modules/CMakeSystemSpecificInformation.cmake /usr/share/cmake-3.28/Modules/CMakeSystemSpecificInitialize.cmake /usr/share/cmake-3.28/Modules/CheckCXXSourceCompiles.cmake /usr/share/cmake-3.28/Modules/CheckIncludeFileCXX.cmake /usr/share/cmake-3.28/Modules/CheckLibraryExists.cmake /usr/share/cmake-3.28/Modules/Compiler/CMakeCommonCompilerMacros.cmake /usr/share/cmake-3.28/Modules/Compiler/GNU-CXX.cmake /usr/share/cmake-3.28/Modules/Compiler/GNU.cmake /usr/share/cmake-3.28/Modules/Compiler/NVIDIA-CUDA.cmake /usr/share/cmake-3.28/Modules/Compiler/NVIDIA.cmake /usr/share/cmake-3.28/Modules/FindCUDAToolkit.cmake /usr/share/cmake-3.28/Modules/FindPackageHandleStandardArgs.cmake /usr/share/cmake-3.28/Modules/FindPackageMessage.cmake /usr/share/cmake-3.28/Modules/FindThreads.cmake /usr/share/cmake-3.28/Modules/Internal/CheckSourceCompiles.cmake /usr/share/cmake-3.28/Modules/Platform/Linux-GNU-CXX.cmake /usr/share/cmake-3.28/Modules/Platform/Linux-GNU.cmake /usr/share/cmake-3.28/Modules/Platform/Linux-Initialize.cmake /usr/share/cmake-3.28/Modules/Platform/Linux.cmake /usr/share/cmake-3.28/Modules/Platform/UnixPaths.cmake CMakeCache.txt CMakeFiles/3.28.3/CMakeCUDACompiler.cmake CMakeFiles/3.28.3/CMakeCXXCompiler.cmake CMakeFiles/3.28.3/CMakeSystem.cmake
   pool = console
 
 
 #############################################
 # A missing CMake input file is not an error.
 
-build /teamspace/studios/this_studio/FunDEM/CMakeLists.txt /teamspace/studios/this_studio/FunDEM/build/CMakeFiles/VerifyGlobs.cmake /teamspace/studios/this_studio/FunDEM/kernel/CMakeLists.txt /usr/share/cmake-3.28/Modules/CMakeCUDAInformation.cmake /usr/share/cmake-3.28/Modules/CMakeCXXInformation.cmake /usr/share/cmake-3.28/Modules/CMakeCommonLanguageInclude.cmake /usr/share/cmake-3.28/Modules/CMakeGenericSystem.cmake /usr/share/cmake-3.28/Modules/CMakeInitializeConfigs.cmake /usr/share/cmake-3.28/Modules/CMakeLanguageInformation.cmake /usr/share/cmake-3.28/Modules/CMakeSystemSpecificInformation.cmake /usr/share/cmake-3.28/Modules/CMakeSystemSpecificInitialize.cmake /usr/share/cmake-3.28/Modules/CheckCXXSourceCompiles.cmake /usr/share/cmake-3.28/Modules/CheckIncludeFileCXX.cmake /usr/share/cmake-3.28/Modules/CheckLibraryExists.cmake /usr/share/cmake-3.28/Modules/Compiler/CMakeCommonCompilerMacros.cmake /usr/share/cmake-3.28/Modules/Compiler/GNU-CXX.cmake /usr/share/cmake-3.28/Modules/Compiler/GNU.cmake /usr/share/cmake-3.28/Modules/Compiler/NVIDIA-CUDA.cmake /usr/share/cmake-3.28/Modules/Compiler/NVIDIA.cmake /usr/share/cmake-3.28/Modules/FindCUDAToolkit.cmake /usr/share/cmake-3.28/Modules/FindPackageHandleStandardArgs.cmake /usr/share/cmake-3.28/Modules/FindPackageMessage.cmake /usr/share/cmake-3.28/Modules/FindThreads.cmake /usr/share/cmake-3.28/Modules/Internal/CheckSourceCompiles.cmake /usr/share/cmake-3.28/Modules/Platform/Linux-GNU-CXX.cmake /usr/share/cmake-3.28/Modules/Platform/Linux-GNU.cmake /usr/share/cmake-3.28/Modules/Platform/Linux-Initialize.cmake /usr/share/cmake-3.28/Modules/Platform/Linux.cmake /usr/share/cmake-3.28/Modules/Platform/UnixPaths.cmake CMakeCache.txt CMakeFiles/3.28.3/CMakeCUDACompiler.cmake CMakeFiles/3.28.3/CMakeCXXCompiler.cmake CMakeFiles/3.28.3/CMakeSystem.cmake: phony
+build /teamspace/studios/this_studio/FunDEM/CMakeLists.txt /teamspace/studios/this_studio/FunDEM/apps/CMakeLists.txt /teamspace/studios/this_studio/FunDEM/build/CMakeFiles/VerifyGlobs.cmake /teamspace/studios/this_studio/FunDEM/kernel/CMakeLists.txt /usr/share/cmake-3.28/Modules/CMakeCUDAInformation.cmake /usr/share/cmake-3.28/Modules/CMakeCXXInformation.cmake /usr/share/cmake-3.28/Modules/CMakeCommonLanguageInclude.cmake /usr/share/cmake-3.28/Modules/CMakeGenericSystem.cmake /usr/share/cmake-3.28/Modules/CMakeInitializeConfigs.cmake /usr/share/cmake-3.28/Modules/CMakeLanguageInformation.cmake /usr/share/cmake-3.28/Modules/CMakeSystemSpecificInformation.cmake /usr/share/cmake-3.28/Modules/CMakeSystemSpecificInitialize.cmake /usr/share/cmake-3.28/Modules/CheckCXXSourceCompiles.cmake /usr/share/cmake-3.28/Modules/CheckIncludeFileCXX.cmake /usr/share/cmake-3.28/Modules/CheckLibraryExists.cmake /usr/share/cmake-3.28/Modules/Compiler/CMakeCommonCompilerMacros.cmake /usr/share/cmake-3.28/Modules/Compiler/GNU-CXX.cmake /usr/share/cmake-3.28/Modules/Compiler/GNU.cmake /usr/share/cmake-3.28/Modules/Compiler/NVIDIA-CUDA.cmake /usr/share/cmake-3.28/Modules/Compiler/NVIDIA.cmake /usr/share/cmake-3.28/Modules/FindCUDAToolkit.cmake /usr/share/cmake-3.28/Modules/FindPackageHandleStandardArgs.cmake /usr/share/cmake-3.28/Modules/FindPackageMessage.cmake /usr/share/cmake-3.28/Modules/FindThreads.cmake /usr/share/cmake-3.28/Modules/Internal/CheckSourceCompiles.cmake /usr/share/cmake-3.28/Modules/Platform/Linux-GNU-CXX.cmake /usr/share/cmake-3.28/Modules/Platform/Linux-GNU.cmake /usr/share/cmake-3.28/Modules/Platform/Linux-Initialize.cmake /usr/share/cmake-3.28/Modules/Platform/Linux.cmake /usr/share/cmake-3.28/Modules/Platform/UnixPaths.cmake CMakeCache.txt CMakeFiles/3.28.3/CMakeCUDACompiler.cmake CMakeFiles/3.28.3/CMakeCXXCompiler.cmake CMakeFiles/3.28.3/CMakeSystem.cmake: phony
 
 
 #############################################

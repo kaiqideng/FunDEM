@@ -12,6 +12,31 @@ struct LSBondedInteraction
     HostDeviceArray1D<double3> localbondPointB_;
 };
 
+// ---------------------------------------------
+// Superellipsoid parameters
+// ---------------------------------------------
+struct superellipsoidParams
+{
+    double rx {1.0};
+    double ry {1.0};
+    double rz {1.0};
+    double ee {1.0}; // epsilon_e
+    double en {1.0}; // epsilon_n
+};
+
+struct LevelSetParticleGridInfo
+{
+    // Grid geometry in WORLD/GLOBAL frame
+    double3 gridMin {0.0, 0.0, 0.0}; // background grid min corner (global)
+    int3 gridNodeSize {0, 0, 0}; // (nx, ny, nz)
+    double gridSpacing {0.0}; // h = diameter / 20
+
+    // Flattened phi array, row-major:
+    // idx = (k * ny + j) * nx + i
+    // Convention here: phi > 0 INSIDE, phi < 0 OUTSIDE
+    std::vector<double> gridNodeLSF;
+};
+
 class LSDEMSolver
 {
 public:
@@ -24,17 +49,12 @@ public:
     ~LSDEMSolver() = default;
 
 private:
-    struct LevelSetParticleGridInfo
+    struct fixedLevelSetWall
     {
-        // Grid geometry in WORLD/GLOBAL frame
-        double3 gridMin {0.0, 0.0, 0.0}; // background grid min corner (global)
-        int3 gridNodeSize {0, 0, 0}; // (nx, ny, nz)
-        double gridSpacing {0.0}; // h = diameter / 20
-
-        // Flattened phi array, row-major:
-        // idx = (k * ny + j) * nx + i
-        // Convention here: phi > 0 INSIDE, phi < 0 OUTSIDE
-        std::vector<double> gridNodeLSF;
+        HostDeviceArray1D<double> wallLSFV_;
+        double3 wallGridNodeOrigin_ {0.0, 0.0, 0.0};
+        int3 wallGridNodeSize_ {0, 0, 0};
+        double wallGridSpacing_ {0.};
     };
 
     inline double signedPow(double x, double e)
@@ -49,18 +69,6 @@ private:
         // |x|^e with protection
         return std::pow(std::fabs(x), e);
     }
-
-    // ---------------------------------------------
-    // Superellipsoid parameters
-    // ---------------------------------------------
-    struct superellipsoidParams
-    {
-        double rx {1.0};
-        double ry {1.0};
-        double rz {1.0};
-        double ee {1.0}; // epsilon_e
-        double en {1.0}; // epsilon_n
-    };
 
     // ---------------------------------------------
     // Implicit function F(x,y,z) for superellipsoid (LOCAL coordinates)
@@ -118,7 +126,7 @@ private:
     // - Uses a dedicated finite-difference step (fd) for ∇F (NOT the grid spacing).
     // - Adds robust protection for small |∇F|.
     // ---------------------------------------------
-    inline LevelSetParticleGridInfo buildLevelSetSuperellipsoidGridGlobal(const superellipsoidParams s,
+    inline LevelSetParticleGridInfo buildLevelSetSuperellipsoidGrid(const superellipsoidParams s,
     const double3 centerPoint,
     const int paddingLayers = 2)
     {
@@ -155,11 +163,6 @@ private:
         info.gridMin = gmin;
         info.gridNodeSize = make_int3(nx, ny, nz);
         info.gridNodeLSF.assign(size_t(nx) * size_t(ny) * size_t(nz), 0.0);
-
-        auto idx3 = [&](int i, int j, int k) -> size_t
-        {
-            return size_t((k * ny + j) * nx + i);
-        };
 
         // Dedicated finite-difference step for gradient (more stable than using grid spacing directly).
         // You can tune this: smaller -> more accurate but can be noisier with finite precision.
@@ -206,7 +209,7 @@ private:
                         phi = sgn * 0.5 * h;
                     }
 
-                    info.gridNodeLSF[idx3(i, j, k)] = phi; // phi<0 inside, phi>0 outside
+                    info.gridNodeLSF[linearIndex3D(make_int3(i, j, k), info.gridNodeSize)] = phi; // phi<0 inside, phi>0 outside
                 }
             }
         }
@@ -214,7 +217,7 @@ private:
         return info;
     }
 
-    inline std::vector<double3> generateSuperellipsoidSurfacePointsGlobal_Uniform(const superellipsoidParams s, 
+    inline std::vector<double3> generateSuperellipsoidSurfacePoints_Uniform(const superellipsoidParams s, 
     const double3 centerPoint,
     const int nPoints = 10000)
     {
@@ -337,7 +340,7 @@ private:
             LSParticleInteraction_.objectPointing_.allocateDevice(levelSetParticle_.deviceSize(), stream_);
         }
 
-        wallLSFV_.copyHostToDevice(stream_);
+        fixedLevelSetWall_.wallLSFV_.copyHostToDevice(stream_);
     }
 
     void initializeSpatialGrid(const double3 minBoundary, const double3 maxBoundary)
@@ -542,19 +545,20 @@ CUDA_CHECK(cudaGetLastError());
 #endif
         }
 
-        if (wallLSFV_.deviceSize() >= 8)
+        if (fixedLevelSetWall_.wallLSFV_.deviceSize() >= 8)
         {
             launchAddLevelSetParticleWallForce(levelSetParticle_.force(),
+            levelSetParticle_.torque(),
             levelSetParticle_.position(),
             levelSetParticle_.orientation(), 
             levelSetParticle_.inverseMass(),
             levelSetParticle_.materialID(),
             levelSetBoundaryNode_.localPosition(),
             levelSetBoundaryNode_.particleID(),
-            wallLSFV_.d_ptr,
-            wallGridSpacing_,
-            wallGridNodeOrigin_,
-            wallGridNodeSize_,
+            fixedLevelSetWall_.wallLSFV_.d_ptr,
+            fixedLevelSetWall_.wallGridSpacing_,
+            fixedLevelSetWall_.wallGridNodeOrigin_,
+            fixedLevelSetWall_.wallGridNodeSize_,
             levelSetBoundaryNode_.deviceSize(),
             levelSetBoundaryNode_.gridDim(),
             levelSetBoundaryNode_.blockDim(),
@@ -615,23 +619,24 @@ CUDA_CHECK(cudaGetLastError());
         out << std::fixed << std::setprecision(10);
 
         const size_t N = levelSetBoundaryNode_.deviceSize();
+        const std::vector<int> pID = levelSetBoundaryNode_.particleIDHostRef();
         std::vector<double3> p = levelSetBoundaryNode_.localPositionHostRef();
-        std::vector<double3> v(N, make_double3(0.0, 0.0, 0.0)) , a(N, make_double3(0.0, 0.0, 0.0));
-        std::vector<int> m(N, 0);
+        std::vector<double3> v(N, make_double3(0.0, 0.0, 0.0)), ang(N, make_double3(0.0, 0.0, 0.0));
+        std::vector<int> mID(N, 0);
 
         std::vector<double3> p_p = levelSetParticle_.positionHostCopy();
         std::vector<double3> v_p = levelSetParticle_.velocityHostCopy();
-        std::vector<double3> a_p = levelSetParticle_.angularVelocityHostCopy();
+        std::vector<double3> ang_p = levelSetParticle_.angularVelocityHostCopy();
         std::vector<quaternion> q_p = levelSetParticle_.orientationHostCopy();
         const std::vector<int>& m_p = levelSetParticle_.materialIDHostRef();
 
         for (size_t i = 0; i < N; i++)
         {
-            const int pID = levelSetBoundaryNode_.particleIDHostRef()[i];
-            p[i] = p_p[pID] + rotateVectorByQuaternion(q_p[pID], p[i]);
-            v[i] = v_p[pID] + cross(p[i] - p_p[pID], a_p[pID]);
-            a[i] = a_p[pID];
-            m[i] = m_p[pID];
+            int pID_i = pID[i];
+            p[i] = p_p[pID_i] + rotateVectorByQuaternion(q_p[pID_i], p[i]);
+            v[i] = v_p[pID_i] + cross(ang_p[pID_i], p[i] - p_p[pID_i]);
+            ang[i] = ang_p[pID_i];
+            mID[i] = m_p[pID_i];
         }
 
         out << "<?xml version=\"1.0\"?>\n"
@@ -668,10 +673,14 @@ CUDA_CHECK(cudaGetLastError());
         out << "\n        </DataArray>\n"
             "      </Cells>\n";
 
-        out << "      <PointData Scalars=\"material ID\">\n";
+        out << "      <PointData Scalars=\"particle ID\">\n";
+
+        out << "        <DataArray type=\"Int32\" Name=\"particle ID\" format=\"ascii\">\n";
+        for (int i = 0; i < N; ++i) out << ' ' << pID[i];
+        out << "\n        </DataArray>\n";
 
         out << "        <DataArray type=\"Int32\" Name=\"material ID\" format=\"ascii\">\n";
-        for (int i = 0; i < N; ++i) out << ' ' << m[i];
+        for (int i = 0; i < N; ++i) out << ' ' << mID[i];
         out << "\n        </DataArray>\n";
 
         const struct {
@@ -679,7 +688,7 @@ CUDA_CHECK(cudaGetLastError());
             const std::vector<double3>& vec;
         } vec3s[] = {
             { "velocity"       , v     },
-            { "angularVelocity", a     }
+            { "angularVelocity", ang   }
         };
         for (size_t k = 0; k < sizeof(vec3s) / sizeof(vec3s[0]); ++k) {
             out << "        <DataArray type=\"Float32\" Name=\"" << vec3s[k].name
@@ -776,6 +785,11 @@ CUDA_CHECK(cudaGetLastError());
             "</VTKFile>\n";
     }
 
+    const size_t getLevelSetParticleNumber()
+    {
+        return levelSetParticle_.hostSize();
+    }
+
     const double3* getLSParticlePositionDevicePtr()
     {
         return levelSetParticle_.position();
@@ -816,15 +830,24 @@ CUDA_CHECK(cudaGetLastError());
         return levelSetParticle_.angularVelocityHostCopy();
     }
 
-    std::vector<int> getLevelSetParticlePairA()
+    std::vector<quaternion> getLSParticleOrientation()
+    {
+        return levelSetParticle_.orientationHostCopy();
+    }
+
+    std::vector<int> getLevelSetParticlePointed()
     { 
         std::vector<int> a = LSParticleInteraction_.pair_.objectPointingHostCopy();
         std::vector<int> a1(a.begin(), a.begin() + LSParticleInteraction_.numActivated_);
-        for (auto& aa: a1) aa = levelSetBoundaryNode_.particleIDHostRef()[aa];
-        return a1;
+        std::vector<int> a2;
+        for (size_t i = 0; i < a1.size(); i++)
+        {
+            a2.push_back(levelSetBoundaryNode_.particleIDHostRef()[i]);
+        }
+        return a2;
     }
 
-    std::vector<int> getLevelSetParticlePairB()
+    std::vector<int> getLevelSetParticlePointing()
     { 
         std::vector<int> b = LSParticleInteraction_.pair_.objectPointingHostCopy();
         std::vector<int> b1(b.begin(), b.begin() + LSParticleInteraction_.numActivated_);
@@ -845,6 +868,11 @@ CUDA_CHECK(cudaGetLastError());
         return n1;
     }
 
+    cudaStream_t getDEMCUDAStream()
+    {
+        return stream_;
+    }
+
     void addLSBondedInteraction(std::vector<int> particleA, 
     std::vector<int> particleB, 
     std::vector<double3> point_b, 
@@ -852,21 +880,54 @@ CUDA_CHECK(cudaGetLastError());
     std::vector<double> radius_b,
     std::vector<double> length_b)
     {
-        std::vector<quaternion> orientation_p = levelSetParticle_.orientationHostCopy();
+        const size_t n = particleA.size();
+        if (particleB.size() != n) return;
+        if (point_b.size() != n) return;
+        if (normal_b.size() != n) return;
+        if (radius_b.size() != n) return;
+        if (length_b.size() != n) return;
+
         std::vector<double3> position_p = levelSetParticle_.positionHostCopy();
-        for (size_t i = 0; i < particleA.size(); i++)
+        std::vector<quaternion> orientation_p = levelSetParticle_.orientationHostCopy();
+
+        const size_t np = position_p.size();
+        if (orientation_p.size() != np) return;
+
+        for (size_t i = 0; i < n; i++)
         {
-            int idxA = particleA[i], idxB = particleB[i];
-            if (idxA >= orientation_p.size()) continue;
-            if (idxB >= orientation_p.size()) continue;
+            const int idxA = particleA[i];
+            const int idxB = particleB[i];
+
+            if (idxA < 0 || idxB < 0) continue;
+            if ((size_t)idxA >= np) continue;
+            if ((size_t)idxB >= np) continue;
+
+            const double L = length_b[i];
+            if (L <= 0.0) continue;
+
+            // Ensure normal is unit length (required by point +/- 0.5*L*n)
+            double3 n_b = normal_b[i];
+            const double nn2 = dot(n_b, n_b);
+            if (nn2 <= 1e-30) continue;
+            n_b = n_b * (1.0 / sqrt(nn2));
+
+            // Store pair + bond geometry
             LSBondedInteraction_.pair_.addHost(idxA, idxB);
-            LSBondedInteraction_.bond_.addHost(point_b[i], normal_b[i]);
+            LSBondedInteraction_.bond_.addHost(point_b[i], n_b);
             LSBondedInteraction_.bondRadius_.pushHost(radius_b[i]);
-            LSBondedInteraction_.bondLength_.pushHost(length_b[i]);
-            double3 pointA_global = point_b[i] + 0.5 * length_b[i] * normal_b[i];
-            double3 pointB_global = point_b[i] - 0.5 * length_b[i] * normal_b[i];
-            double3 pointA_local = reverseRotateVectorByQuaternion(pointA_global - position_p[idxA], orientation_p[idxA]);
-            double3 pointB_local = reverseRotateVectorByQuaternion(pointB_global - position_p[idxB], orientation_p[idxB]);
+            LSBondedInteraction_.bondLength_.pushHost(L);
+
+            // Global endpoints
+            const double3 pointA_global = point_b[i] + 0.5 * L * n_b;
+            const double3 pointB_global = point_b[i] - 0.5 * L * n_b;
+
+            // Convert to local frames of each particle
+            const double3 pointA_local = reverseRotateVectorByQuaternion(pointA_global - position_p[(size_t)idxA],
+            orientation_p[(size_t)idxA]);
+
+            const double3 pointB_local = reverseRotateVectorByQuaternion(pointB_global - position_p[(size_t)idxB],
+            orientation_p[(size_t)idxB]);
+
             LSBondedInteraction_.localbondPointA_.pushHost(pointA_local);
             LSBondedInteraction_.localbondPointB_.pushHost(pointB_local);
         }
@@ -943,21 +1004,23 @@ public:
         bondTable_.push_back(row);
     }
 
-    void addLSParticle(const std::vector<double3>& globalPosition_boundaryNode,
+    void addLSParticle(const std::vector<double3>& localPosition_boundaryNode,
     const std::vector<double>& gridNodeLSFV, //The grid node index is calculated by gN_x + gridNodeSize.x * (gN_y + gridNodeSize.y * gN_z)
-    const double3 gridNodeGlobalOrigin,
+    const double3 gridNodeLocalOrigin,
     const int3 gridNodeSize,
     const double gridSpacing,
     const int materialID,
     const double density,
+    const double3 position,
     const double3 velocity,
-    const double3 angularvelocity)
+    const double3 angularvelocity,
+    const quaternion orientation)
     {
         if (gridNodeSize.x < 2 || gridNodeSize.y < 2 || gridNodeSize.z < 2 || gridSpacing <= 0.) return;
         if (gridNodeSize.x * gridNodeSize.y * gridNodeSize.z != gridNodeLSFV.size()) return;
 
         double mass = 0.;
-        double3 center = make_double3(0., 0., 0.);
+        double3 localCenter = make_double3(0., 0., 0.);
         symMatrix I = make_symMatrix(0., 0., 0., 0., 0., 0.);
 
         auto smoothHeaviside = [&](const double phi_dimensionless, const double smoothParameter) -> double
@@ -999,13 +1062,13 @@ public:
                     {
                         const int index = x + gridNodeSize.x * (y + gridNodeSize.y * z);
                         const double H = smoothHeaviside(gridNodeLSFV[index] / gridSpacing, 1.5);
-                        center.x += H * (gridNodeGlobalOrigin.x + double(x) * gridSpacing);
-                        center.y += H * (gridNodeGlobalOrigin.y + double(y) * gridSpacing);
-                        center.z += H * (gridNodeGlobalOrigin.z + double(z) * gridSpacing);
+                        localCenter.x += H * (gridNodeLocalOrigin.x + double(x) * gridSpacing);
+                        localCenter.y += H * (gridNodeLocalOrigin.y + double(y) * gridSpacing);
+                        localCenter.z += H * (gridNodeLocalOrigin.z + double(z) * gridSpacing);
                     }
                 }
             }
-            center *= m_gridNode / mass;
+            localCenter *= m_gridNode / mass;
 
             for (int x = 0; x < gridNodeSize.x; x++)
             {
@@ -1015,7 +1078,7 @@ public:
                     {
                         const int index = x + gridNodeSize.x * (y + gridNodeSize.y * z);
                         const double H = smoothHeaviside(gridNodeLSFV[index] / gridSpacing, 1.5);
-                        double3 r = gridNodeGlobalOrigin + gridSpacing * make_double3(double(x), double(y), double(z)) - center;
+                        double3 r = gridNodeLocalOrigin + gridSpacing * make_double3(double(x), double(y), double(z)) - localCenter;
                         I.xx += H * (r.y * r.y + r.z * r.z) * m_gridNode;
                         I.yy += H * (r.x * r.x + r.z * r.z) * m_gridNode;
                         I.zz += H * (r.y * r.y + r.x * r.x) * m_gridNode;
@@ -1029,16 +1092,15 @@ public:
         }
         else 
         {
-            center = gridNodeGlobalOrigin + 0.5 * gridSpacing * make_double3(double(gridNodeSize.x), double(gridNodeSize.y), double(gridNodeSize.z));
+            localCenter = gridNodeLocalOrigin + 0.5 * gridSpacing * make_double3(double(gridNodeSize.x), double(gridNodeSize.y), double(gridNodeSize.z));
         }
-
 
         double radii = 0.;
         int particleID = static_cast<int>(levelSetParticle_.hostSize());
-        for (const auto& p : globalPosition_boundaryNode)
+        for (const auto& p : localPosition_boundaryNode)
         {
-            levelSetBoundaryNode_.addHost(p - center, particleID);
-            radii = std::max(length(p - center), radii);
+            levelSetBoundaryNode_.addHost(p - localCenter, particleID);
+            radii = std::max(length(p - localCenter), radii);
         }
 
         for (const auto& p : gridNodeLSFV)
@@ -1048,17 +1110,17 @@ public:
 
         int prefixSum_b = static_cast<int>(levelSetBoundaryNode_.hostSize());
         int prefixSum_g = static_cast<int>(levelSetGridNode_.hostSize());
-        levelSetParticle_.addHost(center, 
+        levelSetParticle_.addHost(position + rotateVectorByQuaternion(orientation, localCenter), 
         velocity, 
         angularvelocity, 
         make_double3(0., 0., 0.), 
         make_double3(0., 0., 0.), 
         radii, 
         invM, 
-        make_quaternion(1., 0., 0., 0.), 
+        orientation, 
         invI, 
         materialID, 
-        gridNodeGlobalOrigin - center, 
+        gridNodeLocalOrigin - localCenter, 
         gridSpacing, 
         gridNodeSize, 
         prefixSum_g, 
@@ -1067,22 +1129,26 @@ public:
         -1);
     }
 
-    void addFixedLSParticle(const std::vector<double3>& globalPosition_boundaryNode,
+    void addFixedLSParticle(const std::vector<double3>& localPosition_boundaryNode,
     const std::vector<double>& gridNodeLSFV,
-    const double3 globalOrigin_grid,
+    const double3 localOrigin_grid,
     const int3 gridNodeSize,
     const double gridSpacing,
-    const int materialID)
+    const int materialID,
+    const double3 position, 
+    const quaternion orientation)
     {
-        addLSParticle(globalPosition_boundaryNode,
+        addLSParticle(localPosition_boundaryNode,
         gridNodeLSFV,
-        globalOrigin_grid,
+        localOrigin_grid,
         gridNodeSize,
         gridSpacing,
         materialID,
         0.,
+        position,
         make_double3(0., 0., 0.),
-        make_double3(0., 0., 0.));
+        make_double3(0., 0., 0.),
+        orientation);
     }
 
     void addLSSuperellipsoid(const double rx, 
@@ -1095,6 +1161,7 @@ public:
     const double3 position,
     const double3 velocity,
     const double3 angularvelocity,
+    const quaternion orientaion,
     const int nPoints = 10000)
     {
         superellipsoidParams s;
@@ -1103,8 +1170,8 @@ public:
         s.rz = rz;
         s.ee = ee;
         s.en = en;
-        LevelSetParticleGridInfo ls = buildLevelSetSuperellipsoidGridGlobal(s, position);
-        std::vector<double3> sp = generateSuperellipsoidSurfacePointsGlobal_Uniform(s, position, nPoints);
+        LevelSetParticleGridInfo ls = buildLevelSetSuperellipsoidGrid(s, make_double3(0., 0., 0.));
+        std::vector<double3> sp = generateSuperellipsoidSurfacePoints_Uniform(s, make_double3(0., 0., 0.), nPoints);
         addLSParticle(sp, 
         ls.gridNodeLSF, 
         ls.gridMin, 
@@ -1112,11 +1179,13 @@ public:
         ls.gridSpacing, 
         materialID, 
         density, 
+        position,
         velocity, 
-        angularvelocity);
+        angularvelocity,
+        orientaion);
     }
 
-    void setLevelSetBox(const double3 boxMin_global,
+    void setFixedBoxWall(const double3 boxMin_global,
     const double3 boxMax_global,
     const int paddingLayers = 2)
     {
@@ -1154,16 +1223,11 @@ public:
         const int ny = int(std::llround((gmax.y - gmin.y) / h)) + 1;
         const int nz = int(std::llround((gmax.z - gmin.z) / h)) + 1;
 
-        if (nx <= 0 || ny <= 0 || nz <= 0) return info;
+        if (nx <= 0 || ny <= 0 || nz <= 0) return;
 
         info.gridMin = gmin;
         info.gridNodeSize = make_int3(nx, ny, nz);
         info.gridNodeLSF.assign(size_t(nx) * size_t(ny) * size_t(nz), 0.0);
-
-        auto idx3 = [&](int i, int j, int k) -> size_t
-        {
-            return size_t((k * ny + j) * nx + i);
-        };
 
         // ---------------------------------------------------------
         // Signed distance to an axis-aligned box (SDF)
@@ -1208,18 +1272,75 @@ public:
                     // Convention required:
                     //   inside  -> positive
                     //   outside -> negative
-                    info.gridNodeLSF[idx3(i, j, k)] = -sdf;
+                    info.gridNodeLSF[linearIndex3D(make_int3(i, j, k), info.gridNodeSize)] = -sdf;
                 }
             }
         }
 
-        for (const auto& ptr: info.gridNodeLSF)
+        fixedLevelSetWall_.wallLSFV_.setHost(info.gridNodeLSF);
+        fixedLevelSetWall_.wallGridNodeOrigin_ = info.gridMin;
+        fixedLevelSetWall_.wallGridNodeSize_ = info.gridNodeSize;
+        fixedLevelSetWall_.wallGridSpacing_ = info.gridSpacing;
+    }
+
+    void setFixedPlaneWall(const double3 gridMin,
+    const double gridSpacing,
+    const double3 planePoint,
+    const double3 planeNormal)
+    {
+        LevelSetParticleGridInfo info;
+
+        if (gridSpacing <= 0.0) return;
+
+        // Normalize plane normal
+        double3 n = planeNormal;
+        const double nn = std::sqrt(n.x*n.x + n.y*n.y + n.z*n.z);
+        if (nn <= 1e-30) return;
+        n.x /= nn; n.y /= nn; n.z /= nn;
+
+        int3 gridNodeSize = make_int3(2, 2, 2);
+        info.gridMin = gridMin;
+        info.gridNodeSize = gridNodeSize;
+        info.gridSpacing  = gridSpacing;
+
+        const size_t nx = static_cast<size_t>(gridNodeSize.x);
+        const size_t ny = static_cast<size_t>(gridNodeSize.y);
+        const size_t nz = static_cast<size_t>(gridNodeSize.z);
+
+        info.gridNodeLSF.assign(nx * ny * nz, 0.0);
+
+        for (int k = 0; k < gridNodeSize.z; ++k)
         {
-            wallLSFV_.pushHost(ptr);
+            const double z = gridMin.z + double(k) * gridSpacing;
+
+            for (int j = 0; j < gridNodeSize.y; ++j)
+            {
+                const double y = gridMin.y + double(j) * gridSpacing;
+
+                for (int i = 0; i < gridNodeSize.x; ++i)
+                {
+                    const double x = gridMin.x + double(i) * gridSpacing;
+
+                    // Signed distance to plane: d = (p - p0)·n
+                    const double dx = x - planePoint.x;
+                    const double dy = y - planePoint.y;
+                    const double dz = z - planePoint.z;
+                    const double d = dx * n.x + dy * n.y + dz * n.z;
+
+                    info.gridNodeLSF[linearIndex3D(make_int3(i, j, k), info.gridNodeSize)] = d;
+                }
+            }
         }
-        wallGridNodeOrigin_ = info.gridMin;
-        wallGridNodeSize_ = info.gridNodeSize;
-        wallGridSpacing_ = info.gridSpacing;
+
+        fixedLevelSetWall_.wallLSFV_.setHost(info.gridNodeLSF);
+        fixedLevelSetWall_.wallGridNodeOrigin_ = info.gridMin;
+        fixedLevelSetWall_.wallGridNodeSize_ = info.gridNodeSize;
+        fixedLevelSetWall_.wallGridSpacing_ = info.gridSpacing;
+    }
+
+    void eraseWall()
+    {
+        fixedLevelSetWall_.wallGridNodeSize_ = make_int3(0, 0, 0);
     }
 
     void solve(const double3 minBoundary, 
@@ -1286,9 +1407,11 @@ public:
             if (iStep % 10 == 0) updateLSSpatialGridCellHashStartEnd();
             LSParticleContactDetection();
             LSParticleContactForceTorque(halfTimeStep);
+            addExternalForceTorque(time);
             LSParticleIntegration1stHalf(gravity, halfTimeStep);
             LSParticleContactDetection();
             LSParticleContactForceTorque(halfTimeStep);
+            addExternalForceTorque(time);
             LSParticleIntegration2ndHalf(gravity, halfTimeStep);
             if (iStep % frameInterval == 0)
             {
@@ -1320,8 +1443,5 @@ private:
     solidInteraction LSParticleInteraction_;
     LSBondedInteraction LSBondedInteraction_;
 
-    HostDeviceArray1D<double> wallLSFV_;
-    double3 wallGridNodeOrigin_;
-    int3 wallGridNodeSize_;
-    double wallGridSpacing_;
+    fixedLevelSetWall fixedLevelSetWall_;
 };

@@ -2,7 +2,7 @@
 #include "buildHashStartEnd.cuh"
 #include "myUtility/myVec.h"
 
-__global__ void calculateHash(int* hashValue, 
+__global__ void linearIndex3D(int* hashValue, 
 const double3* position, 
 const double3 minBound, 
 const double3 maxBound, 
@@ -22,7 +22,7 @@ const size_t numObject)
     else if (p.z >= maxBound.z) p.z = maxBound.z - 0.5 * cellSize.z;
     
     int3 gridPosition = calculateGridPosition(p, minBound, cellSize);
-    hashValue[idx] = calculateHash(gridPosition, gridSize);
+    hashValue[idx] = linearIndex3D(gridPosition, gridSize);
 }
 
 __global__ void calculateDummyHash(int* hashValue, 
@@ -50,7 +50,7 @@ const size_t numObject)
     if (flag)
     {
         int3 gridPosition = calculateGridPosition(p, minBound, cellSize);
-        hashValue[idx] = calculateHash(gridPosition, gridSize);
+        hashValue[idx] = linearIndex3D(gridPosition, gridSize);
     }
 }
 
@@ -93,7 +93,7 @@ const size_t gridD_GPU,
 const size_t blockD_GPU, 
 cudaStream_t stream_GPU)
 {
-    calculateHash <<< gridD_GPU, blockD_GPU, 0, stream_GPU >>> (hashValue, 
+    linearIndex3D <<< gridD_GPU, blockD_GPU, 0, stream_GPU >>> (hashValue, 
     position, 
     minBound, 
     maxBound, 
