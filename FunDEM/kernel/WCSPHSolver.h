@@ -1,10 +1,10 @@
 #include "particle.h"
 #include "interaction.h"
 #include "boundary.h"
-#include "CUDAKernelFunction/buildHashStartEnd.cuh"
 #include "CUDAKernelFunction/neighborSearchKernel.cuh"
 #include "CUDAKernelFunction/SPHNeighborSearchKernel.cuh"
 #include "CUDAKernelFunction/WCSPHIntegrationKernel.cuh"
+#include "CUDAKernelFunction/myUtilit/buildHashStartEnd.cuh"
 #include "CUDAKernelFunction/myUtility/myFileEdit.h"
 #include <algorithm>
 #include <fstream>

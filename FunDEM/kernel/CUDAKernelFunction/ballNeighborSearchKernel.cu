@@ -1,7 +1,7 @@
 #include "ballNeighborSearchKernel.cuh"
-#include "buildHashStartEnd.cuh"
 #include "neighborSearchKernel.cuh"
 #include "myUtility/myVec.h"
+#include "myUtility/buildHashStartEnd.cuh"
 
 __global__ void countBallInteractionsKernel(int* neighborCount,
 const double3* position, 

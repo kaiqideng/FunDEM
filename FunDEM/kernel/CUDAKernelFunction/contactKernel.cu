@@ -227,7 +227,7 @@ const size_t numInteraction)
     const double mu_r = getFrictionParam(ip, f_MUR);
     const double mu_t = getFrictionParam(ip, f_MUT);
     const double k_n = getLinearStiffnessParam(ip, l_KN);
-    if (k_n > 1.e-10)
+    if (k_n > 1.e-30)
     {
         const double k_s = getLinearStiffnessParam(ip, l_KS);
         const double k_r = getLinearStiffnessParam(ip, l_KR);
@@ -241,7 +241,7 @@ const size_t numInteraction)
     {
 		const double E_i = getYoungsModulusParam(mat_i);
 		const double E_j = getYoungsModulusParam(mat_j);
-		if (E_i < 1.e-10 || E_j < 1.e-10) return;
+		if (E_i < 1.e-30 || E_j < 1.e-30) return;
 		const double nu_i = getPoissonRatioParam(mat_i);
 		const double nu_j = getPoissonRatioParam(mat_j);
 		const double G_i = E_i / (2. * (1. + nu_i));
@@ -345,7 +345,7 @@ const size_t numBall)
 				if (type1 == SphereTriangleContactType::None) continue;
 				else if (type1 == SphereTriangleContactType::Face)
 				{
-					if (lengthSquared(cross(r_c - p01, p11 - p01)) < 1.e-10) 
+					if (lengthSquared(cross(r_c - p01, p11 - p01)) < 1.e-30) 
 					{
 						slidingSpring[idx_c] = slidingSpring[idx_c1];
 						rollingSpring[idx_c] = rollingSpring[idx_c1];
@@ -353,7 +353,7 @@ const size_t numBall)
 						cancelFlag[idx_c] = 1;
 						break;
 					}
-					if (lengthSquared(cross(r_c - p11, p21 - p11)) < 1.e-10)
+					if (lengthSquared(cross(r_c - p11, p21 - p11)) < 1.e-30)
 					{
 						slidingSpring[idx_c] = slidingSpring[idx_c1];
 						rollingSpring[idx_c] = rollingSpring[idx_c1];
@@ -361,7 +361,7 @@ const size_t numBall)
 						cancelFlag[idx_c] = 1;
 						break;
 					}
-					if (lengthSquared(cross(r_c - p01, p21 - p01)) < 1.e-10) 
+					if (lengthSquared(cross(r_c - p01, p21 - p01)) < 1.e-30) 
 					{
 						slidingSpring[idx_c] = slidingSpring[idx_c1];
 						rollingSpring[idx_c] = rollingSpring[idx_c1];
@@ -376,7 +376,7 @@ const size_t numBall)
 					{
 						if (idx_c1 < idx_c)
 						{
-							if (lengthSquared(r_c - r_c1) < 1.e-10)
+							if (lengthSquared(r_c - r_c1) < 1.e-30)
 							{
 								slidingSpring[idx_c] = slidingSpring[idx_c1];
 								rollingSpring[idx_c] = rollingSpring[idx_c1];
@@ -388,7 +388,7 @@ const size_t numBall)
 					}
 					else 
 					{
-						if (lengthSquared(r_c - r_c1) < 1.e-10)
+						if (lengthSquared(r_c - r_c1) < 1.e-30)
 						{
 							slidingSpring[idx_c] = slidingSpring[idx_c1];
 							rollingSpring[idx_c] = rollingSpring[idx_c1];
@@ -404,7 +404,7 @@ const size_t numBall)
 					{
 						if (idx_c1 < idx_c)
 						{
-							if (lengthSquared(r_c - r_c1) < 1.e-10)
+							if (lengthSquared(r_c - r_c1) < 1.e-30)
 							{
 								slidingSpring[idx_c] = slidingSpring[idx_c1];
 								rollingSpring[idx_c] = rollingSpring[idx_c1];
@@ -450,7 +450,7 @@ const size_t numBall)
 {
     size_t idx_i = blockIdx.x * blockDim.x + threadIdx.x;
 	if (idx_i >= numBall) return;
-	if (inverseMass[idx_i] < 1.e-10) return;
+	if (inverseMass[idx_i] < 1.e-30) return;
 
 	const int mat_i = materialID[idx_i];
 	const double E_i = getYoungsModulusParam(mat_i);
@@ -504,7 +504,7 @@ const size_t numBall)
 		const double mu_r = getFrictionParam(ip, f_MUR);
 		const double mu_t = getFrictionParam(ip, f_MUT);
 		const double k_n = getLinearStiffnessParam(ip, l_KN);
-		if (k_n > 1.e-10)
+		if (k_n > 1.e-30)
 		{
 			const double k_s = getLinearStiffnessParam(ip, l_KS);
 			const double k_r = getLinearStiffnessParam(ip, l_KR);
@@ -517,7 +517,7 @@ const size_t numBall)
 		else
 		{
 			const double E_j = getYoungsModulusParam(mat_j);
-			if (E_i < 1.e-10 && E_j < 1.e-10) return;
+			if (E_i < 1.e-30 && E_j < 1.e-30) return;
 			const double nu_j = getPoissonRatioParam(mat_j);
 			const double G_j = E_j / (2. * (1. + nu_j));
 			const double E_ij = E_i * E_j / (E_j * (1. +  nu_i * nu_i) + E_i * (1. +  nu_j * nu_j));

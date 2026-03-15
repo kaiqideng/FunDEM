@@ -1,7 +1,7 @@
 #include "SPHNeighborSearchKernel.cuh"
-#include "buildHashStartEnd.cuh"
 #include "neighborSearchKernel.cuh"
 #include "myUtility/myVec.h"
+#include "myUtility/buildHashStartEnd.cuh"
 
 __global__ void countSPHInteractionsKernel(int* neighborCount,
 const double3* position, 

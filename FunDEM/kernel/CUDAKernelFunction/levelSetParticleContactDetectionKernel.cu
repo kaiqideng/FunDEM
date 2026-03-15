@@ -1,6 +1,6 @@
 #include "levelSetParticleContactDetectionKernel.cuh"
 #include "neighborSearchKernel.cuh"
-#include "buildHashStartEnd.cuh"
+#include "myUtility/buildHashStartEnd.cuh"
 
 __global__ void countLevelSetBoundaryNodeInteractionsKernel(int* neighborCount_bNode,
 const double3* localPosition_bNode, 

@@ -2,12 +2,12 @@
 #include "wall.h"
 #include "interaction.h"
 #include "boundary.h"
-#include "CUDAKernelFunction/buildHashStartEnd.cuh"
 #include "CUDAKernelFunction/neighborSearchKernel.cuh"
 #include "CUDAKernelFunction/ballNeighborSearchKernel.cuh"
 #include "CUDAKernelFunction/contactKernel.cuh"
 #include "CUDAKernelFunction/ballIntegrationKernel.cuh"
 #include "CUDAKernelFunction/wallIntegrationKernel.cuh"
+#include "CUDAKernelFunction/myUtility//buildHashStartEnd.cuh"
 #include "CUDAKernelFunction/myUtility/myContactParameters.h"
 #include "CUDAKernelFunction/myUtility/myFileEdit.h"
 #include <fstream>

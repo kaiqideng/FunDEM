@@ -179,7 +179,7 @@ public:
     {
         const size_t n = getLevelSetParticlePointed().size();
         if (n == 0) return false;
-        std::vector<double> radius_b(n, 1e-4), length_b(n, 2e-4);
+        std::vector<double> radius_b(n, 1e-3), length_b(n, 2e-3);
         addLSBondedInteraction(getLevelSetParticlePointed(), 
         getLevelSetParticlePointing(), 
         getContactPoint(), 
@@ -195,7 +195,7 @@ int main()
     problemSolver problemSolver_;
 
     const double3 boxMin = make_double3(0., 0., 0.);
-    const double3 boxMax = make_double3(1., 1., 4.);
+    const double3 boxMax = make_double3(1., 1., 5.);
     const double rMin = 0.1;
     const double rMax = 0.3;
     std::vector<double3> p;
@@ -248,7 +248,7 @@ int main()
 
     problemSolver_.solve(boxMin, boxMax, make_double3(0., 0., -9.81), 1.e-5, 7., 140, "levelSetParticleBeforeBonding");
 
-    problemSolver_.setBond(0, 0, 5.e9, 0.3, 0., 0., 0.);
+    problemSolver_.setBond(0, 0, .5e9, 0.3, 0., 0., 0.);
     problemSolver_.setFixedPlaneWall(make_double3(0., -3., -5.), 7., make_double3(1., 0.5, -1.), make_double3(1., 0., 1.));
     
     problemSolver_.solve(make_double3(-2., -3., -5.), make_double3(5., 4, 2.), make_double3(0., 0., -9.81), 1.e-5, 3., 60, "levelSetParticleAfterBonding");

@@ -480,7 +480,7 @@ double3& closestPoint)
     // --------------------------------------------------------
     // Degenerate triangle -> treat as 3 segments
     // --------------------------------------------------------
-    if (area2 <= 1e-20)
+    if (area2 <= 1e-30)
     {
         double t01, t02, t12;
         const double3 q01 = closestPointOnSegment(v0, v1, sphereCenter, t01);

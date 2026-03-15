@@ -2,7 +2,6 @@
 #include "myHostDeviceArray.h"
 #include "myMat.h"
 #include <cassert>
-#include <vector>
 
 struct ball
 {
