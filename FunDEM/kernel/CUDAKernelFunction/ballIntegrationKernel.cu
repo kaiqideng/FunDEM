@@ -6,9 +6,11 @@ const double3* position_c,
 const double* invMass_c, 
 const int* pebbleStart_c, 
 const int* pebbleEnd_c,
+
 const double3* position_p,
 const double3* force_p, 
 const double3* torque_p,
+
 const size_t numClump)
 {
 	size_t idx_c = blockIdx.x * blockDim.x + threadIdx.x;
@@ -41,6 +43,7 @@ const double3* torque,
 const double* radius, 
 const double* invMass, 
 const int* clumpID, 
+
 const double3 g,
 const double dt,
 const size_t numBall)
@@ -64,6 +67,7 @@ const size_t numBall)
 __global__ void ballPositionIntegrationKernel(double3* position, 
 const double3* velocity, 
 const int* clumpID, 
+
 const double dt,
 const size_t num)
 {
@@ -81,8 +85,10 @@ const double3* torque_c,
 const double* invMass_c, 
 const quaternion* orientation_c, 
 const symMatrix* inverseInertiaTensor_c, 
+
 const double3 g,
 const double dt, 
+
 const size_t numClump)
 {
 	size_t idx_c = blockIdx.x * blockDim.x + threadIdx.x;
@@ -99,7 +105,9 @@ __global__ void clumpPositionOrientationIntegrationKernel(double3* position,
 quaternion* orientation, 
 const double3* velocity, 
 const double3* angularVelocity, 
+
 const double dt,
+
 const size_t num)
 {
 	size_t idx_c = blockIdx.x * blockDim.x + threadIdx.x;
@@ -114,10 +122,12 @@ double3* velocity,
 double3* angularVelocity, 
 const double3* localPosition,
 const int* clumpID,
+
 const double3* position_c,
 const double3* velocity_c, 
 const double3* angularVelocity_c,
 const quaternion* orientation_c,
+
 const size_t numBall)
 {
 	size_t idx = blockIdx.x * blockDim.x + threadIdx.x;

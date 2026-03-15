@@ -15,6 +15,7 @@
  *
  * @param[out] hashValue     Per-object hash (cell linear index) array.
  * @param[in]  position      Per-object positions in global coordinates.
+
  * @param[in]  minBound      Global domain minimum corner.
  * @param[in]  maxBound      Global domain maximum corner (exclusive boundary conceptually).
  * @param[in]  cellSize      Cell size in each axis (dx, dy, dz).
@@ -57,6 +58,7 @@ const size_t numObject)
  *
  * @param[out] position_dummy   Output dummy positions (global coordinates).
  * @param[in]  position         Original positions (global coordinates).
+
  * @param[in]  minBound         Global domain minimum corner.
  * @param[in]  maxBound         Global domain maximum corner.
  * @param[in]  cellSize         Cell size (used as the "near boundary" threshold).
@@ -65,6 +67,7 @@ const size_t numObject)
  */
 __global__ void buildDummyPositionKernel(double3* position_dummy, 
 const double3* position, 
+
 const double3 minBound, 
 const double3 maxBound,
 const double3 cellSize, 
@@ -96,6 +99,7 @@ const size_t numObject)
  *
  * @param[out] hashValue     Per-object dummy hash array. -1 means "not outside".
  * @param[in]  position      Per-object positions in global coordinates.
+
  * @param[in]  minBound      Global domain minimum corner.
  * @param[in]  maxBound      Global domain maximum corner.
  * @param[in]  cellSize      Cell size in each axis.
@@ -104,6 +108,7 @@ const size_t numObject)
  */
 __global__ void calculateDummyHashKernel(int* hashValue, 
 const double3* position, 
+
 const double3 minBound, 
 const double3 maxBound, 
 const double3 cellSize, 

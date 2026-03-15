@@ -8,15 +8,19 @@ const double3* torque_c,
 const double* invMass_c, 
 const quaternion* orientation_c, 
 const symMatrix* inverseInertiaTensor_c, 
+
 const double3 g,
 const double dt, 
+
 const size_t numClump);
 
 __global__ void clumpPositionOrientationIntegrationKernel(double3* position, 
 quaternion* orientation, 
 const double3* velocity, 
 const double3* angularVelocity, 
+
 const double dt,
+
 const size_t num);
 
 extern "C" void launchBall1stHalfIntegration(double3* position, 

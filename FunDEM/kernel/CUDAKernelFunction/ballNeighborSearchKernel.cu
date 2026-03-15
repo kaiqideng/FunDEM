@@ -15,8 +15,10 @@
  * @param[in]  inverseMass          Ball inverse masses (1/m). Used to skip static-static pairs.
  * @param[in]  clumpID              Ball clump ids. If two balls share same clumpID>=0, the pair is skipped.
  * @param[in]  hashIndex            Sorted index list: hashIndex[i] gives the ball index stored at sorted entry i.
+
  * @param[in]  cellHashStart        cellHashStart[h] = start offset in hashIndex for cell hash h, or -1 if empty.
  * @param[in]  cellHashEnd          cellHashEnd[h]   = end offset (exclusive) in hashIndex for cell hash h.
+
  * @param[in]  minBound             Global minimum boundary of the spatial grid.
  * @param[in]  cellSize             Spatial grid cell size (global length).
  * @param[in]  gridSize             Spatial grid resolution in cells (x,y,z). numCells = x*y*z.
@@ -28,8 +30,10 @@ const double* radius,
 const double* inverseMass,
 const int* clumpID, 
 const int* hashIndex,
+
 const int* cellHashStart, 
 const int* cellHashEnd,
+
 const double3 minBound, 
 const double3 cellSize, 
 const int3 gridSize, 
@@ -113,8 +117,10 @@ const size_t numBall)
  * @param[in]  neighborPrefixSum             Inclusive prefix sum of neighborCount, length = numBall.
  * @param[in]  interactionStart_old          For each idxB, start offset into neighborPairHashIndex_old, length = numBall.
  * @param[in]  interactionEnd_old            For each idxB, end offset (exclusive) into neighborPairHashIndex_old, length = numBall.
+
  * @param[in]  cellHashStart                 Spatial grid cell start array, length = numCells.
  * @param[in]  cellHashEnd                   Spatial grid cell end array, length = numCells.
+
  * @param[in]  minBound                      Global minimum boundary of the spatial grid.
  * @param[in]  cellSize                      Spatial grid cell size (global length).
  * @param[in]  gridSize                      Spatial grid resolution in cells (x,y,z).
@@ -125,11 +131,13 @@ double3* rollingSpring,
 double3* torsionSpring,
 int* objectPointed, 
 int* objectPointing,
+
 const double3* slidingSpring_old,
 const double3* rollingSpring_old,
 const double3* torsionSpring_old,
 const int* objectPointed_old,
 const int* neighborPairHashIndex_old,
+
 const double3* position, 
 const double* radius,
 const double* inverseMass,
@@ -138,6 +146,7 @@ const int* hashIndex,
 const int* neighborPrefixSum, 
 const int* interactionStart_old,
 const int* interactionEnd_old,
+
 const int* cellHashStart, 
 const int* cellHashEnd, 
 const double3 minBound, 
@@ -224,13 +233,17 @@ const size_t numBall)
  * @param[out] neighborCount         neighborCount[idxA] = number of candidate triangles for ball idxA.
  * @param[in]  position              Ball center positions (global), length = numBall.
  * @param[in]  radius                Ball radii, length = numBall.
+
  * @param[in]  index0_tri            Triangle vertex index0, length = numTri.
  * @param[in]  index1_tri            Triangle vertex index1, length = numTri.
  * @param[in]  index2_tri            Triangle vertex index2, length = numTri.
  * @param[in]  hashIndex_tri         Sorted index list: hashIndex_tri[i] gives triangle index at sorted entry i.
+
  * @param[in]  globalPosition_ver    Vertex positions (global), length = numVertices.
+
  * @param[in]  cellHashStart         Triangle grid cell start array, length = numCells.
  * @param[in]  cellHashEnd           Triangle grid cell end array, length = numCells.
+
  * @param[in]  minBound              Global minimum boundary of triangle spatial grid.
  * @param[in]  cellSize              Triangle spatial grid cell size.
  * @param[in]  gridSize              Triangle spatial grid resolution in cells (x,y,z).
@@ -239,13 +252,17 @@ const size_t numBall)
 __global__ void countBallTriangleInteractionsKernel(int* neighborCount,
 const double3* position, 
 const double* radius,
+
 const int* index0_tri, 
 const int* index1_tri,
 const int* index2_tri,
 const int* hashIndex_tri,
+
 const double3* globalPosition_ver,
+
 const int* cellHashStart, 
 const int* cellHashEnd,
+
 const double3 minBound, 
 const double3 cellSize, 
 const int3 gridSize, 
@@ -346,6 +363,7 @@ const size_t numBall)
  * @param[in]  hashIndex_tri                 Sorted triangle index list.
  * @param[in]  interactionStart_old_tri      For each triangle idxB, start offset into neighborPairHashIndex_old.
  * @param[in]  interactionEnd_old_tri        For each triangle idxB, end offset (exclusive) into neighborPairHashIndex_old.
+ 
  * @param[in]  globalPosition_ver            Vertex positions (global).
  *
  * @param[in]  cellHashStart                 Triangle grid cell start array.
@@ -360,23 +378,29 @@ double3* rollingSpring,
 double3* torsionSpring,
 int* objectPointed, 
 int* objectPointing,
+
 const double3* slidingSpring_old,
 const double3* rollingSpring_old,
 const double3* torsionSpring_old,
 const int* objectPointed_old,
 const int* neighborPairHashIndex_old,
+
 const double3* position, 
 const double* radius,
 const int* neighborPrefixSum,
+
 const int* index0_tri, 
 const int* index1_tri,
 const int* index2_tri,
 const int* hashIndex_tri,
 const int* interactionStart_old_tri,
 const int* interactionEnd_old_tri,
+
 const double3* globalPosition_ver,
+
 const int* cellHashStart, 
 const int* cellHashEnd,
+
 const double3 minBound, 
 const double3 cellSize, 
 const int3 gridSize, 
@@ -477,6 +501,7 @@ int* neighborPrefixSum,
 
 int* cellHashStart,
 int* cellHashEnd,
+
 const double3 minBound,
 const double3 cellSize,
 const int3 gridSize,
@@ -528,6 +553,7 @@ int* neighborPairHashIndex_old,
 
 int* cellHashStart,
 int* cellHashEnd,
+
 const double3 minBound,
 const double3 cellSize,
 const int3 gridSize,
@@ -577,6 +603,7 @@ double3* globalPosition_ver,
 
 int* cellHashStart,
 int* cellHashEnd,
+
 const double3 minBound,
 const double3 cellSize,
 const int3 gridSize,
@@ -634,6 +661,7 @@ int* neighborPairHashIndex_old,
 
 int* cellHashStart,
 int* cellHashEnd,
+
 const double3 minBound,
 const double3 cellSize,
 const int3 gridSize,

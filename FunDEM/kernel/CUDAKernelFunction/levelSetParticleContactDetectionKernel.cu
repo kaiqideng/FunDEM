@@ -17,7 +17,9 @@
  * @param[out] neighborCount_bNode  Contact count per boundary node.
  * @param[in]  localPosition_bNode  Boundary node local position in its owner particle A frame.
  * @param[in]  particleID_bNode     Owner particle index (A) for each boundary node.
+
  * @param[in]  LSFV_gNode           Concatenated level-set grid node values (phi) for all particles.
+
  * @param[in]  position_p           Particle global positions.
  * @param[in]  orientation_p        Particle orientations (used for frame transforms).
  * @param[in]  radii_p              Bounding radius for each particle (used for early rejection).
@@ -27,8 +29,10 @@
  * @param[in]  gridNodeSize_p       Grid resolution (nx,ny,nz) of each particle's level-set grid.
  * @param[in]  gridNodePrefixSum_p  Inclusive prefix sum of grid node counts per particle (used to locate each particle's grid in LSFV_gNode).
  * @param[in]  hashIndex_p          Spatial hash sorted index list mapping cell range -> particle indices.
+
  * @param[in]  cellHashStart        Spatial hash cell start index in hashIndex_p (size = numCells).
  * @param[in]  cellHashEnd          Spatial hash cell end index in hashIndex_p (size = numCells).
+
  * @param[in]  minBound             Spatial grid global minimum bound.
  * @param[in]  cellSize             Spatial grid cell size.
  * @param[in]  gridSize             Spatial grid resolution (nx,ny,nz) in cells.
@@ -52,6 +56,7 @@ const int* hashIndex_p,
 
 const int* cellHashStart, 
 const int* cellHashEnd,
+
 const double3 minBound, 
 const double3 cellSize, 
 const int3 gridSize, 
@@ -203,6 +208,7 @@ const size_t numBoundaryNode)
  *
  * @param[in]  cellHashStart         Spatial hash cell start in hashIndex_p.
  * @param[in]  cellHashEnd           Spatial hash cell end in hashIndex_p.
+
  * @param[in]  minBound              Spatial grid global minimum bound.
  * @param[in]  cellSize              Spatial grid cell size.
  * @param[in]  gridSize              Spatial grid resolution in cells.
@@ -245,6 +251,7 @@ const int* interactionEnd_p_old,
 
 const int* cellHashStart, 
 const int* cellHashEnd,
+
 const double3 minBound, 
 const double3 cellSize, 
 const int3 gridSize, 

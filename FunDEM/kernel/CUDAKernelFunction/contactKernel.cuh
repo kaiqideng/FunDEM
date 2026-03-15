@@ -621,6 +621,7 @@ double3& closestPoint)
  * @param[in]  objectPointing    Per-interaction pointing index (ball j).
  *
  * @param[in]  timeStep          Time step dt.
+
  * @param[in]  numInteraction    Number of interactions.
  * @param[in]  gridD             Launch grid dimension.
  * @param[in]  blockD            Launch block dimension.
@@ -685,6 +686,7 @@ cudaStream_t stream);
  * @param[in] objectPointing_b    Bonded pair j indices.
  *
  * @param[in] timeStep            Time step dt.
+
  * @param[in] numBondedInteraction Number of bonds.
  * @param[in] gridD               Launch grid dimension.
  * @param[in] blockD              Launch block dimension.
@@ -737,10 +739,12 @@ cudaStream_t stream);
  * @param[in] neighborPrefixSum   Pointed-side prefix sum of interactions per object.
  * @param[in] interactionStart    Pointing-side adjacency list start per object.
  * @param[in] interactionEnd      Pointing-side adjacency list end per object.
+
  * @param[in] contactForce        Per-interaction forces (stored on pointed side).
  * @param[in] contactTorque       Per-interaction torques.
  * @param[in] contactPoint        Per-interaction contact points.
  * @param[in] neighborPairHashIndex Remap array from adjacency list entries to interaction indices.
+
  * @param[in] num                 Number of objects.
  * @param[in] gridD               Launch grid dimension.
  * @param[in] blockD              Launch block dimension.
@@ -804,6 +808,7 @@ cudaStream_t stream);
  * @param[out] cancelFlag         Candidate cancel flags.
  *
  * @param[in] timeStep            Time step dt.
+
  * @param[in] numBall             Number of balls.
  * @param[in] gridD               Launch grid dimension.
  * @param[in] blockD              Launch block dimension.
@@ -868,6 +873,7 @@ cudaStream_t stream);
  * @param[in] overlap              Overlap per interaction.
  * @param[in] objectPointed        Boundary node index per interaction.
  * @param[in] objectPointing       Particle j per interaction.
+
  * @param[in] particleID_bNode     Owner particle id per boundary node.
  *
  * @param[in,out] force_p          Particle force accumulation (atomic).
@@ -876,6 +882,7 @@ cudaStream_t stream);
  * @param[in] velocity_p           Particle velocities.
  * @param[in] angularVelocity_p    Particle angular velocities.
  * @param[in] materialID_p         Particle material ids.
+
  * @param[in] timeStep             Time step dt.
  *
  * @param[in] numInteraction       Number of interactions.
@@ -938,6 +945,7 @@ cudaStream_t stream);
  * @param[in] materialID            Particle material ids.
  *
  * @param[in] dt                    Time step.
+ 
  * @param[in] numBondedInteraction  Number of bonds.
  * @param[in] gridD                 Launch grid dimension.
  * @param[in] blockD                Launch block dimension.

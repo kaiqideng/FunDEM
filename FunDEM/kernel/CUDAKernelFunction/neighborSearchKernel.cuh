@@ -64,10 +64,12 @@ cudaStream_t stream_GPU);
  *
  * @param[out] position_dummy   Output dummy positions.
  * @param[in]  position         Input positions.
+
  * @param[in]  minBound         Domain minimum corner.
  * @param[in]  maxBound         Domain maximum corner.
  * @param[in]  cellSize         Cell size (used as near-boundary threshold).
  * @param[in]  directionFlag    Axes to wrap (1 => wrap on that axis).
+
  * @param[in]  numObject        Number of objects.
  * @param[in]  gridD_GPU        CUDA grid dimension.
  * @param[in]  blockD_GPU       CUDA block dimension.
@@ -101,13 +103,16 @@ cudaStream_t stream_GPU);
  * @param[in]  position        Object positions.
  * @param[out] hashIndex       Permutation index array after sorting.
  * @param[in,out] hashValue    Hash array (dummy hash); sorted in-place.
+
  * @param[out] cellHashStart   Per-cell start offsets.
  * @param[out] cellHashEnd     Per-cell end offsets (exclusive).
+
  * @param[in]  minBound        Global domain minimum corner.
  * @param[in]  maxBound        Global domain maximum corner.
  * @param[in]  cellSize        Cell size.
  * @param[in]  gridSize        Grid size in cells.
  * @param[in]  numGrids        Total number of cells.
+ 
  * @param[in]  numObject       Number of objects.
  * @param[in]  gridD_GPU       CUDA grid dimension.
  * @param[in]  blockD_GPU      CUDA block dimension.

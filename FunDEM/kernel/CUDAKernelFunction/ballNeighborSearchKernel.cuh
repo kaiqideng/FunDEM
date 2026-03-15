@@ -15,11 +15,13 @@
  * @param[out] hashIndex             Sorted ball index list (device).
  * @param[out] neighborCount         neighborCount[idxA] output (device), length = numBall.
  * @param[out] neighborPrefixSum     inclusive_scan(neighborCount) (device), length = numBall.
+
  * @param[in]  cellHashStart         Spatial grid cell start array (device).
  * @param[in]  cellHashEnd           Spatial grid cell end array (device).
  * @param[in]  minBound              Global minimum boundary of spatial grid.
  * @param[in]  cellSize              Spatial grid cell size.
  * @param[in]  gridSize              Spatial grid resolution in cells.
+
  * @param[in]  numBall               Number of balls.
  * @param[in]  gridD_GPU             Grid dimension for launching kernels.
  * @param[in]  blockD_GPU            Block dimension for launching kernels.
@@ -35,6 +37,7 @@ int* neighborPrefixSum,
 
 int* cellHashStart,
 int* cellHashEnd,
+
 const double3 minBound,
 const double3 cellSize,
 const int3 gridSize,
@@ -104,6 +107,7 @@ int* neighborPairHashIndex_old,
 
 int* cellHashStart,
 int* cellHashEnd,
+
 const double3 minBound,
 const double3 cellSize,
 const int3 gridSize,
@@ -129,6 +133,7 @@ cudaStream_t stream_GPU);
  * @param[in]  index1_tri            Triangle vertex index1 (device).
  * @param[in]  index2_tri            Triangle vertex index2 (device).
  * @param[in]  hashIndex_tri         Sorted triangle index list (device).
+
  * @param[in]  globalPosition_ver    Vertex positions (device).
  *
  * @param[in]  cellHashStart         Triangle grid cell start array (device).
@@ -156,6 +161,7 @@ double3* globalPosition_ver,
 
 int* cellHashStart,
 int* cellHashEnd,
+
 const double3 minBound,
 const double3 cellSize,
 const int3 gridSize,
@@ -181,6 +187,7 @@ cudaStream_t stream_GPU);
  * @param[in]  hashIndex_tri                 Sorted triangle index list (device).
  * @param[in]  interactionStart_tri_old      Old "pointing list" start offsets per triangle (device).
  * @param[in]  interactionEnd_tri_old        Old "pointing list" end offsets per triangle (device).
+
  * @param[in]  globalPosition_ver            Vertex positions (device).
  *
  * @param[out] slidingSpring                 New sliding springs (device).
@@ -233,6 +240,7 @@ int* neighborPairHashIndex_old,
 
 int* cellHashStart,
 int* cellHashEnd,
+
 const double3 minBound,
 const double3 cellSize,
 const int3 gridSize,

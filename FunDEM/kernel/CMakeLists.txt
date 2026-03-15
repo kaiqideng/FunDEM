@@ -1,53 +1,28 @@
-# ============================================================
-# Kernel library
-#   - kernel/ has:
-#       * CUDAKernelFunction/ (contains .cu/.h/.cuh/.cpp...)
-#       * some extra headers directly under kernel/
-# ============================================================
+# kernel/CMakeLists.txt
+cmake_minimum_required(VERSION 3.22)
+
+# ------------------------------------------------------------------
+# This directory contains:
+#   - CUDAKernelFunction/   (compilable CUDA/C++ sources)
+#   - extra headers under kernel/ (helpers / configs / etc.)
+# We build the actual library in CUDAKernelFunction and only attach
+# the extra headers here for IDE convenience.
+# ------------------------------------------------------------------
 
 set(KERNEL_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
-set(CUDAK_DIR   ${KERNEL_ROOT}/CUDAKernelFunction)
-set(UTIL_DIR    ${CUDAK_DIR}/myUtility)
 
-# Collect all compilation units under CUDAKernelFunction/
-file(GLOB_RECURSE KERNEL_COMPILE_SRCS CONFIGURE_DEPENDS
-    ${CUDAK_DIR}/*.cu
-    ${CUDAK_DIR}/*.cpp
-    ${CUDAK_DIR}/*.cxx
-)
+# Add the real kernel implementation subdir (creates target: FunDEM_kernels)
+add_subdirectory(CUDAKernelFunction)
 
-# Also track headers (not required for building, but nice for IDE)
-file(GLOB_RECURSE KERNEL_HEADERS CONFIGURE_DEPENDS
+# Track headers directly under kernel/ (not compiled, only for IDE/project view)
+file(GLOB_RECURSE KERNEL_EXTRA_HEADERS CONFIGURE_DEPENDS
     ${KERNEL_ROOT}/*.h
     ${KERNEL_ROOT}/*.hpp
     ${KERNEL_ROOT}/*.cuh
-    ${CUDAK_DIR}/*.h
-    ${CUDAK_DIR}/*.hpp
-    ${CUDAK_DIR}/*.cuh
 )
 
-add_library(FunDEM_kernels STATIC
-    ${KERNEL_COMPILE_SRCS}
-    ${KERNEL_HEADERS}
-)
+# Attach those headers to the target so IDE can see them
+target_sources(FunDEM_kernels PRIVATE ${KERNEL_EXTRA_HEADERS})
 
-# ------------------------------------------------------------
-# CUDA Toolkit (provides cuda_runtime.h, etc.)
-# ------------------------------------------------------------
-find_package(CUDAToolkit REQUIRED)
-target_link_libraries(FunDEM_kernels PUBLIC CUDA::cudart)
-
-# Export include paths to apps
-target_include_directories(FunDEM_kernels PUBLIC
-    ${FUNDEM_ROOT}     # project root
-    ${KERNEL_ROOT}     # kernel/ (for those extra .h files)
-    ${CUDAK_DIR}       # kernel/CUDAKernelFunction/
-    ${UTIL_DIR}        # kernel/CUDAKernelFunction/myUtility/
-)
-
-set_target_properties(FunDEM_kernels PROPERTIES
-    CUDA_SEPARABLE_COMPILATION ${FUNDEM_ENABLE_RDC}
-    POSITION_INDEPENDENT_CODE  ${FUNDEM_ENABLE_PIC}
-    CXX_STANDARD 17
-    CXX_STANDARD_REQUIRED YES
-)
+# Make sure apps can include headers under kernel/
+target_include_directories(FunDEM_kernels PUBLIC ${KERNEL_ROOT})

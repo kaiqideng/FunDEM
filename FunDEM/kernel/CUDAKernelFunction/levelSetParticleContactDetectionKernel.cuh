@@ -87,7 +87,9 @@ const double phi111)
  * @param[out] neighborPrefixSum_bNode   Inclusive prefix sum over neighborCount_bNode.
  * @param[in]  localPosition_bNode       Boundary node local positions (in owner particle frame).
  * @param[in]  particleID_bNode          Owner particle id for each boundary node.
+
  * @param[in]  LSFV_gNode                Concatenated level-set grid node values for all particles.
+
  * @param[in]  position_p                Particle global positions.
  * @param[in]  orientation_p             Particle orientations.
  * @param[in]  radii_p                   Bounding radius per particle.
@@ -97,11 +99,14 @@ const double phi111)
  * @param[in]  gridNodeSize_p            Grid size per particle.
  * @param[in]  gridNodePrefixSum_p       Inclusive prefix sum of per-particle grid node counts.
  * @param[in]  hashIndex_p               Spatial hash sorted indices (cell range -> particle index).
+
  * @param[in]  cellHashStart             Spatial hash cell start indices.
  * @param[in]  cellHashEnd               Spatial hash cell end indices.
+
  * @param[in]  minBound                  Spatial grid min bound.
  * @param[in]  cellSize                  Spatial grid cell size.
  * @param[in]  gridSize                  Spatial grid resolution.
+
  * @param[in]  numBoundaryNode           Total number of boundary nodes.
  * @param[in]  gridD                     CUDA grid dimension (number of blocks).
  * @param[in]  blockD                    CUDA block dimension (threads per block).
@@ -127,6 +132,7 @@ const int* hashIndex_p,
 
 const int* cellHashStart,
 const int* cellHashEnd,
+
 const double3 minBound,
 const double3 cellSize,
 const int3 gridSize,
@@ -178,6 +184,7 @@ cudaStream_t stream);
  *
  * @param[in]  cellHashStart              Spatial hash start.
  * @param[in]  cellHashEnd                Spatial hash end.
+
  * @param[in]  minBound                   Spatial grid min bound.
  * @param[in]  cellSize                   Spatial grid cell size.
  * @param[in]  gridSize                   Spatial grid resolution.
@@ -224,6 +231,7 @@ const int* interactionEnd_p_old,
 
 const int* cellHashStart,
 const int* cellHashEnd,
+
 const double3 minBound,
 const double3 cellSize,
 const int3 gridSize,

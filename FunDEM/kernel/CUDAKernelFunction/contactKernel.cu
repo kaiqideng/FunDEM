@@ -177,8 +177,10 @@ __device__ void atomicAddDouble3(double3* arr, size_t idx, const double3& v)
  * @param[out] overlap          Normal overlap delta per interaction (positive if penetrating).
  * @param[in]  objectPointed    Ball index i per interaction.
  * @param[in]  objectPointing   Ball index j per interaction.
+
  * @param[in]  position         Ball centers r_i / r_j in global coordinates.
  * @param[in]  radius           Ball radii.
+
  * @param[in]  numInteraction   Number of interactions in arrays.
  */
 __global__ void updateBallContactKernel(double3* contactPoint,
@@ -186,8 +188,10 @@ double3* contactNormal,
 double* overlap,
 const int* objectPointed, 
 const int* objectPointing, 
+
 const double3* position, 
 const double* radius,
+
 const size_t numInteraction)
 {
     size_t idx = blockIdx.x * blockDim.x + threadIdx.x;
@@ -245,6 +249,7 @@ const size_t numInteraction)
  * @param[in]  radius             Ball radii.
  * @param[in]  inverseMass        Ball inverse masses.
  * @param[in]  materialID         Ball material ids (used to lookup parameters in `para`).
+
  * @param[in]  dt                 Time step.
  * @param[in]  numInteraction     Number of interactions.
  */
@@ -258,12 +263,14 @@ const double3* contactNormal,
 const double* overlap,
 const int* objectPointed, 
 const int* objectPointing, 
+
 const double3* position, 
 const double3* velocity, 
 const double3* angularVelocity, 
 const double* radius, 
 const double* inverseMass,
 const int* materialID,
+
 const double dt,
 const size_t numInteraction)
 {
@@ -377,6 +384,7 @@ const size_t numInteraction)
  * @param[in]  index0_t              Triangle vertex index0.
  * @param[in]  index1_t              Triangle vertex index1.
  * @param[in]  index2_t              Triangle vertex index2.
+
  * @param[in]  globalPosition_v      Global vertex positions.
  *
  * @param[in]  numBall               Number of balls (threads map to balls).
@@ -559,6 +567,7 @@ const size_t numBall)
  *
  * @param[in,out] force               Ball forces (accumulated).
  * @param[in,out] torque              Ball torques (accumulated).
+
  * @param[out]    contactForce        Per-candidate contact force.
  * @param[out]    contactTorque       Per-candidate contact torque.
  * @param[in,out] slidingSpring       Sliding spring history per candidate.
@@ -583,6 +592,7 @@ const size_t numBall)
  * @param[in]  velocity_w             Wall rigid body velocities.
  * @param[in]  angularVelocity_w      Wall rigid body angular velocities.
  * @param[in]  materialID_w           Wall rigid body material ids.
+
  * @param[in]  wallIndex_tri          Map triangle index -> wall rigid body index.
  *
  * @param[in]  dt                     Time step.
@@ -590,6 +600,7 @@ const size_t numBall)
  */
 __global__ void addBallWallContactForceTorqueKernel(double3* force,
 double3* torque,
+
 double3* contactForce, 
 double3* contactTorque,
 double3* slidingSpring, 
@@ -601,6 +612,7 @@ const double* overlap,
 const int* objectPointed, 
 const int* objectPointing, 
 const int* cancelFlag, 
+
 const double3* position, 
 const double3* velocity, 
 const double3* angularVelocity, 
@@ -608,11 +620,14 @@ const double* radius,
 const double* inverseMass,
 const int* materialID,
 const int* neighborPrefixSum,
+
 const double3* position_w, 
 const double3* velocity_w, 
 const double3* angularVelocity_w, 
 const int* materialID_w,
+
 const int* wallIndex_tri,
+
 const double dt,
 const size_t numBall)
 {
@@ -728,6 +743,7 @@ const size_t numBall)
  *
  * @param[in,out] contactForce       Per-contact force array (ball-ball contact list).
  * @param[in,out] contactTorque      Per-contact torque array (ball-ball contact list).
+
  * @param[in,out] force              Global ball force accumulation (atomic when used).
  * @param[in,out] torque             Global ball torque accumulation (atomic when used).
  *
@@ -885,6 +901,7 @@ const size_t numBondedInteraction)
  *
  * @param[out]    contactForce      Per-interaction contact force.
  * @param[in,out] slidingSpring     Sliding spring history per interaction.
+
  * @param[in,out] force_p           Particle forces (accumulated, atomic).
  * @param[in,out] torque_p          Particle torques (accumulated, atomic).
  *
@@ -893,12 +910,14 @@ const size_t numBondedInteraction)
  * @param[in]  overlap              Overlap per interaction.
  * @param[in]  objectPointed        Boundary node index per interaction.
  * @param[in]  objectPointing       Particle index j per interaction.
+
  * @param[in]  particleID_bNode     Owner particle id for each boundary node index.
  *
  * @param[in]  position_p           Particle positions (global).
  * @param[in]  velocity_p           Particle velocities.
  * @param[in]  angularVelocity_p    Particle angular velocities.
  * @param[in]  materialID_p         Particle material ids.
+
  * @param[in]  dt                   Time step.
  * @param[in]  numInteraction       Number of interactions.
  */
@@ -919,6 +938,7 @@ const double3* position_p,
 const double3* velocity_p, 
 const double3* angularVelocity_p,
 const int* materialID_p,
+
 const double dt,
 const size_t numInteraction)
 {
@@ -1011,6 +1031,7 @@ const size_t numInteraction)
  * @param[in]  angularVelocity       Particle angular velocities.
  * @param[in]  orientation           Particle orientations (quaternions).
  * @param[in]  materialID            Particle material ids.
+
  * @param[in]  dt                    Time step.
  * @param[in]  numBondedInteraction  Number of bonds.
  */
@@ -1253,18 +1274,22 @@ const size_t numBoundaryNode)
  * @param[in,out] torque            Global torque per object (accumulated).
  * @param[in]     position          Object positions (used for torque arm).
  * @param[in]     neighborPrefixSum Inclusive prefix sum of per-object interaction counts.
+
  * @param[in]     contactForce      Per-interaction force (applied on the pointed object).
  * @param[in]     contactTorque     Per-interaction torque (about contact point).
  * @param[in]     contactPoint      Per-interaction contact point (global).
+
  * @param[in]     num               Number of pointed objects.
  */
 __global__ void sumObjectPointedForceTorqueFromInteractionKernel(double3* force, 
 double3* torque, 
 const double3* position, 
 const int* neighborPrefixSum,
+
 const double3* contactForce, 
 const double3* contactTorque, 
 const double3* contactPoint,
+
 const size_t num)
 {
 	size_t idx_i = blockIdx.x * blockDim.x + threadIdx.x;
@@ -1294,24 +1319,30 @@ const size_t num)
  *
  * @param[in,out] force               Global force per object (accumulated).
  * @param[in,out] torque              Global torque per object (accumulated).
+
  * @param[in]     position            Object positions (used for torque arm).
  * @param[in]     interactionStart    Start offset per pointing object, -1 if none.
  * @param[in]     interactionEnd      End offset per pointing object.
+
  * @param[in]     contactForce        Per-interaction force (stored on pointed object side).
  * @param[in]     contactTorque       Per-interaction torque.
  * @param[in]     contactPoint        Per-interaction contact point.
  * @param[in]     neighborPairHashIndex Mapping from compact adjacency list entry to interaction index.
+
  * @param[in]     num                 Number of pointing objects.
  */
 __global__ void sumObjectPointingForceTorqueFromInteractionKernel(double3* force, 
 double3* torque, 
+
 const double3* position, 
 const int* interactionStart, 
 const int* interactionEnd,
+
 const double3* contactForce, 
 const double3* contactTorque, 
 const double3* contactPoint,
 const int* neighborPairHashIndex,
+
 const size_t num)
 {
 	size_t idx_i = blockIdx.x * blockDim.x + threadIdx.x;
@@ -1593,6 +1624,7 @@ const double3* position_p,
 const double3* velocity_p,
 const double3* angularVelocity_p,
 const int* materialID_p,
+
 const double timeStep,
 
 const size_t numInteraction,
