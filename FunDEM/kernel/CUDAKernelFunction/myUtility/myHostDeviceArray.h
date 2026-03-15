@@ -24,16 +24,16 @@ inline void check_cuda_error(cudaError_t result, const char* func, const char* f
 #define CUDA_CHECK(val) check_cuda_error((val), #val, __FILE__, __LINE__)
 
 template <typename T>
-void debug_dump_device_array(const T* d_ptr,
-std::size_t n,
-const char* name,
-cudaStream_t stream = 0)
+void debug_dump_device_array(const T* d_ptr, std::size_t n, const char* name, cudaStream_t stream = 0)
 {
     if (n == 0) return;
 
-    if (stream == 0) {
+    if (stream == 0) 
+    {
         CUDA_CHECK(cudaDeviceSynchronize());
-    } else {
+    } 
+    else 
+    {
         CUDA_CHECK(cudaStreamSynchronize(stream));
     }
 
@@ -44,22 +44,23 @@ cudaStream_t stream = 0)
     cudaMemcpyDeviceToHost));
 
     std::cout << "[DEBUG] " << name << " (first " << n << " values):\n";
-    for (std::size_t i = 0; i < n; ++i) {
+    for (std::size_t i = 0; i < n; ++i) 
+    {
         std::cout << "  [" << i << "] = " << h_buf[i] << "\n";
     }
 }
 
 template <>
-inline void debug_dump_device_array<double3>(const double3* d_ptr, 
-std::size_t n,
-const char* name,
-cudaStream_t stream)
+inline void debug_dump_device_array<double3>(const double3* d_ptr, std::size_t n, const char* name, cudaStream_t stream)
 {
     if (n == 0) return;
 
-    if (stream == 0) {
+    if (stream == 0) 
+    {
         CUDA_CHECK(cudaDeviceSynchronize());
-    } else {
+    } 
+    else 
+    {
         CUDA_CHECK(cudaStreamSynchronize(stream));
     }
 
@@ -78,9 +79,9 @@ cudaStream_t stream)
     {
         const auto& v = h[i];
         std::cout << "  [" << i << "] = ("
-                  << v.x << ", "
-                  << v.y << ", "
-                  << v.z << ")\n";
+        << v.x << ", "
+        << v.y << ", "
+        << v.z << ")\n";
     }
 
     std::cout.copyfmt(old_state);
@@ -96,6 +97,23 @@ private:
 public:
     T* d_ptr {nullptr};        // device pointer
 
+private:
+    // ---------------------------------------------------------------------
+    // Helpers
+    // ---------------------------------------------------------------------
+    // Best-effort sync free for destructor / move-assignment.
+    // Do NOT CUDA_CHECK here because CUDA runtime may already be shutting down.
+    void releaseDeviceNoThrow_() noexcept
+    {
+        if (d_ptr)
+        {
+            (void)cudaFree(d_ptr); // ignore error on teardown
+            d_ptr = nullptr;
+        }
+        d_size = 0;
+    }
+
+public:
     // ---------------------------------------------------------------------
     // Rule of Five
     // ---------------------------------------------------------------------
@@ -103,8 +121,7 @@ public:
 
     ~HostDeviceArray1D()
     {
-        // Destructor cannot rely on a user-provided stream; use sync free.
-        releaseDeviceSync();
+        releaseDeviceNoThrow_();
     }
 
     HostDeviceArray1D(const HostDeviceArray1D&) = delete;
@@ -119,28 +136,26 @@ public:
     {
         if (this != &other)
         {
-            // We cannot safely cudaFreeAsync without a stream here; use sync free.
-            releaseDeviceSync();
+            releaseDeviceNoThrow_();
 
             h_data = std::move(other.h_data);
-
-            d_ptr  = std::exchange(other.d_ptr,  nullptr);
+            d_ptr = std::exchange(other.d_ptr,  nullptr);
             d_size = std::exchange(other.d_size, 0);
         }
         return *this;
     }
 
+public:
     // ---------------------------------------------------------------------
     // Sizes
     // ---------------------------------------------------------------------
     size_t hostSize() const { return h_data.size(); }
     size_t deviceSize() const { return d_size; }
 
+public:
     // ---------------------------------------------------------------------
     // Device memory management
     // ---------------------------------------------------------------------
-
-    // Async free (preferred when you have a stream).
     void releaseDevice(cudaStream_t stream)
     {
         if (d_ptr)
@@ -151,7 +166,6 @@ public:
         d_size = 0;
     }
 
-    // Sync free (safe for destructor / move assignment).
     void releaseDeviceSync()
     {
         if (d_ptr)
@@ -162,13 +176,8 @@ public:
         d_size = 0;
     }
 
-    // Allocate device array of size n.
-    // - Frees old device memory first.
-    // - Uses cudaMallocAsync/cudaFreeAsync on the provided stream.
-    // - If n==0, releases device memory and returns.
     void allocateDevice(size_t n, cudaStream_t stream, bool zeroFill = true)
     {
-        // Release old allocation if any.
         if (d_ptr) releaseDevice(stream);
 
         d_size = n;
@@ -185,13 +194,11 @@ public:
         }
     }
 
+public:
     // ---------------------------------------------------------------------
     // Host-side modifications
     // ---------------------------------------------------------------------
-    void pushHost(const T& value)
-    {
-        h_data.push_back(value);
-    }
+    void pushHost(const T& value) { h_data.push_back(value); }
 
     void insertHost(size_t index, const T& value)
     {
@@ -205,53 +212,36 @@ public:
         h_data.erase(h_data.begin() + static_cast<std::ptrdiff_t>(index));
     }
 
-    void clearHost()
-    {
-        h_data.clear();
-    }
-
-    void reserveHost(size_t n)
-    {
-        h_data.reserve(n);
-    }
-
-    void resizeHost(size_t n)
-    {
-        h_data.resize(n);
-    }
+    void clearHost() { h_data.clear(); }
+    void reserveHost(size_t n) { h_data.reserve(n); }
+    void resizeHost(size_t n) { h_data.resize(n); }
 
     const std::vector<T>& hostRef() const { return h_data; }
-
     void setHost(const std::vector<T>& newData) { h_data = newData; }
 
+public:
     // ---------------------------------------------------------------------
     // Host <-> Device transfer
     // ---------------------------------------------------------------------
-
-    // Host -> Device (async).
-    // Allocates device memory to match hostSize().
     void copyHostToDevice(cudaStream_t stream)
     {
         const size_t n = hostSize();
 
         if (n != d_size || d_ptr == nullptr)
         {
-            // No need to zero-fill because memcpy overwrites the buffer.
             allocateDevice(n, stream, /*zeroFill=*/false);
         }
 
         if (n > 0)
         {
             CUDA_CHECK(cudaMemcpyAsync(d_ptr,
-                                       h_data.data(),
-                                       n * sizeof(T),
-                                       cudaMemcpyHostToDevice,
-                                       stream));
+            h_data.data(),
+            n * sizeof(T),
+            cudaMemcpyHostToDevice,
+            stream));
         }
     }
 
-    // Device -> Host (async).
-    // After calling this, synchronize the stream before reading h_data.
     void copyDeviceToHost(cudaStream_t stream)
     {
         if (d_size == 0 || d_ptr == nullptr) return;
@@ -262,13 +252,12 @@ public:
         }
 
         CUDA_CHECK(cudaMemcpyAsync(h_data.data(),
-                                   d_ptr,
-                                   d_size * sizeof(T),
-                                   cudaMemcpyDeviceToHost,
-                                   stream));
+        d_ptr,
+        d_size * sizeof(T),
+        cudaMemcpyDeviceToHost,
+        stream));
     }
 
-    // Device -> Host (sync).
     std::vector<T> getHostCopy()
     {
         if (d_size > 0 && d_ptr)
@@ -278,9 +267,9 @@ public:
                 h_data.resize(d_size);
             }
             CUDA_CHECK(cudaMemcpy(h_data.data(),
-                                  d_ptr,
-                                  d_size * sizeof(T),
-                                  cudaMemcpyDeviceToHost));
+            d_ptr,
+            d_size * sizeof(T),
+            cudaMemcpyDeviceToHost));
         }
         return h_data;
     }

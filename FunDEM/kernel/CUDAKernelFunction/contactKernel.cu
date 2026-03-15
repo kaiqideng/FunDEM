@@ -650,8 +650,8 @@ const size_t numBondedInteraction)
 
 	if (!flag)
 	{
-		const double3 F_c = F_n * n_ij + F_s;
-		const double3 T_c = T_t * n_ij + T_b;
+		double3 F_c = F_n * n_ij + F_s;
+		double3 T_c = T_t * n_ij + T_b;
 		atomicAddDouble3(force, idx_i, F_c);
 		atomicAddDouble3(torque, idx_i, T_c + cross(r_c - r_i, F_c));
 		atomicAddDouble3(force, idx_j, -F_c);
@@ -826,8 +826,8 @@ const size_t numBondedInteraction)
 	maxNormalStress[idx] = sigma_max;
 	maxShearStress[idx] = tau_max;
 
-    const double3 F_c = F_n * n_ij + F_s;
-	const double3 T_c = T_t * n_ij + T_b;
+    double3 F_c = F_n * n_ij + F_s;
+	double3 T_c = T_t * n_ij + T_b;
 	atomicAddDouble3(force, idx_i, F_c);
 	atomicAddDouble3(torque, idx_i, T_c + cross(r_c - r_i, F_c));
 	atomicAddDouble3(force, idx_j, -F_c);

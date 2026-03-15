@@ -129,7 +129,7 @@ const size_t numBall)
 	const double3 r_c = position_c[idx_c];
     const double3 r_i = r_c + rotateVectorByQuaternion(orientation_c[idx_c], localPosition[idx]);
 	position[idx] = r_i;
-    double3 w_c = angularVelocity_c[idx_c];
+    const double3 w_c = angularVelocity_c[idx_c];
     angularVelocity[idx] = w_c;
 	velocity[idx] = velocity_c[idx_c] + cross(w_c, r_i - r_c);
 }
