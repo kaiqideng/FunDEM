@@ -2,6 +2,38 @@
 #include "neighborSearchKernel.cuh"
 #include "myUtility/buildHashStartEnd.cuh"
 
+/**
+ * @brief Count the number of LS-particle contacts for each boundary node (bNode).
+ *
+ * Each boundary node belongs to a source particle A (idxA = particleID_bNode[idx]).
+ * We search candidate neighbor particles B (idxB) via a spatial hash grid.
+ * For each candidate B, we transform the boundary node into particle-B's local frame,
+ * trilinearly interpolate B's level-set value (phi) at that location, and count a contact
+ * if overlap = -phi > 0.
+ *
+ * Output:
+ * - neighborCount_bNode[idx] = number of detected contacts for boundary node idx
+ *
+ * @param[out] neighborCount_bNode  Contact count per boundary node.
+ * @param[in]  localPosition_bNode  Boundary node local position in its owner particle A frame.
+ * @param[in]  particleID_bNode     Owner particle index (A) for each boundary node.
+ * @param[in]  LSFV_gNode           Concatenated level-set grid node values (phi) for all particles.
+ * @param[in]  position_p           Particle global positions.
+ * @param[in]  orientation_p        Particle orientations (used for frame transforms).
+ * @param[in]  radii_p              Bounding radius for each particle (used for early rejection).
+ * @param[in]  inverseMass_p        Inverse mass per particle (used to skip static-static pairs).
+ * @param[in]  gridSpacing_p        Grid spacing of each particle's level-set grid.
+ * @param[in]  gridNodeLocalOrigin_p Local origin (min corner) of each particle's level-set grid in that particle's local frame.
+ * @param[in]  gridNodeSize_p       Grid resolution (nx,ny,nz) of each particle's level-set grid.
+ * @param[in]  gridNodePrefixSum_p  Inclusive prefix sum of grid node counts per particle (used to locate each particle's grid in LSFV_gNode).
+ * @param[in]  hashIndex_p          Spatial hash sorted index list mapping cell range -> particle indices.
+ * @param[in]  cellHashStart        Spatial hash cell start index in hashIndex_p (size = numCells).
+ * @param[in]  cellHashEnd          Spatial hash cell end index in hashIndex_p (size = numCells).
+ * @param[in]  minBound             Spatial grid global minimum bound.
+ * @param[in]  cellSize             Spatial grid cell size.
+ * @param[in]  gridSize             Spatial grid resolution (nx,ny,nz) in cells.
+ * @param[in]  numBoundaryNode      Total number of boundary nodes.
+ */
 __global__ void countLevelSetBoundaryNodeInteractionsKernel(int* neighborCount_bNode,
 const double3* localPosition_bNode, 
 const int* particleID_bNode, 
@@ -122,6 +154,60 @@ const size_t numBoundaryNode)
     neighborCount_bNode[idx] = count;
 }
 
+/**
+ * @brief Build LS-boundary-node interaction pairs and initialize per-interaction state.
+ *
+ * For each boundary node idx:
+ * - Use neighborPrefixSum_bNode to locate its output segment in the interaction arrays.
+ * - Traverse candidate particles idxB via spatial hash.
+ * - Compute overlap = -phi via trilinear interpolation of particle-B's level-set grid.
+ * - If overlap > 0, write an interaction record:
+ *     objectPointed[index_w]  = idx   (boundary node index)
+ *     objectPointing[index_w] = idxB  (target particle index)
+ *     contactPoint/Normal/Overlap set accordingly
+ *     sliding/rolling/torsion spring initialized (and optionally restored from old pairs)
+ *
+ * @param[out] slidingSpring         Sliding spring state per interaction.
+ * @param[out] rollingSpring         Rolling spring state per interaction.
+ * @param[out] torsionSpring         Torsion spring state per interaction.
+ * @param[out] contactPoint          Contact point in GLOBAL coordinates per interaction.
+ * @param[out] contactNormal         Contact normal in GLOBAL coordinates per interaction.
+ * @param[out] contactOverlap        Positive overlap per interaction (overlap = -phi).
+ * @param[out] objectPointed         Interaction "pointed" object index (boundary node idx).
+ * @param[out] objectPointing        Interaction "pointing" object index (particle idxB).
+ *
+ * @param[in]  slidingSpring_old     Old sliding spring state per old interaction.
+ * @param[in]  rollingSpring_old     Old rolling spring state per old interaction.
+ * @param[in]  torsionSpring_old     Old torsion spring state per old interaction.
+ * @param[in]  objectPointed_old     Old objectPointed (boundary node index) per old interaction.
+ * @param[in]  neighborPairHashIndex_old  Mapping from old adjacency slot -> packed old interaction index.
+ *
+ * @param[in]  localPosition_bNode   Boundary node local position in its owner particle A frame.
+ * @param[in]  particleID_bNode      Owner particle index (A) for each boundary node.
+ * @param[in]  neighborPrefixSum_bNode Inclusive prefix sum of neighborCount_bNode (defines output segments per bNode).
+ *
+ * @param[in]  LSFV_gNode            Concatenated level-set grid node values for all particles.
+ *
+ * @param[in]  position_p            Particle global positions.
+ * @param[in]  orientation_p         Particle orientations.
+ * @param[in]  radii_p               Bounding radius per particle (early rejection).
+ * @param[in]  inverseMass_p         Inverse mass per particle (skip static-static).
+ * @param[in]  gridSpacing_p         Grid spacing per particle.
+ * @param[in]  gridNodeLocalOrigin_p Local grid origin per particle (in particle local frame).
+ * @param[in]  gridNodeSize_p        Grid resolution per particle.
+ * @param[in]  gridNodePrefixSum_p   Inclusive prefix sum of per-particle grid node counts.
+ * @param[in]  hashIndex_p           Spatial hash sorted index list mapping cell range -> particle indices.
+ *
+ * @param[in]  interactionStart_p_old Old interaction start index per particle (for restoring springs).
+ * @param[in]  interactionEnd_p_old   Old interaction end index per particle (for restoring springs).
+ *
+ * @param[in]  cellHashStart         Spatial hash cell start in hashIndex_p.
+ * @param[in]  cellHashEnd           Spatial hash cell end in hashIndex_p.
+ * @param[in]  minBound              Spatial grid global minimum bound.
+ * @param[in]  cellSize              Spatial grid cell size.
+ * @param[in]  gridSize              Spatial grid resolution in cells.
+ * @param[in]  numBoundaryNode       Total number of boundary nodes.
+ */
 __global__ void writeLevelSetBoundaryNodeInteractionsKernel(double3* slidingSpring,
 double3* rollingSpring,
 double3* torsionSpring,
@@ -154,8 +240,8 @@ const int3* gridNodeSize_p,
 const int* gridNodePrefixSum_p,
 const int* hashIndex_p,
 
-const int* interactionStart_old_p,
-const int* interactionEnd_old_p,
+const int* interactionStart_p_old,
+const int* interactionEnd_p_old,
 
 const int* cellHashStart, 
 const int* cellHashEnd,
@@ -280,9 +366,9 @@ const size_t numBoundaryNode)
                         slidingSpring[index_w] = make_double3(0., 0., 0.);
                         rollingSpring[index_w] = make_double3(0., 0., 0.);
                         torsionSpring[index_w] = make_double3(0., 0., 0.);
-                        if (interactionStart_old_p[idxB] != -1)
+                        if (interactionStart_p_old[idxB] != -1)
                         {
-                            for (int j = interactionStart_old_p[idxB]; j < interactionEnd_old_p[idxB]; j++)
+                            for (int j = interactionStart_p_old[idxB]; j < interactionEnd_p_old[idxB]; j++)
                             {
                                 const int j1 = neighborPairHashIndex_old[j];
                                 const int idx1 = objectPointed_old[j1];
@@ -393,8 +479,8 @@ const int3* gridNodeSize_p,
 const int* gridNodePrefixSum_p,
 const int* hashIndex_p,
 
-const int* interactionStart_old_p,
-const int* interactionEnd_old_p,
+const int* interactionStart_p_old,
+const int* interactionEnd_p_old,
 
 const int* cellHashStart,
 const int* cellHashEnd,
@@ -438,8 +524,8 @@ cudaStream_t stream)
     gridNodePrefixSum_p,
     hashIndex_p,
 
-    interactionStart_old_p,
-    interactionEnd_old_p,
+    interactionStart_p_old,
+    interactionEnd_p_old,
 
     cellHashStart,
     cellHashEnd,

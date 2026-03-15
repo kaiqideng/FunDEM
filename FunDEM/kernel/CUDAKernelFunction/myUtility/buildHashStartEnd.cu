@@ -3,6 +3,18 @@
 #include <thrust/sort.h>
 #include <thrust/scan.h>
 
+// -----------------------------------------------------------------------------
+// setHashIndex
+// -----------------------------------------------------------------------------
+// Initialize the permutation array "hashIndex" with identity mapping:
+//   hashIndex[i] = i
+//
+// This is typically used before sorting (hashValue, hashIndex) by hashValue,
+// so that after sorting, hashIndex stores the original element indices.
+//
+// hashIndex      : device array of length hashListSize
+// hashListSize   : number of elements in the hash list
+// -----------------------------------------------------------------------------
 __global__ void setHashIndex(int* hashIndex, 
 const size_t hashListSize)
 {
@@ -11,6 +23,27 @@ const size_t hashListSize)
     hashIndex[index] = static_cast<int>(index);
 }
 
+// -----------------------------------------------------------------------------
+// findStartAndEnd
+// -----------------------------------------------------------------------------
+// Given a sorted hash array "sortedHashValue" (ascending), compute for each hash
+// value h the half-open range [start[h], end[h]) of indices in the sorted list.
+//
+// The arrays start/end are assumed to be initialized to -1 (0xFF) beforehand.
+// This kernel writes:
+//   start[h] = first index where sortedHashValue[index] == h
+//   end[h]   = (last index where sortedHashValue[index] == h) + 1
+//
+// start          : device array length startEndSize (per-cell start)
+// end            : device array length startEndSize (per-cell end)
+// sortedHashValue: device array length hashListSize, must be sorted
+// startEndSize   : number of possible hash buckets (e.g., number of grid cells)
+// hashListSize   : length of sortedHashValue
+//
+// Notes:
+// - If a hash bucket h has no elements, start[h] and end[h] remain -1.
+// - Any hash value outside [0, startEndSize) is ignored.
+// -----------------------------------------------------------------------------
 __global__ void findStartAndEnd(int* start, 
 int* end, 
 int* sortedHashValue, 

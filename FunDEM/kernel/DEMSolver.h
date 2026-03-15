@@ -546,7 +546,7 @@ CUDA_CHECK(cudaGetLastError());
 
         if (ballTriangleInteraction_.numActivated_ > 0)
         {            
-            launchCalculateBallWallContactForceTorque(ball_.position(),
+            launchAddBallWallContactForceTorque(ball_.position(),
             ball_.velocity(),
             ball_.angularVelocity(),
             ball_.force(),

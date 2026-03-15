@@ -3,14 +3,14 @@
 #include <driver_types.h>
 #include <vector_types.h>
 
-extern "C" void launchAddConstantForce(double3* force,
+extern "C" void launchAddConstantForceToParticle(double3* force,
 const double3* force_external,
 const size_t num,
 const size_t gridD,
 const size_t blockD,
 cudaStream_t stream);
 
-extern "C" void launchAddGlobalDampingForceTorque(double3* force,
+extern "C" void launchAddGlobalDampingForceTorqueToParticle(double3* force,
 double3* torque,
 const double3* velocity,
 const double3* angularVelocity,

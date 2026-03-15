@@ -64,7 +64,7 @@ const double bondFrictionCoefficient)
 	return isBonded;
 }
 
-__device__ __forceinline__ int ParallelBondedContact2(double& bondNormalForce, 
+__device__ __forceinline__ int ParallelBondedContactForLevelSetParticle(double& bondNormalForce, 
 double& bondTorsionalTorque, 
 double3& bondShearForce, 
 double3& bondBendingTorque,
@@ -595,6 +595,37 @@ double3& closestPoint)
     : SphereTriangleContactType::None;
 }
 
+/**
+ * @brief Launch ball-ball contact update and contact force/torque computation (per interaction).
+ *
+ * Runs:
+ *  1) updateBallContactKernel
+ *  2) calBallContactForceTorqueKernel
+ *
+ * @param[in]  position          Ball positions.
+ * @param[in]  velocity          Ball velocities.
+ * @param[in]  angularVelocity   Ball angular velocities.
+ * @param[in]  radius            Ball radii.
+ * @param[in]  inverseMass       Ball inverse masses.
+ * @param[in]  materialID        Ball material ids.
+ *
+ * @param[in,out] slidingSpring  Sliding spring history per interaction.
+ * @param[in,out] rollingSpring  Rolling spring history per interaction.
+ * @param[in,out] torsionSpring  Torsion spring history per interaction.
+ * @param[out] contactForce      Per-interaction contact force.
+ * @param[out] contactTorque     Per-interaction contact torque.
+ * @param[out] contactPoint      Per-interaction contact point.
+ * @param[out] contactNormal     Per-interaction contact normal.
+ * @param[out] overlap           Per-interaction overlap.
+ * @param[in]  objectPointed     Per-interaction pointed index (ball i).
+ * @param[in]  objectPointing    Per-interaction pointing index (ball j).
+ *
+ * @param[in]  timeStep          Time step dt.
+ * @param[in]  numInteraction    Number of interactions.
+ * @param[in]  gridD             Launch grid dimension.
+ * @param[in]  blockD            Launch block dimension.
+ * @param[in]  stream            CUDA stream.
+ */
 extern "C" void launchCalculateBallContactForceTorque(double3* position, 
 double3* velocity, 
 double3* angularVelocity, 
@@ -620,6 +651,45 @@ const size_t gridD,
 const size_t blockD, 
 cudaStream_t stream);
 
+/**
+ * @brief Launch bonded contact update between ball pairs and accumulate bonded contribution.
+ *
+ * Runs:
+ *  1) addBondedForceTorqueKernel
+ *
+ * @param[in] position            Ball positions.
+ * @param[in] velocity            Ball velocities.
+ * @param[in] angularVelocity     Ball angular velocities.
+ * @param[in,out] force           Ball forces (accumulated).
+ * @param[in,out] torque          Ball torques (accumulated).
+ * @param[in] radius              Ball radii.
+ * @param[in] materialID          Ball material ids.
+ * @param[in] neighborPrefixSum   Contact list prefix sum per ball (for matching existing contacts).
+ *
+ * @param[in,out] contactForce    Contact list forces (bonded contribution is added if match exists).
+ * @param[in,out] contactTorque   Contact list torques (bonded contribution is added if match exists).
+ * @param[in] contactPoint        Contact list points.
+ * @param[in] contactNormal       Contact list normals.
+ * @param[in] objectPointing      Contact list pointing indices (ball j) per contact.
+ *
+ * @param[out] bondPoint          Bond point per bond.
+ * @param[out] bondNormal         Bond normal per bond.
+ * @param[in,out] shearForce      Bond shear history.
+ * @param[in,out] bendingTorque   Bond bending history.
+ * @param[in,out] normalForce     Bond normal history.
+ * @param[in,out] torsionTorque   Bond torsion history.
+ * @param[in,out] maxNormalStress Peak normal stress.
+ * @param[in,out] maxShearStress  Peak shear stress.
+ * @param[in,out] isBonded        Bond active flags.
+ * @param[in] objectPointed_b     Bonded pair i indices.
+ * @param[in] objectPointing_b    Bonded pair j indices.
+ *
+ * @param[in] timeStep            Time step dt.
+ * @param[in] numBondedInteraction Number of bonds.
+ * @param[in] gridD               Launch grid dimension.
+ * @param[in] blockD              Launch block dimension.
+ * @param[in] stream              CUDA stream.
+ */
 extern "C" void launchAddBondedForceTorque(double3* position, 
 double3* velocity, 
 double3* angularVelocity, 
@@ -654,6 +724,28 @@ const size_t gridD,
 const size_t blockD, 
 cudaStream_t stream);
 
+/**
+ * @brief Launch force/torque reduction from per-interaction arrays to both pointed and pointing objects.
+ *
+ * Runs:
+ *  1) sumObjectPointedForceTorqueFromInteractionKernel
+ *  2) sumObjectPointingForceTorqueFromInteractionKernel
+ *
+ * @param[in] position            Object positions.
+ * @param[in,out] force           Object forces (accumulated).
+ * @param[in,out] torque          Object torques (accumulated).
+ * @param[in] neighborPrefixSum   Pointed-side prefix sum of interactions per object.
+ * @param[in] interactionStart    Pointing-side adjacency list start per object.
+ * @param[in] interactionEnd      Pointing-side adjacency list end per object.
+ * @param[in] contactForce        Per-interaction forces (stored on pointed side).
+ * @param[in] contactTorque       Per-interaction torques.
+ * @param[in] contactPoint        Per-interaction contact points.
+ * @param[in] neighborPairHashIndex Remap array from adjacency list entries to interaction indices.
+ * @param[in] num                 Number of objects.
+ * @param[in] gridD               Launch grid dimension.
+ * @param[in] blockD              Launch block dimension.
+ * @param[in] stream              CUDA stream.
+ */
 extern "C" void launchSumContactForceTorque(double3* position, 
 double3* force, 
 double3* torque,
@@ -671,7 +763,53 @@ const size_t gridD,
 const size_t blockD, 
 cudaStream_t stream);
 
-extern "C" void launchCalculateBallWallContactForceTorque(double3* position, 
+/**
+ * @brief Launch ball-triangle contact update and wall contact force accumulation.
+ *
+ * Runs:
+ *  1) updateBallTriangleContact
+ *  2) addBallWallContactForceTorqueKernel
+ *
+ * @param[in] position            Ball positions.
+ * @param[in] velocity            Ball velocities.
+ * @param[in] angularVelocity     Ball angular velocities.
+ * @param[in,out] force           Ball forces (accumulated).
+ * @param[in,out] torque          Ball torques (accumulated).
+ * @param[in] radius              Ball radii.
+ * @param[in] inverseMass         Ball inverse masses.
+ * @param[in] materialID          Ball material ids.
+ * @param[in] neighborPrefixSum   Candidate triangle count prefix sum per ball.
+ *
+ * @param[in] position_w          Wall rigid body positions.
+ * @param[in] velocity_w          Wall rigid body velocities.
+ * @param[in] angularVelocity_w   Wall rigid body angular velocities.
+ * @param[in] materialID_w        Wall rigid body material ids.
+ *
+ * @param[in] index0_t            Triangle vertex index0.
+ * @param[in] index1_t            Triangle vertex index1.
+ * @param[in] index2_t            Triangle vertex index2.
+ * @param[in] wallIndex_tri       Map triangle index -> wall rigid body index.
+ * @param[in] globalPosition_v    Global vertex positions.
+ *
+ * @param[in,out] slidingSpring   Candidate spring histories.
+ * @param[in,out] rollingSpring   Candidate spring histories.
+ * @param[in,out] torsionSpring   Candidate spring histories.
+ * @param[out] contactForce       Candidate contact forces.
+ * @param[out] contactTorque      Candidate contact torques.
+ * @param[out] contactPoint       Candidate contact points.
+ * @param[out] contactNormal      Candidate normals.
+ * @param[out] overlap            Candidate overlaps.
+ * @param[in] objectPointed       Candidate pointed indices (ball i).
+ * @param[in] objectPointing      Candidate pointing indices (triangle j).
+ * @param[out] cancelFlag         Candidate cancel flags.
+ *
+ * @param[in] timeStep            Time step dt.
+ * @param[in] numBall             Number of balls.
+ * @param[in] gridD               Launch grid dimension.
+ * @param[in] blockD              Launch block dimension.
+ * @param[in] stream              CUDA stream.
+ */
+extern "C" void launchAddBallWallContactForceTorque(double3* position, 
 double3* velocity, 
 double3* angularVelocity, 
 double3* force, 
@@ -712,6 +850,39 @@ const size_t gridD,
 const size_t blockD, 
 cudaStream_t stream);
 
+/**
+ * @brief Launch level-set boundary-node vs level-set particle contact forces and accumulate to particle arrays.
+ *
+ * Runs:
+ *  1) calLevelSetParticleContactForceTorqueKernel
+ *
+ * Pair convention:
+ * - objectPointed = boundary node index
+ * - objectPointing = particle j
+ * - particleID_bNode[objectPointed] gives particle i
+ *
+ * @param[out] contactForce        Per-interaction contact force.
+ * @param[in,out] slidingSpring    Sliding spring history per interaction.
+ * @param[in] contactPoint         Contact point per interaction.
+ * @param[in] contactNormal        Contact normal per interaction.
+ * @param[in] overlap              Overlap per interaction.
+ * @param[in] objectPointed        Boundary node index per interaction.
+ * @param[in] objectPointing       Particle j per interaction.
+ * @param[in] particleID_bNode     Owner particle id per boundary node.
+ *
+ * @param[in,out] force_p          Particle force accumulation (atomic).
+ * @param[in,out] torque_p         Particle torque accumulation (atomic).
+ * @param[in] position_p           Particle positions.
+ * @param[in] velocity_p           Particle velocities.
+ * @param[in] angularVelocity_p    Particle angular velocities.
+ * @param[in] materialID_p         Particle material ids.
+ * @param[in] timeStep             Time step dt.
+ *
+ * @param[in] numInteraction       Number of interactions.
+ * @param[in] gridD                Launch grid dimension.
+ * @param[in] blockD               Launch block dimension.
+ * @param[in] stream               CUDA stream.
+ */
 extern "C" void launchCalLevelSetParticleContactForceTorque(double3* contactForce,
 double3* slidingSpring,
 const double3* contactPoint,
@@ -735,6 +906,43 @@ const size_t gridD,
 const size_t blockD,
 cudaStream_t stream);
 
+/**
+ * @brief Launch bonded force/torque for level-set particle bonds (local endpoints) and accumulate to force/torque.
+ *
+ * Runs:
+ *  1) addLevelSetParticleBondedForceTorqueKernel
+ *
+ * @param[out] bondPoint            Bond center point per bond.
+ * @param[out] bondNormal           Bond normal per bond.
+ * @param[in,out] shearForce        Bond shear history.
+ * @param[in,out] bendingTorque     Bond bending history.
+ * @param[in,out] normalForce       Bond normal history.
+ * @param[in,out] torsionTorque     Bond torsion history.
+ * @param[in,out] maxNormalStress   Peak normal stress.
+ * @param[in,out] maxShearStress    Peak shear stress.
+ * @param[in,out] isBonded          Bond active flags.
+ *
+ * @param[in] localPointA_b         Local endpoint in particle i frame.
+ * @param[in] localPointB_b         Local endpoint in particle j frame.
+ * @param[in] length_b              Bond length.
+ * @param[in] radius_b              Bond radius.
+ * @param[in] objectPointed_b       Particle i indices.
+ * @param[in] objectPointing_b      Particle j indices.
+ *
+ * @param[in,out] force             Particle force accumulation (atomic).
+ * @param[in,out] torque            Particle torque accumulation (atomic).
+ * @param[in] position              Particle positions.
+ * @param[in] velocity              Particle velocities.
+ * @param[in] angularVelocity       Particle angular velocities.
+ * @param[in] orientation           Particle orientations.
+ * @param[in] materialID            Particle material ids.
+ *
+ * @param[in] dt                    Time step.
+ * @param[in] numBondedInteraction  Number of bonds.
+ * @param[in] gridD                 Launch grid dimension.
+ * @param[in] blockD                Launch block dimension.
+ * @param[in] stream                CUDA stream.
+ */
 extern "C" void launchAddLevelSetParticleBondedForceTorque(double3* bondPoint,
 double3* bondNormal,
 double3* shearForce,
@@ -766,6 +974,32 @@ const size_t gridD,
 const size_t blockD,
 cudaStream_t stream);
 
+/**
+ * @brief Launch level-set particle vs fixed level-set wall force accumulation using wall grid interpolation.
+ *
+ * Runs:
+ *  1) addLevelSetParticleWallForce
+ *
+ * @param[in,out] force_p              Particle forces (atomic accumulation).
+ * @param[in,out] torque_p             Particle torques (atomic accumulation).
+ * @param[in] position_p               Particle positions.
+ * @param[in] orientation_p            Particle orientations.
+ * @param[in] inverseMass_p            Particle inverse masses (<=0 => fixed).
+ * @param[in] materialID_p             Particle material ids.
+ *
+ * @param[in] localPosition_bNode      Boundary node local positions.
+ * @param[in] particleID_bNode         Owner particle id for each boundary node.
+ *
+ * @param[in] LSFV_w                   Wall grid phi values.
+ * @param[in] gridSpacing_w            Wall grid spacing.
+ * @param[in] gridNodeGlobalOrigin_w   Wall grid origin (global).
+ * @param[in] gridNodeSize_w           Wall grid node size.
+ *
+ * @param[in] numBoundaryNode          Number of boundary nodes.
+ * @param[in] gridD                    Launch grid dimension.
+ * @param[in] blockD                   Launch block dimension.
+ * @param[in] stream                   CUDA stream.
+ */
 extern "C" void launchAddLevelSetParticleWallForce(double3* force_p,
 double3* torque_p,
 const double3* position_p,

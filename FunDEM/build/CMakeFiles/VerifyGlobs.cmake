@@ -14,7 +14,10 @@ endif()
 # APP_SRCS at apps/CMakeLists.txt:14 (file)
 file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "/teamspace/studios/this_studio/FunDEM/apps/*.cpp")
 set(OLD_GLOB
+  "/teamspace/studios/this_studio/FunDEM/apps/tutorial-bondedBalls/bondedParticleBeam.cpp"
+  "/teamspace/studios/this_studio/FunDEM/apps/tutorial-bondedBalls/ice-struct.cpp"
   "/teamspace/studios/this_studio/FunDEM/apps/tutorial-bondedLevelSetParticles/bondedLevelSetParticles.cpp"
+  "/teamspace/studios/this_studio/FunDEM/apps/tutorial-singleBall/elasticBounce.cpp"
   )
 if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
   message("-- GLOB mismatch!")
@@ -24,6 +27,7 @@ endif()
 # APP_SRCS at apps/CMakeLists.txt:14 (file)
 file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "/teamspace/studios/this_studio/FunDEM/apps/*.cu")
 set(OLD_GLOB
+  "/teamspace/studios/this_studio/FunDEM/apps/tutorial-bondedBalls/externalForceTorque.cu"
   "/teamspace/studios/this_studio/FunDEM/apps/tutorial-bondedLevelSetParticles/globalDamping.cu"
   )
 if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
@@ -47,10 +51,10 @@ set(OLD_GLOB
   "/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/WCSPHIntegrationKernel.cuh"
   "/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/ballIntegrationKernel.cuh"
   "/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/ballNeighborSearchKernel.cuh"
-  "/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/buildHashStartEnd.cuh"
   "/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/contactKernel.cuh"
   "/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/levelSetParticleContactDetectionKernel.cuh"
   "/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/levelSetParticleIntegrationKernel.cuh"
+  "/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility/buildHashStartEnd.cuh"
   "/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/neighborSearchKernel.cuh"
   "/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/wallIntegrationKernel.cuh"
   )
@@ -107,10 +111,10 @@ set(OLD_GLOB
   "/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/WCSPHIntegrationKernel.cu"
   "/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/ballIntegrationKernel.cu"
   "/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/ballNeighborSearchKernel.cu"
-  "/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/buildHashStartEnd.cu"
   "/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/contactKernel.cu"
   "/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/levelSetParticleContactDetectionKernel.cu"
   "/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/levelSetParticleIntegrationKernel.cu"
+  "/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility/buildHashStartEnd.cu"
   "/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/neighborSearchKernel.cu"
   "/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/wallIntegrationKernel.cu"
   )
@@ -126,10 +130,10 @@ set(OLD_GLOB
   "/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/WCSPHIntegrationKernel.cuh"
   "/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/ballIntegrationKernel.cuh"
   "/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/ballNeighborSearchKernel.cuh"
-  "/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/buildHashStartEnd.cuh"
   "/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/contactKernel.cuh"
   "/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/levelSetParticleContactDetectionKernel.cuh"
   "/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/levelSetParticleIntegrationKernel.cuh"
+  "/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility/buildHashStartEnd.cuh"
   "/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/neighborSearchKernel.cuh"
   "/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/wallIntegrationKernel.cuh"
   )

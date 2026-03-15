@@ -50,7 +50,7 @@ HOST_DEVICE inline quaternion operator/(quaternion q, double c) {
 
 HOST_DEVICE inline quaternion normalize(quaternion q) {
     double lenSq = q.q0 * q.q0 + q.q1 * q.q1 + q.q2 * q.q2 + q.q3 * q.q3;
-    if (lenSq < kMinPhysicalValue) return q; // Prevent NaN
+    if (isZero(lenSq)) return q; // Prevent NaN
 
 #ifdef __CUDA_ARCH__
     double invLen = rsqrt(lenSq); // Use hardware intrinsic on GPU

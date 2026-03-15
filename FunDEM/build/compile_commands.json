@@ -1,74 +1,98 @@
 [
 {
   "directory": "/teamspace/studios/this_studio/FunDEM/build",
-  "command": "/usr/local/cuda/bin/nvcc -forward-unknown-to-host-compiler -I/teamspace/studios/this_studio/FunDEM -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -isystem /usr/local/cuda/targets/x86_64-linux/include -O3 -DNDEBUG -std=c++17 \"--generate-code=arch=compute_75,code=[compute_75,sm_75]\" -Xcompiler=-fPIC -x cu -rdc=true -c /teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/SPHNeighborSearchKernel.cu -o kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/SPHNeighborSearchKernel.cu.o",
+  "command": "/usr/bin/nvcc -forward-unknown-to-host-compiler -I/teamspace/studios/this_studio/FunDEM -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -O3 -DNDEBUG -std=c++17 \"--generate-code=arch=compute_75,code=[compute_75,sm_75]\" -Xcompiler=-fPIC -x cu -rdc=true -c /teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/SPHNeighborSearchKernel.cu -o kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/SPHNeighborSearchKernel.cu.o",
   "file": "/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/SPHNeighborSearchKernel.cu",
   "output": "kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/SPHNeighborSearchKernel.cu.o"
 },
 {
   "directory": "/teamspace/studios/this_studio/FunDEM/build",
-  "command": "/usr/local/cuda/bin/nvcc -forward-unknown-to-host-compiler -I/teamspace/studios/this_studio/FunDEM -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -isystem /usr/local/cuda/targets/x86_64-linux/include -O3 -DNDEBUG -std=c++17 \"--generate-code=arch=compute_75,code=[compute_75,sm_75]\" -Xcompiler=-fPIC -x cu -rdc=true -c /teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/WCSPHIntegrationKernel.cu -o kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/WCSPHIntegrationKernel.cu.o",
+  "command": "/usr/bin/nvcc -forward-unknown-to-host-compiler -I/teamspace/studios/this_studio/FunDEM -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -O3 -DNDEBUG -std=c++17 \"--generate-code=arch=compute_75,code=[compute_75,sm_75]\" -Xcompiler=-fPIC -x cu -rdc=true -c /teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/WCSPHIntegrationKernel.cu -o kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/WCSPHIntegrationKernel.cu.o",
   "file": "/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/WCSPHIntegrationKernel.cu",
   "output": "kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/WCSPHIntegrationKernel.cu.o"
 },
 {
   "directory": "/teamspace/studios/this_studio/FunDEM/build",
-  "command": "/usr/local/cuda/bin/nvcc -forward-unknown-to-host-compiler -I/teamspace/studios/this_studio/FunDEM -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -isystem /usr/local/cuda/targets/x86_64-linux/include -O3 -DNDEBUG -std=c++17 \"--generate-code=arch=compute_75,code=[compute_75,sm_75]\" -Xcompiler=-fPIC -x cu -rdc=true -c /teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/ballIntegrationKernel.cu -o kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/ballIntegrationKernel.cu.o",
+  "command": "/usr/bin/nvcc -forward-unknown-to-host-compiler -I/teamspace/studios/this_studio/FunDEM -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -O3 -DNDEBUG -std=c++17 \"--generate-code=arch=compute_75,code=[compute_75,sm_75]\" -Xcompiler=-fPIC -x cu -rdc=true -c /teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/ballIntegrationKernel.cu -o kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/ballIntegrationKernel.cu.o",
   "file": "/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/ballIntegrationKernel.cu",
   "output": "kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/ballIntegrationKernel.cu.o"
 },
 {
   "directory": "/teamspace/studios/this_studio/FunDEM/build",
-  "command": "/usr/local/cuda/bin/nvcc -forward-unknown-to-host-compiler -I/teamspace/studios/this_studio/FunDEM -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -isystem /usr/local/cuda/targets/x86_64-linux/include -O3 -DNDEBUG -std=c++17 \"--generate-code=arch=compute_75,code=[compute_75,sm_75]\" -Xcompiler=-fPIC -x cu -rdc=true -c /teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/ballNeighborSearchKernel.cu -o kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/ballNeighborSearchKernel.cu.o",
+  "command": "/usr/bin/nvcc -forward-unknown-to-host-compiler -I/teamspace/studios/this_studio/FunDEM -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -O3 -DNDEBUG -std=c++17 \"--generate-code=arch=compute_75,code=[compute_75,sm_75]\" -Xcompiler=-fPIC -x cu -rdc=true -c /teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/ballNeighborSearchKernel.cu -o kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/ballNeighborSearchKernel.cu.o",
   "file": "/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/ballNeighborSearchKernel.cu",
   "output": "kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/ballNeighborSearchKernel.cu.o"
 },
 {
   "directory": "/teamspace/studios/this_studio/FunDEM/build",
-  "command": "/usr/local/cuda/bin/nvcc -forward-unknown-to-host-compiler -I/teamspace/studios/this_studio/FunDEM -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -isystem /usr/local/cuda/targets/x86_64-linux/include -O3 -DNDEBUG -std=c++17 \"--generate-code=arch=compute_75,code=[compute_75,sm_75]\" -Xcompiler=-fPIC -x cu -rdc=true -c /teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/buildHashStartEnd.cu -o kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/buildHashStartEnd.cu.o",
-  "file": "/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/buildHashStartEnd.cu",
-  "output": "kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/buildHashStartEnd.cu.o"
-},
-{
-  "directory": "/teamspace/studios/this_studio/FunDEM/build",
-  "command": "/usr/local/cuda/bin/nvcc -forward-unknown-to-host-compiler -I/teamspace/studios/this_studio/FunDEM -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -isystem /usr/local/cuda/targets/x86_64-linux/include -O3 -DNDEBUG -std=c++17 \"--generate-code=arch=compute_75,code=[compute_75,sm_75]\" -Xcompiler=-fPIC -x cu -rdc=true -c /teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/contactKernel.cu -o kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/contactKernel.cu.o",
+  "command": "/usr/bin/nvcc -forward-unknown-to-host-compiler -I/teamspace/studios/this_studio/FunDEM -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -O3 -DNDEBUG -std=c++17 \"--generate-code=arch=compute_75,code=[compute_75,sm_75]\" -Xcompiler=-fPIC -x cu -rdc=true -c /teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/contactKernel.cu -o kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/contactKernel.cu.o",
   "file": "/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/contactKernel.cu",
   "output": "kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/contactKernel.cu.o"
 },
 {
   "directory": "/teamspace/studios/this_studio/FunDEM/build",
-  "command": "/usr/local/cuda/bin/nvcc -forward-unknown-to-host-compiler -I/teamspace/studios/this_studio/FunDEM -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -isystem /usr/local/cuda/targets/x86_64-linux/include -O3 -DNDEBUG -std=c++17 \"--generate-code=arch=compute_75,code=[compute_75,sm_75]\" -Xcompiler=-fPIC -x cu -rdc=true -c /teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/levelSetParticleContactDetectionKernel.cu -o kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/levelSetParticleContactDetectionKernel.cu.o",
+  "command": "/usr/bin/nvcc -forward-unknown-to-host-compiler -I/teamspace/studios/this_studio/FunDEM -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -O3 -DNDEBUG -std=c++17 \"--generate-code=arch=compute_75,code=[compute_75,sm_75]\" -Xcompiler=-fPIC -x cu -rdc=true -c /teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/levelSetParticleContactDetectionKernel.cu -o kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/levelSetParticleContactDetectionKernel.cu.o",
   "file": "/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/levelSetParticleContactDetectionKernel.cu",
   "output": "kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/levelSetParticleContactDetectionKernel.cu.o"
 },
 {
   "directory": "/teamspace/studios/this_studio/FunDEM/build",
-  "command": "/usr/local/cuda/bin/nvcc -forward-unknown-to-host-compiler -I/teamspace/studios/this_studio/FunDEM -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -isystem /usr/local/cuda/targets/x86_64-linux/include -O3 -DNDEBUG -std=c++17 \"--generate-code=arch=compute_75,code=[compute_75,sm_75]\" -Xcompiler=-fPIC -x cu -rdc=true -c /teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/levelSetParticleIntegrationKernel.cu -o kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/levelSetParticleIntegrationKernel.cu.o",
+  "command": "/usr/bin/nvcc -forward-unknown-to-host-compiler -I/teamspace/studios/this_studio/FunDEM -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -O3 -DNDEBUG -std=c++17 \"--generate-code=arch=compute_75,code=[compute_75,sm_75]\" -Xcompiler=-fPIC -x cu -rdc=true -c /teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/levelSetParticleIntegrationKernel.cu -o kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/levelSetParticleIntegrationKernel.cu.o",
   "file": "/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/levelSetParticleIntegrationKernel.cu",
   "output": "kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/levelSetParticleIntegrationKernel.cu.o"
 },
 {
   "directory": "/teamspace/studios/this_studio/FunDEM/build",
-  "command": "/usr/local/cuda/bin/nvcc -forward-unknown-to-host-compiler -I/teamspace/studios/this_studio/FunDEM -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -isystem /usr/local/cuda/targets/x86_64-linux/include -O3 -DNDEBUG -std=c++17 \"--generate-code=arch=compute_75,code=[compute_75,sm_75]\" -Xcompiler=-fPIC -x cu -rdc=true -c /teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/neighborSearchKernel.cu -o kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/neighborSearchKernel.cu.o",
+  "command": "/usr/bin/nvcc -forward-unknown-to-host-compiler -I/teamspace/studios/this_studio/FunDEM -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -O3 -DNDEBUG -std=c++17 \"--generate-code=arch=compute_75,code=[compute_75,sm_75]\" -Xcompiler=-fPIC -x cu -rdc=true -c /teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility/buildHashStartEnd.cu -o kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/myUtility/buildHashStartEnd.cu.o",
+  "file": "/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility/buildHashStartEnd.cu",
+  "output": "kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/myUtility/buildHashStartEnd.cu.o"
+},
+{
+  "directory": "/teamspace/studios/this_studio/FunDEM/build",
+  "command": "/usr/bin/nvcc -forward-unknown-to-host-compiler -I/teamspace/studios/this_studio/FunDEM -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -O3 -DNDEBUG -std=c++17 \"--generate-code=arch=compute_75,code=[compute_75,sm_75]\" -Xcompiler=-fPIC -x cu -rdc=true -c /teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/neighborSearchKernel.cu -o kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/neighborSearchKernel.cu.o",
   "file": "/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/neighborSearchKernel.cu",
   "output": "kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/neighborSearchKernel.cu.o"
 },
 {
   "directory": "/teamspace/studios/this_studio/FunDEM/build",
-  "command": "/usr/local/cuda/bin/nvcc -forward-unknown-to-host-compiler -I/teamspace/studios/this_studio/FunDEM -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -isystem /usr/local/cuda/targets/x86_64-linux/include -O3 -DNDEBUG -std=c++17 \"--generate-code=arch=compute_75,code=[compute_75,sm_75]\" -Xcompiler=-fPIC -x cu -rdc=true -c /teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/wallIntegrationKernel.cu -o kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/wallIntegrationKernel.cu.o",
+  "command": "/usr/bin/nvcc -forward-unknown-to-host-compiler -I/teamspace/studios/this_studio/FunDEM -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -O3 -DNDEBUG -std=c++17 \"--generate-code=arch=compute_75,code=[compute_75,sm_75]\" -Xcompiler=-fPIC -x cu -rdc=true -c /teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/wallIntegrationKernel.cu -o kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/wallIntegrationKernel.cu.o",
   "file": "/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/wallIntegrationKernel.cu",
   "output": "kernel/CMakeFiles/FunDEM_kernels.dir/CUDAKernelFunction/wallIntegrationKernel.cu.o"
 },
 {
   "directory": "/teamspace/studios/this_studio/FunDEM/build",
-  "command": "/usr/local/cuda/bin/nvcc -forward-unknown-to-host-compiler -I/teamspace/studios/this_studio/FunDEM/apps -I/teamspace/studios/this_studio/FunDEM -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -isystem /usr/local/cuda/targets/x86_64-linux/include -O3 -DNDEBUG -std=c++17 \"--generate-code=arch=compute_75,code=[compute_75,sm_75]\" -Xcompiler=-fPIC -x cu -rdc=true -c /teamspace/studios/this_studio/FunDEM/apps/tutorial-bondedLevelSetParticles/globalDamping.cu -o apps/CMakeFiles/FunDEM_apps_common.dir/tutorial-bondedLevelSetParticles/globalDamping.cu.o",
+  "command": "/usr/bin/nvcc -forward-unknown-to-host-compiler -I/teamspace/studios/this_studio/FunDEM/apps -I/teamspace/studios/this_studio/FunDEM -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -O3 -DNDEBUG -std=c++17 \"--generate-code=arch=compute_75,code=[compute_75,sm_75]\" -Xcompiler=-fPIC -x cu -rdc=true -c /teamspace/studios/this_studio/FunDEM/apps/tutorial-bondedBalls/externalForceTorque.cu -o apps/CMakeFiles/FunDEM_apps_common.dir/tutorial-bondedBalls/externalForceTorque.cu.o",
+  "file": "/teamspace/studios/this_studio/FunDEM/apps/tutorial-bondedBalls/externalForceTorque.cu",
+  "output": "apps/CMakeFiles/FunDEM_apps_common.dir/tutorial-bondedBalls/externalForceTorque.cu.o"
+},
+{
+  "directory": "/teamspace/studios/this_studio/FunDEM/build",
+  "command": "/usr/bin/nvcc -forward-unknown-to-host-compiler -I/teamspace/studios/this_studio/FunDEM/apps -I/teamspace/studios/this_studio/FunDEM -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -O3 -DNDEBUG -std=c++17 \"--generate-code=arch=compute_75,code=[compute_75,sm_75]\" -Xcompiler=-fPIC -x cu -rdc=true -c /teamspace/studios/this_studio/FunDEM/apps/tutorial-bondedLevelSetParticles/globalDamping.cu -o apps/CMakeFiles/FunDEM_apps_common.dir/tutorial-bondedLevelSetParticles/globalDamping.cu.o",
   "file": "/teamspace/studios/this_studio/FunDEM/apps/tutorial-bondedLevelSetParticles/globalDamping.cu",
   "output": "apps/CMakeFiles/FunDEM_apps_common.dir/tutorial-bondedLevelSetParticles/globalDamping.cu.o"
 },
 {
   "directory": "/teamspace/studios/this_studio/FunDEM/build",
-  "command": "/usr/bin/c++ -I/teamspace/studios/this_studio/FunDEM/apps -I/teamspace/studios/this_studio/FunDEM -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -isystem /usr/local/cuda/targets/x86_64-linux/include -O3 -DNDEBUG -std=gnu++17 -fPIE -o apps/CMakeFiles/tutorial-bondedLevelSetParticles__bondedLevelSetParticles.dir/tutorial-bondedLevelSetParticles/bondedLevelSetParticles.cpp.o -c /teamspace/studios/this_studio/FunDEM/apps/tutorial-bondedLevelSetParticles/bondedLevelSetParticles.cpp",
+  "command": "/usr/bin/c++ -I/teamspace/studios/this_studio/FunDEM/apps -I/teamspace/studios/this_studio/FunDEM -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -O3 -DNDEBUG -std=gnu++17 -fPIE -o apps/CMakeFiles/tutorial-bondedBalls__bondedParticleBeam.dir/tutorial-bondedBalls/bondedParticleBeam.cpp.o -c /teamspace/studios/this_studio/FunDEM/apps/tutorial-bondedBalls/bondedParticleBeam.cpp",
+  "file": "/teamspace/studios/this_studio/FunDEM/apps/tutorial-bondedBalls/bondedParticleBeam.cpp",
+  "output": "apps/CMakeFiles/tutorial-bondedBalls__bondedParticleBeam.dir/tutorial-bondedBalls/bondedParticleBeam.cpp.o"
+},
+{
+  "directory": "/teamspace/studios/this_studio/FunDEM/build",
+  "command": "/usr/bin/c++ -I/teamspace/studios/this_studio/FunDEM/apps -I/teamspace/studios/this_studio/FunDEM -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -O3 -DNDEBUG -std=gnu++17 -fPIE -o apps/CMakeFiles/tutorial-bondedBalls__ice-struct.dir/tutorial-bondedBalls/ice-struct.cpp.o -c /teamspace/studios/this_studio/FunDEM/apps/tutorial-bondedBalls/ice-struct.cpp",
+  "file": "/teamspace/studios/this_studio/FunDEM/apps/tutorial-bondedBalls/ice-struct.cpp",
+  "output": "apps/CMakeFiles/tutorial-bondedBalls__ice-struct.dir/tutorial-bondedBalls/ice-struct.cpp.o"
+},
+{
+  "directory": "/teamspace/studios/this_studio/FunDEM/build",
+  "command": "/usr/bin/c++ -I/teamspace/studios/this_studio/FunDEM/apps -I/teamspace/studios/this_studio/FunDEM -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -O3 -DNDEBUG -std=gnu++17 -fPIE -o apps/CMakeFiles/tutorial-bondedLevelSetParticles__bondedLevelSetParticles.dir/tutorial-bondedLevelSetParticles/bondedLevelSetParticles.cpp.o -c /teamspace/studios/this_studio/FunDEM/apps/tutorial-bondedLevelSetParticles/bondedLevelSetParticles.cpp",
   "file": "/teamspace/studios/this_studio/FunDEM/apps/tutorial-bondedLevelSetParticles/bondedLevelSetParticles.cpp",
   "output": "apps/CMakeFiles/tutorial-bondedLevelSetParticles__bondedLevelSetParticles.dir/tutorial-bondedLevelSetParticles/bondedLevelSetParticles.cpp.o"
+},
+{
+  "directory": "/teamspace/studios/this_studio/FunDEM/build",
+  "command": "/usr/bin/c++ -I/teamspace/studios/this_studio/FunDEM/apps -I/teamspace/studios/this_studio/FunDEM -I/teamspace/studios/this_studio/FunDEM/kernel -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction -I/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility -O3 -DNDEBUG -std=gnu++17 -fPIE -o apps/CMakeFiles/tutorial-singleBall__elasticBounce.dir/tutorial-singleBall/elasticBounce.cpp.o -c /teamspace/studios/this_studio/FunDEM/apps/tutorial-singleBall/elasticBounce.cpp",
+  "file": "/teamspace/studios/this_studio/FunDEM/apps/tutorial-singleBall/elasticBounce.cpp",
+  "output": "apps/CMakeFiles/tutorial-singleBall__elasticBounce.dir/tutorial-singleBall/elasticBounce.cpp.o"
 }
 ]

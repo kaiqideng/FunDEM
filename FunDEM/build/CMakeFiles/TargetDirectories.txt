@@ -4,6 +4,9 @@
 /teamspace/studios/this_studio/FunDEM/build/kernel/CMakeFiles/edit_cache.dir
 /teamspace/studios/this_studio/FunDEM/build/kernel/CMakeFiles/rebuild_cache.dir
 /teamspace/studios/this_studio/FunDEM/build/apps/CMakeFiles/FunDEM_apps_common.dir
+/teamspace/studios/this_studio/FunDEM/build/apps/CMakeFiles/tutorial-bondedBalls__bondedParticleBeam.dir
+/teamspace/studios/this_studio/FunDEM/build/apps/CMakeFiles/tutorial-bondedBalls__ice-struct.dir
 /teamspace/studios/this_studio/FunDEM/build/apps/CMakeFiles/tutorial-bondedLevelSetParticles__bondedLevelSetParticles.dir
+/teamspace/studios/this_studio/FunDEM/build/apps/CMakeFiles/tutorial-singleBall__elasticBounce.dir
 /teamspace/studios/this_studio/FunDEM/build/apps/CMakeFiles/edit_cache.dir
 /teamspace/studios/this_studio/FunDEM/build/apps/CMakeFiles/rebuild_cache.dir

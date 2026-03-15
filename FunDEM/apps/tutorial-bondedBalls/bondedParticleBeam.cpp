@@ -29,14 +29,14 @@ public:
         if (num < 256) blockD = num;
         size_t gridD = (num + blockD - 1) / blockD;
 
-        launchAddConstantForce(getBallForceDevicePtr(), 
+        launchAddConstantForceToParticle(getBallForceDevicePtr(), 
         f_e.d_ptr, 
         num, 
         gridD, 
         blockD, 
         0);
 
-        launchAddGlobalDampingForceTorque(getBallForceDevicePtr(), 
+        launchAddGlobalDampingForceTorqueToParticle(getBallForceDevicePtr(), 
         getBallTorqueDevicePtr(), 
         getBallVelocityDevicePtr(), 
         getBallAngularVelocityDevicePtr(), 

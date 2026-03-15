@@ -76,6 +76,37 @@ const double phi111)
     dphidz_n);
 }
 
+/**
+ * @brief Launch: count LS-boundary-node interactions and build neighbor prefix sum.
+ *
+ * This launches:
+ * 1) countLevelSetBoundaryNodeInteractionsKernel -> neighborCount_bNode
+ * 2) buildPrefixSum (Thrust inclusive_scan)      -> neighborPrefixSum_bNode
+ *
+ * @param[out] neighborCount_bNode       Contact count per boundary node.
+ * @param[out] neighborPrefixSum_bNode   Inclusive prefix sum over neighborCount_bNode.
+ * @param[in]  localPosition_bNode       Boundary node local positions (in owner particle frame).
+ * @param[in]  particleID_bNode          Owner particle id for each boundary node.
+ * @param[in]  LSFV_gNode                Concatenated level-set grid node values for all particles.
+ * @param[in]  position_p                Particle global positions.
+ * @param[in]  orientation_p             Particle orientations.
+ * @param[in]  radii_p                   Bounding radius per particle.
+ * @param[in]  inverseMass_p             Inverse mass per particle.
+ * @param[in]  gridSpacing_p             Grid spacing per particle.
+ * @param[in]  gridNodeLocalOrigin_p     Local grid origin per particle.
+ * @param[in]  gridNodeSize_p            Grid size per particle.
+ * @param[in]  gridNodePrefixSum_p       Inclusive prefix sum of per-particle grid node counts.
+ * @param[in]  hashIndex_p               Spatial hash sorted indices (cell range -> particle index).
+ * @param[in]  cellHashStart             Spatial hash cell start indices.
+ * @param[in]  cellHashEnd               Spatial hash cell end indices.
+ * @param[in]  minBound                  Spatial grid min bound.
+ * @param[in]  cellSize                  Spatial grid cell size.
+ * @param[in]  gridSize                  Spatial grid resolution.
+ * @param[in]  numBoundaryNode           Total number of boundary nodes.
+ * @param[in]  gridD                     CUDA grid dimension (number of blocks).
+ * @param[in]  blockD                    CUDA block dimension (threads per block).
+ * @param[in]  stream                    CUDA stream used for kernels and prefix sum.
+ */
 extern "C" void launchCountLevelSetBoundaryNodeInteractions(int* neighborCount_bNode,
 int* neighborPrefixSum_bNode,
 
@@ -105,6 +136,57 @@ const size_t gridD,
 const size_t blockD,
 cudaStream_t stream);
 
+/**
+ * @brief Launch: write LS-boundary-node interactions and initialize contact state.
+ *
+ * This launches:
+ * - writeLevelSetBoundaryNodeInteractionsKernel
+ *
+ * @param[out] slidingSpring             Sliding spring per interaction.
+ * @param[out] rollingSpring             Rolling spring per interaction.
+ * @param[out] torsionSpring             Torsion spring per interaction.
+ * @param[out] contactPoint              Contact point (GLOBAL) per interaction.
+ * @param[out] contactNormal             Contact normal (GLOBAL) per interaction.
+ * @param[out] contactOverlap            Overlap per interaction (positive).
+ * @param[out] objectPointed             Boundary node index per interaction.
+ * @param[out] objectPointing            Particle index per interaction.
+ *
+ * @param[in]  slidingSpring_old          Old sliding spring (for state carry-over).
+ * @param[in]  rollingSpring_old          Old rolling spring.
+ * @param[in]  torsionSpring_old          Old torsion spring.
+ * @param[in]  objectPointed_old          Old boundary node index per old interaction.
+ * @param[in]  neighborPairHashIndex_old  Map old adjacency slot -> old packed interaction index.
+ *
+ * @param[in]  localPosition_bNode        Boundary node local positions.
+ * @param[in]  particleID_bNode           Owner particle id per boundary node.
+ * @param[in]  neighborPrefixSum_bNode    Prefix sum computed from neighbor counts (defines output segments).
+ *
+ * @param[in]  LSFV_gNode                 Concatenated level-set grid node values.
+ *
+ * @param[in]  position_p                 Particle global positions.
+ * @param[in]  orientation_p              Particle orientations.
+ * @param[in]  radii_p                    Bounding radius per particle.
+ * @param[in]  inverseMass_p              Inverse mass per particle.
+ * @param[in]  gridSpacing_p              Grid spacing per particle.
+ * @param[in]  gridNodeLocalOrigin_p      Local grid origin per particle.
+ * @param[in]  gridNodeSize_p             Grid size per particle.
+ * @param[in]  gridNodePrefixSum_p        Inclusive prefix sum of grid node counts per particle.
+ * @param[in]  hashIndex_p                Spatial hash sorted indices.
+ *
+ * @param[in]  interactionStart_p_old     Old interaction start per particle (for searching old pairs).
+ * @param[in]  interactionEnd_p_old       Old interaction end per particle.
+ *
+ * @param[in]  cellHashStart              Spatial hash start.
+ * @param[in]  cellHashEnd                Spatial hash end.
+ * @param[in]  minBound                   Spatial grid min bound.
+ * @param[in]  cellSize                   Spatial grid cell size.
+ * @param[in]  gridSize                   Spatial grid resolution.
+ *
+ * @param[in]  numBoundaryNode            Total boundary nodes.
+ * @param[in]  gridD                      CUDA grid dimension.
+ * @param[in]  blockD                     CUDA block dimension.
+ * @param[in]  stream                     CUDA stream.
+ */
 extern "C" void launchWriteLevelSetBoundaryNodeInteractions(double3* slidingSpring,
 double3* rollingSpring,
 double3* torsionSpring,
@@ -137,8 +219,8 @@ const int3* gridNodeSize_p,
 const int* gridNodePrefixSum_p,
 const int* hashIndex_p,
 
-const int* interactionStart_old_p,
-const int* interactionEnd_old_p,
+const int* interactionStart_p_old,
+const int* interactionEnd_p_old,
 
 const int* cellHashStart,
 const int* cellHashEnd,

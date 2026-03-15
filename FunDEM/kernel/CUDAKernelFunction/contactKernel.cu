@@ -5,6 +5,21 @@
 
 __constant__ paramsDevice para;
 
+/**
+ * @brief Upload contact parameter tables to device arrays and commit pointers/meta to constant memory `para`.
+ *
+ * This builds:
+ * - per-material arrays: Young's modulus, Poisson ratio, restitution coefficient
+ * - per-pair packed tables (upper-triangular indexing + fallback slot):
+ *   friction (mu_s, mu_r, mu_t), linear stiffness (k_n,k_s,k_r,k_t), bond parameters (gamma,E,kn/ks,sigma,C,mu)
+ * Then writes a paramsDevice struct (device pointers + sizes) into __constant__ memory `para`.
+ *
+ * @param[in] materialTable          Per-material physical properties table (Young's modulus, Poisson ratio, restitution).
+ * @param[in] frictionTable          Per-pair friction coefficients table (sliding/rolling/torsion friction).
+ * @param[in] linearStiffnessTable   Per-pair linear stiffness table (k_n, k_s, k_r, k_t).
+ * @param[in] bondTable              Per-pair bond parameters table (gamma, E_bond, kn/ks, tensile strength, cohesion, mu).
+ * @param[in] stream                 CUDA stream used for async allocations/copies and cudaMemcpyToSymbolAsync.
+ */
 void contactParameters::buildFromTables(const std::vector<materialRow>& materialTable,
 const std::vector<frictionRow>& frictionTable,
 const std::vector<linearStiffnessRow>& linearStiffnessTable,
@@ -102,6 +117,13 @@ cudaStream_t stream)
     stream);
 }
 
+/**
+ * @brief Atomic add for double on device. Uses native atomicAdd on sm_60+; CAS loop otherwise.
+ *
+ * @param[in,out] addr   Address to add into.
+ * @param[in]     val    Value to add.
+ * @return The old value stored at *addr before the add (CUDA atomicAdd semantics).
+ */
 #if defined(__CUDA_ARCH__) && (__CUDA_ARCH__ >= 600)       // sm 6.0+
 __device__ __forceinline__ double atomicAddDouble(double* addr, double val)
 {
@@ -124,6 +146,13 @@ __device__ __forceinline__ double atomicAddDouble(double* addr, double val)
 }
 #endif
 
+/**
+ * @brief Atomic add a double3 vector into arr[idx] component-wise.
+ *
+ * @param[in,out] arr   Target array of double3.
+ * @param[in]     idx   Index into arr.
+ * @param[in]     v     Value to add to arr[idx].
+ */
 __device__ void atomicAddDouble3(double3* arr, size_t idx, const double3& v)
 {
     atomicAddDouble(&(arr[idx].x), v.x);
@@ -131,6 +160,27 @@ __device__ void atomicAddDouble3(double3* arr, size_t idx, const double3& v)
 	atomicAddDouble(&(arr[idx].z), v.z);
 }
 
+/**
+ * @brief Update ball-ball contact kinematics (contact point, normal, overlap) from current positions/radii.
+ *
+ * Pair convention:
+ * - objectPointed[idx]  = i (ball i)
+ * - objectPointing[idx] = j (ball j)
+ *
+ * Contact geometry (sphere-sphere):
+ * - n_ij = normalized (r_i - r_j) (points from j to i)
+ * - overlap delta = (r_i + r_j) - |r_i - r_j|
+ * - contact point r_c located on the line of centers (your current formula).
+ *
+ * @param[out] contactPoint     Contact point in global coordinates per interaction.
+ * @param[out] contactNormal    Unit normal n_ij per interaction (points from j -> i).
+ * @param[out] overlap          Normal overlap delta per interaction (positive if penetrating).
+ * @param[in]  objectPointed    Ball index i per interaction.
+ * @param[in]  objectPointing   Ball index j per interaction.
+ * @param[in]  position         Ball centers r_i / r_j in global coordinates.
+ * @param[in]  radius           Ball radii.
+ * @param[in]  numInteraction   Number of interactions in arrays.
+ */
 __global__ void updateBallContactKernel(double3* contactPoint,
 double3* contactNormal,
 double* overlap,
@@ -161,6 +211,43 @@ const size_t numInteraction)
     overlap[idx] = delta;
 }
 
+/**
+ * @brief Compute ball-ball contact force/torque for each interaction and update spring histories.
+ *
+ * This kernel:
+ * - reads contact kinematics: contactPoint, contactNormal, overlap
+ * - computes relative contact velocity v_c_ij and relative angular velocity w_ij
+ * - loads/updates history variables (sliding/rolling/torsion spring states)
+ * - chooses contact model:
+ *     - if linear stiffness k_n != 0: LinearContact
+ *     - else: HertzianMindlinContact (needs E_i,E_j,nu_i,nu_j)
+ * - writes per-interaction contactForce/contactTorque and updated spring histories.
+ *
+ * Pair convention:
+ * - objectPointed[idx]  = i
+ * - objectPointing[idx] = j
+ *
+ * @param[out] contactForce       Contact force on i (interaction-local result).
+ * @param[out] contactTorque      Contact torque on i (interaction-local result).
+ * @param[in,out] slidingSpring   Sliding spring history per interaction.
+ * @param[in,out] rollingSpring   Rolling spring history per interaction.
+ * @param[in,out] torsionSpring   Torsion spring history per interaction.
+ *
+ * @param[in]  contactPoint       Contact point (global).
+ * @param[in]  contactNormal      Contact normal n_ij (global, unit).
+ * @param[in]  overlap            Overlap delta.
+ * @param[in]  objectPointed      Ball i index per interaction.
+ * @param[in]  objectPointing     Ball j index per interaction.
+ *
+ * @param[in]  position           Ball positions r (global).
+ * @param[in]  velocity           Ball translational velocities.
+ * @param[in]  angularVelocity    Ball angular velocities.
+ * @param[in]  radius             Ball radii.
+ * @param[in]  inverseMass        Ball inverse masses.
+ * @param[in]  materialID         Ball material ids (used to lookup parameters in `para`).
+ * @param[in]  dt                 Time step.
+ * @param[in]  numInteraction     Number of interactions.
+ */
 __global__ void calBallContactForceTorqueKernel(double3* contactForce, 
 double3* contactTorque,
 double3* slidingSpring, 
@@ -261,6 +348,39 @@ const size_t numInteraction)
 	torsionSpring[idx] = epsilon_t;
 }
 
+/**
+ * @brief Update ball-triangle contact kinematics for each ball based on candidate triangle list.
+ *
+ * For each ball idx_i:
+ * - loops over its candidate triangle interactions [start,end) using neighborPrefixSum
+ * - calls classifySphereTriangleContact(...) to get closest point r_c and contact type
+ * - sets contactPoint/contactNormal/overlap
+ * - sets cancelFlag=1 and zero springs when no contact
+ *
+ * Additional "dedup" logic:
+ * - For non-face contacts (edge/vertex), it scans other candidates for the same ball to avoid duplicates
+ *   (e.g., shared edges/vertices), and may copy spring state from another candidate and cancel this one.
+ *
+ * @param[in,out] slidingSpring      Sliding spring per candidate (may be copied/zeroed).
+ * @param[in,out] rollingSpring      Rolling spring per candidate (may be copied/zeroed).
+ * @param[in,out] torsionSpring      Torsion spring per candidate (may be copied/zeroed).
+ * @param[out]    contactPoint       Closest/contact point on triangle (global) per candidate.
+ * @param[out]    contactNormal      Normal from contact point to sphere center (unit) per candidate.
+ * @param[out]    overlap            Overlap = rad_i - |r_i - r_c| per candidate.
+ * @param[out]    cancelFlag         1 => ignore this candidate in force stage, 0 => keep.
+ *
+ * @param[in]  objectPointing        Triangle index per candidate interaction (pointing).
+ * @param[in]  position              Ball positions.
+ * @param[in]  radius                Ball radii.
+ * @param[in]  neighborPrefixSum     Inclusive prefix sum of candidate triangle counts per ball.
+ *
+ * @param[in]  index0_t              Triangle vertex index0.
+ * @param[in]  index1_t              Triangle vertex index1.
+ * @param[in]  index2_t              Triangle vertex index2.
+ * @param[in]  globalPosition_v      Global vertex positions.
+ *
+ * @param[in]  numBall               Number of balls (threads map to balls).
+ */
 __global__ void updateBallTriangleContact(double3* slidingSpring, 
 double3* rollingSpring, 
 double3* torsionSpring,
@@ -420,6 +540,54 @@ const size_t numBall)
 	}
 }
 
+/**
+ * @brief Compute ball-wall (triangle mesh) contact force/torque per candidate and accumulate to ball force/torque.
+ *
+ * Thread per ball idx_i:
+ * - skips fixed balls (inverseMass==0)
+ * - iterates its candidate contacts [start,end) using neighborPrefixSum
+ * - ignores candidates with cancelFlag==1
+ * - uses wallIndex_tri[triangle] to map triangle -> wall rigid body index
+ * - computes relative contact velocity using ball and wall rigid body kinematics
+ * - applies either LinearContact or HertzianMindlinContact (material pair i vs wall material)
+ * - writes per-candidate contactForce/contactTorque, updates spring histories
+ * - accumulates force[idx_i] and torque[idx_i] (non-atomic, because one thread owns idx_i)
+ *
+ * Pair meaning:
+ * - objectPointed is ball index (not used explicitly here since thread is idx_i)
+ * - objectPointing[idx_c] is triangle index
+ *
+ * @param[in,out] force               Ball forces (accumulated).
+ * @param[in,out] torque              Ball torques (accumulated).
+ * @param[out]    contactForce        Per-candidate contact force.
+ * @param[out]    contactTorque       Per-candidate contact torque.
+ * @param[in,out] slidingSpring       Sliding spring history per candidate.
+ * @param[in,out] rollingSpring       Rolling spring history per candidate.
+ * @param[in,out] torsionSpring       Torsion spring history per candidate.
+ * @param[in]     contactPoint        Contact point per candidate.
+ * @param[in]     contactNormal       Contact normal per candidate.
+ * @param[in]     overlap             Overlap per candidate.
+ * @param[in]     objectPointed       Ball index per candidate (redundant with idx_i).
+ * @param[in]     objectPointing      Triangle index per candidate.
+ * @param[in]     cancelFlag          Candidate validity flag.
+ *
+ * @param[in]  position               Ball positions.
+ * @param[in]  velocity               Ball velocities.
+ * @param[in]  angularVelocity        Ball angular velocities.
+ * @param[in]  radius                 Ball radii.
+ * @param[in]  inverseMass            Ball inverse masses.
+ * @param[in]  materialID             Ball material ids.
+ * @param[in]  neighborPrefixSum      Candidate counts prefix sum per ball.
+ *
+ * @param[in]  position_w             Wall rigid body positions.
+ * @param[in]  velocity_w             Wall rigid body velocities.
+ * @param[in]  angularVelocity_w      Wall rigid body angular velocities.
+ * @param[in]  materialID_w           Wall rigid body material ids.
+ * @param[in]  wallIndex_tri          Map triangle index -> wall rigid body index.
+ *
+ * @param[in]  dt                     Time step.
+ * @param[in]  numBall                Number of balls.
+ */
 __global__ void addBallWallContactForceTorqueKernel(double3* force,
 double3* torque,
 double3* contactForce, 
@@ -539,6 +707,47 @@ const size_t numBall)
 	}
 }
 
+/**
+ * @brief Compute bonded forces/torques between ball-ball pairs and add into either:
+ * - global force/torque arrays (atomic) if not already in contact list, or
+ * - contactForce/contactTorque of the matching contact entry if a contact exists.
+ *
+ * This kernel tries to locate the corresponding contact entry (idx_c) for (idx_i, idx_j) by scanning
+ * ball i's candidate contact list (neighborPrefixSum + objectPointing). If found, the bonded
+ * contribution is accumulated into contactForce/contactTorque to be later summed.
+ *
+ * @param[out]    bondPoint          Bond contact point (global) per bonded interaction.
+ * @param[out]    bondNormal         Bond normal (global) per bonded interaction.
+ * @param[in,out] shearForce         Bond shear force history.
+ * @param[in,out] bendingTorque      Bond bending torque history.
+ * @param[in,out] normalForce        Bond normal force history (scalar).
+ * @param[in,out] torsionTorque      Bond torsion torque history (scalar).
+ * @param[in,out] maxNormalStress    Peak normal stress for damage check.
+ * @param[in,out] maxShearStress     Peak shear stress for damage check.
+ * @param[in,out] isBonded           Bond active flag (0 breaks and stays inactive).
+ *
+ * @param[in,out] contactForce       Per-contact force array (ball-ball contact list).
+ * @param[in,out] contactTorque      Per-contact torque array (ball-ball contact list).
+ * @param[in,out] force              Global ball force accumulation (atomic when used).
+ * @param[in,out] torque             Global ball torque accumulation (atomic when used).
+ *
+ * @param[in]  objectPointed_b       Bonded pair i indices.
+ * @param[in]  objectPointing_b      Bonded pair j indices.
+ *
+ * @param[in]  contactPoint          Contact list contact points (for matching).
+ * @param[in]  contactNormal         Contact list normals (for matching).
+ * @param[in]  objectPointing        Contact list pointing indices (ball j) per contact entry.
+ *
+ * @param[in]  position              Ball positions.
+ * @param[in]  velocity              Ball velocities.
+ * @param[in]  angularVelocity       Ball angular velocities.
+ * @param[in]  radius                Ball radii.
+ * @param[in]  materialID            Ball material ids.
+ * @param[in]  neighborPrefixSum     Contact list prefix sum (defines per-ball contact range).
+ *
+ * @param[in]  dt                    Time step.
+ * @param[in]  numBondedInteraction  Number of bonded interactions.
+ */
 __global__ void addBondedForceTorqueKernel(double3* bondPoint,
 double3* bondNormal,
 double3* shearForce, 
@@ -663,6 +872,36 @@ const size_t numBondedInteraction)
 	contactTorque[idx_c] += T_t * n_ij + T_b;
 }
 
+/**
+ * @brief Compute level-set boundary-node vs level-set particle contact forces and accumulate to particle forces/torques.
+ *
+ * Pair meaning for this interaction list:
+ * - objectPointed[idx]  = boundary node index (bNode)
+ * - objectPointing[idx] = particle index j (the "other" LS particle)
+ * - particleID_bNode[objectPointed[idx]] gives particle index i that owns that boundary node
+ *
+ * This kernel computes a (linear) tangential/normal contact for LS particles and updates sliding spring history.
+ * Forces are accumulated to force_p/torque_p using atomic adds.
+ *
+ * @param[out]    contactForce      Per-interaction contact force.
+ * @param[in,out] slidingSpring     Sliding spring history per interaction.
+ * @param[in,out] force_p           Particle forces (accumulated, atomic).
+ * @param[in,out] torque_p          Particle torques (accumulated, atomic).
+ *
+ * @param[in]  contactPoint         Contact point (global) per interaction.
+ * @param[in]  contactNormal        Contact normal (global, unit) per interaction.
+ * @param[in]  overlap              Overlap per interaction.
+ * @param[in]  objectPointed        Boundary node index per interaction.
+ * @param[in]  objectPointing       Particle index j per interaction.
+ * @param[in]  particleID_bNode     Owner particle id for each boundary node index.
+ *
+ * @param[in]  position_p           Particle positions (global).
+ * @param[in]  velocity_p           Particle velocities.
+ * @param[in]  angularVelocity_p    Particle angular velocities.
+ * @param[in]  materialID_p         Particle material ids.
+ * @param[in]  dt                   Time step.
+ * @param[in]  numInteraction       Number of interactions.
+ */
 __global__ void calLevelSetParticleContactForceTorqueKernel(double3* contactForce, 
 double3* slidingSpring, 
 double3* force_p,
@@ -730,6 +969,51 @@ const size_t numInteraction)
 	atomicAddDouble3(torque_p, idx_j, cross(r_c - r_j, -F_c));
 }
 
+/**
+ * @brief Compute bonded force/torque for level-set particle pairs (bond endpoints are stored in each particle local frame).
+ *
+ * Pair meaning:
+ * - objectPointed_b[idx]  = particle i
+ * - objectPointing_b[idx] = particle j
+ *
+ * Local points:
+ * - localPointA_b[idx] is bond endpoint in particle i local frame
+ * - localPointB_b[idx] is bond endpoint in particle j local frame
+ *
+ * This kernel:
+ * - reconstructs global bond endpoints rb_i, rb_j using quaternion orientation + position
+ * - computes bond center r_c and current bond direction n_ij
+ * - evaluates bond constitutive law ParallelBondedContact2(...)
+ * - accumulates forces and torques to both particles using atomic adds
+ *
+ * @param[out]    bondPoint          Bond center point (global).
+ * @param[out]    bondNormal         Current bond direction (unit).
+ * @param[in,out] shearForce         Bond shear force history.
+ * @param[in,out] bendingTorque      Bond bending torque history.
+ * @param[in,out] normalForce        Bond normal force history.
+ * @param[in,out] torsionTorque      Bond torsion torque history.
+ * @param[in,out] maxNormalStress    Peak normal stress.
+ * @param[in,out] maxShearStress     Peak shear stress.
+ * @param[in,out] isBonded           Bond active flag.
+ *
+ * @param[in,out] force              Particle forces (accumulated, atomic).
+ * @param[in,out] torque             Particle torques (accumulated, atomic).
+ *
+ * @param[in]  localPointA_b         Local endpoint on particle i.
+ * @param[in]  localPointB_b         Local endpoint on particle j.
+ * @param[in]  length_b              Reference bond length (scalar per bond).
+ * @param[in]  radius_b              Bond radius (scalar per bond).
+ * @param[in]  objectPointed_b       Particle i indices.
+ * @param[in]  objectPointing_b      Particle j indices.
+ *
+ * @param[in]  position              Particle positions.
+ * @param[in]  velocity              Particle velocities.
+ * @param[in]  angularVelocity       Particle angular velocities.
+ * @param[in]  orientation           Particle orientations (quaternions).
+ * @param[in]  materialID            Particle material ids.
+ * @param[in]  dt                    Time step.
+ * @param[in]  numBondedInteraction  Number of bonds.
+ */
 __global__ void addLevelSetParticleBondedForceTorqueKernel(double3* bondPoint,
 double3* bondNormal,
 double3* shearForce, 
@@ -815,7 +1099,7 @@ const size_t numBondedInteraction)
 	double sigma_max = maxNormalStress[idx];
 	double tau_max = maxShearStress[idx];
 
-	isBonded[idx] = ParallelBondedContact2(F_n, T_t, F_s, T_b, sigma_max, tau_max,
+	isBonded[idx] = ParallelBondedContactForLevelSetParticle(F_n, T_t, F_s, T_b, sigma_max, tau_max,
 	n_ij0, n_ij, v_c_ij, w_i, w_j, dt, rad_b, k_n, k_s, k_b, k_t, 
 	sigma_s, C, mu);
 
@@ -834,6 +1118,34 @@ const size_t numBondedInteraction)
 	atomicAddDouble3(torque, idx_j, -T_c + cross(r_c - r_j, -F_c));
 }
 
+/**
+ * @brief Apply level-set wall reaction to each level-set boundary node (8-node grid) and accumulate to owning particle.
+ *
+ * Each thread handles one boundary node:
+ * - idx_i = particleID_bNode[idx] is owner particle
+ * - compute boundary node global position using orientation + particle position
+ * - trilinearly interpolate wall phi from LSFV_w (grid defined by origin/spacing/size)
+ * - if overlap = -phi > 0, compute gradient-based normal and apply a linear penalty force F = k_n * overlap * n
+ * - accumulate to force_p / torque_p (atomic)
+ *
+ * @param[in,out] force_p               Particle forces (accumulated, atomic).
+ * @param[in,out] torque_p              Particle torques (accumulated, atomic).
+ *
+ * @param[in]  position_p               Particle positions.
+ * @param[in]  orientation_p            Particle orientations.
+ * @param[in]  inverseMass_p            Particle inverse masses (<=0 means fixed).
+ * @param[in]  materialID_p             Particle material ids.
+ *
+ * @param[in]  localPosition_bNode      Boundary node local positions (in owner particle local frame).
+ * @param[in]  particleID_bNode         Owner particle index for each boundary node.
+ *
+ * @param[in]  LSFV_w                   Wall grid level-set values (phi) stored in linearIndex3D order.
+ * @param[in]  gridSpacing_w            Wall grid spacing.
+ * @param[in]  gridNodeGlobalOrigin_w   Wall grid origin in global coordinates.
+ * @param[in]  gridNodeSize_w           Wall grid node counts (x,y,z).
+ *
+ * @param[in]  numBoundaryNode          Number of boundary nodes.
+ */
 __global__ void addLevelSetParticleWallForce(double3* force_p,
 double3* torque_p,
 
@@ -931,6 +1243,21 @@ const size_t numBoundaryNode)
     }
 }
 
+/**
+ * @brief Sum per-interaction forces/torques for "pointed" objects using neighborPrefixSum ranges and add to global force/torque.
+ *
+ * Assumes one thread per object idx_i. The interactions belonging to idx_i are:
+ *   k in [ (idx_i>0 ? neighborPrefixSum[idx_i-1] : 0), neighborPrefixSum[idx_i] )
+ *
+ * @param[in,out] force             Global force per object (accumulated).
+ * @param[in,out] torque            Global torque per object (accumulated).
+ * @param[in]     position          Object positions (used for torque arm).
+ * @param[in]     neighborPrefixSum Inclusive prefix sum of per-object interaction counts.
+ * @param[in]     contactForce      Per-interaction force (applied on the pointed object).
+ * @param[in]     contactTorque     Per-interaction torque (about contact point).
+ * @param[in]     contactPoint      Per-interaction contact point (global).
+ * @param[in]     num               Number of pointed objects.
+ */
 __global__ void sumObjectPointedForceTorqueFromInteractionKernel(double3* force, 
 double3* torque, 
 const double3* position, 
@@ -957,6 +1284,25 @@ const size_t num)
 	torque[idx_i] += T_i;
 }
 
+/**
+ * @brief Sum per-interaction forces/torques for "pointing" objects using interactionStart/End list and add to global force/torque.
+ *
+ * For each object idx_i:
+ * - iterate k in [interactionStart[idx_i], interactionEnd[idx_i]) if start>=0
+ * - map k -> interaction index k1 = neighborPairHashIndex[k]
+ * - subtract the corresponding contactForce/contactTorque (Newton's third law)
+ *
+ * @param[in,out] force               Global force per object (accumulated).
+ * @param[in,out] torque              Global torque per object (accumulated).
+ * @param[in]     position            Object positions (used for torque arm).
+ * @param[in]     interactionStart    Start offset per pointing object, -1 if none.
+ * @param[in]     interactionEnd      End offset per pointing object.
+ * @param[in]     contactForce        Per-interaction force (stored on pointed object side).
+ * @param[in]     contactTorque       Per-interaction torque.
+ * @param[in]     contactPoint        Per-interaction contact point.
+ * @param[in]     neighborPairHashIndex Mapping from compact adjacency list entry to interaction index.
+ * @param[in]     num                 Number of pointing objects.
+ */
 __global__ void sumObjectPointingForceTorqueFromInteractionKernel(double3* force, 
 double3* torque, 
 const double3* position, 
@@ -1144,7 +1490,7 @@ cudaStream_t stream)
 	num);
 }
 
-void launchCalculateBallWallContactForceTorque(double3* position, 
+void launchAddBallWallContactForceTorque(double3* position, 
 double3* velocity, 
 double3* angularVelocity, 
 double3* force, 

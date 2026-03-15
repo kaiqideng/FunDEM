@@ -1,7 +1,7 @@
 #include "externalForceTorque.cuh"
 #include "kernel/CUDAKernelFunction/myUtility/myVec.h"
 
-__global__ void addConstantForce(double3* force,
+__global__ void addConstantForceToParticle(double3* force,
 const double3* force_external,
 const size_t num)
 {
@@ -11,19 +11,19 @@ const size_t num)
     force[idx] += force_external[idx];
 }
 
-extern "C" void launchAddConstantForce(double3* force,
+extern "C" void launchAddConstantForceToParticle(double3* force,
 const double3* force_external,
 const size_t num,
 const size_t gridD,
 const size_t blockD,
 cudaStream_t stream)
 {
-    addConstantForce <<<gridD, blockD, 0, stream>>> (force, 
+    addConstantForceToParticle <<<gridD, blockD, 0, stream>>> (force, 
     force_external,
     num);
 }
 
-__global__ void addGlobalDampingForceTorque(double3* force,
+__global__ void addGlobalDampingForceTorqueToParticle(double3* force,
 double3* torque,
 const double3* velocity,
 const double3* angularVelocity,
@@ -38,7 +38,7 @@ const size_t num)
     torque[idx] -= dampCoeff * length(t) * normalize(angularVelocity[idx]);
 }
 
-extern "C" void launchAddGlobalDampingForceTorque(double3* force,
+extern "C" void launchAddGlobalDampingForceTorqueToParticle(double3* force,
 double3* torque,
 const double3* velocity,
 const double3* angularVelocity,
@@ -48,7 +48,7 @@ const size_t gridD,
 const size_t blockD,
 cudaStream_t stream)
 {
-    addGlobalDampingForceTorque <<<gridD, blockD, 0, stream>>> (force, 
+    addGlobalDampingForceTorqueToParticle <<<gridD, blockD, 0, stream>>> (force, 
     torque, 
     velocity, 
     angularVelocity, 
