@@ -18,10 +18,13 @@ const size_t numBall)
 {
     int idxA = blockIdx.x * blockDim.x + threadIdx.x;
     if (idxA >= numBall) return;
+
     int count = 0;
 
     double3 posA = position[idxA];
     double radA = radius[idxA];
+    bool isInvMassAZero = isZero(inverseMass[idxA]);
+    int clumpIDA = clumpID[idxA];
     int3 gridPositionA = calculateGridPosition(posA, minBound, cellSize);
     int3 gridStart = make_int3(-1, -1, -1);
     int3 gridEnd = make_int3(1, 1, 1);
@@ -46,8 +49,8 @@ const size_t numBall)
                 {
                     int idxB = hashIndex[i];
                     if (idxA >= idxB) continue;
-                    if (inverseMass[idxA] == 0. && inverseMass[idxB] == 0.) continue;
-                    if (clumpID[idxB] >= 0 && clumpID[idxA] == clumpID[idxB]) continue;
+                    if (isInvMassAZero && isZero(inverseMass[idxB])) continue;
+                    if (clumpID[idxB] >= 0 && clumpIDA == clumpID[idxB]) continue;
                     double cut = radA + radius[idxB];
                     double3 rAB = posA - position[idxB];
                     if ((cut - length(rAB)) >= -0.1 * cut) count++;
@@ -89,8 +92,11 @@ const size_t numBall)
     int count = 0;
     int base_w = 0;
     if (idxA > 0) base_w = neighborPrefixSum[idxA - 1];
+
     double3 posA = position[idxA];
     double radA = radius[idxA];
+    bool isInvMassAZero = isZero(inverseMass[idxA]);
+    int clumpIDA = clumpID[idxA];
     int3 gridPositionA = calculateGridPosition(posA, minBound, cellSize);
     int3 gridStart = make_int3(-1, -1, -1);
     int3 gridEnd = make_int3(1, 1, 1);
@@ -115,8 +121,8 @@ const size_t numBall)
                 {
                     int idxB = hashIndex[i];
                     if (idxA >= idxB) continue;
-                    if (inverseMass[idxA] == 0. && inverseMass[idxB] == 0.) continue;
-                    if (clumpID[idxB] >= 0 && clumpID[idxA] == clumpID[idxB]) continue;
+                    if (isInvMassAZero && isZero(inverseMass[idxB])) continue;
+                    if (clumpID[idxB] >= 0 && clumpIDA == clumpID[idxB]) continue;
                     double cut = radA + radius[idxB];
                     double3 rAB = posA - position[idxB];
                     if ((cut - length(rAB)) >= -0.1 * cut)
@@ -167,6 +173,7 @@ const size_t numBall)
 {
     int idxA = blockIdx.x * blockDim.x + threadIdx.x;
     if (idxA >= numBall) return;
+
     int count = 0;
 
     double3 posA = position[idxA];
@@ -260,6 +267,7 @@ const size_t numBall)
     int count = 0;
     int base_w = 0;
     if (idxA > 0) base_w = neighborPrefixSum[idxA - 1];
+    
     double3 posA = position[idxA];
     double radA = radius[idxA];
     int3 gridPositionA = calculateGridPosition(posA, minBound, cellSize);
@@ -369,8 +377,6 @@ cudaStream_t stream_GPU)
     cellSize,
     gridSize,
     numBall);
-
-    //debug_dump_device_array(neighborCount, numBall, "neighborCount", stream_GPU);
 
     buildPrefixSum(neighborPrefixSum, 
     neighborCount, 

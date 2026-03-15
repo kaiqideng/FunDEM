@@ -15,6 +15,17 @@ HOST_DEVICE constexpr double pi()
     return 3.14159265358979323846;
 }
 
+// ---------------------------------------------------------------------
+// Global "physical zero" threshold
+//   Any |x| < kEps is treated as 0
+// ---------------------------------------------------------------------
+HOST_DEVICE constexpr double kMinPhysicalValue = 1.0e-20;
+
+HOST_DEVICE __inline__ bool isZero(const double x)
+{
+    return fabs(x) < kMinPhysicalValue;
+}
+
 // --------------------------------------------------------
 // Basic Operator Optimizations
 // STRATEGY: Use Pass-by-Value instead of Reference.
@@ -114,7 +125,7 @@ HOST_DEVICE inline double3 normalize(double3 v)
     double lenSq = v.x * v.x + v.y * v.y + v.z * v.z;
     
     // Avoid division by zero
-    if (lenSq < 1.0e-20) return make_double3(0.0, 0.0, 0.0);
+    if (lenSq < kMinPhysicalValue) return make_double3(0.0, 0.0, 0.0);
     
 #ifdef __CUDA_ARCH__
     // Use hardware intrinsic rsqrt on GPU

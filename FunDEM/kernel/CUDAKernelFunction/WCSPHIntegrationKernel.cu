@@ -35,7 +35,7 @@ const size_t numDummy)
         Theta -= m_j / rho_j * dW_ij;
     }
 
-    if (lengthSquared(Theta) > 1.e-10) normal[idx_i] = Theta / length(Theta);
+    if (!isZero(lengthSquared(Theta))) normal[idx_i] = Theta / length(Theta);
 }
 
 __global__ void updateWCSPHAccelerationKernel(double3* acceleration,
@@ -514,7 +514,7 @@ const size_t numDummy)
     int idx_j = blockIdx.x * blockDim.x + threadIdx.x;
 	if (idx_j >= numDummy) return;
     if (interactionStart_dummy[idx_j] < 0) return;
-    if (inverseMass[idx_j] < 1.e-20) return;
+    if (isZero(inverseMass[idx_j])) return;
 
     double3 r_j = position[idx_j];
     double3 v_j = velocity[idx_j];

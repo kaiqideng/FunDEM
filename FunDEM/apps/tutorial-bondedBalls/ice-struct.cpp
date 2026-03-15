@@ -1,5 +1,5 @@
 #include "kernel/DEMSolver.h"
-#include "externalForceTorque.h"
+#include "externalForceTorque.cuh"
 #include "pointCloudGeneration.h"
 
 inline double waterSurfaceHeightForStaticSphere(double R,

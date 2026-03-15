@@ -138,7 +138,7 @@ const double timeStep)
 	{
 		double3 springPrev1 = springPrev - dot(springPrev, contactNormal) * contactNormal;
 		double absoluteSpringPrev1 = length(springPrev1);
-		if (absoluteSpringPrev1 > 1e-10)
+		if (!isZero(absoluteSpringPrev1))
 		{
 			springPrev1 *= length(springPrev) / absoluteSpringPrev1;
 		}
@@ -203,7 +203,7 @@ const double slidingFrictionCoefficient,
 const double rollingFrictionCoefficient,
 const double torsionFrictionCoefficient)
 {
-	if (normalOverlap > 0)
+	if (normalOverlap > 0.)
 	{
 		const double normalDampingCoefficient = 2. * dissipation * sqrt(effectiveMass * normalStiffness);
 		const double slidingDampingCoefficient = 2. * dissipation * sqrt(effectiveMass * slidingStiffness);
@@ -271,7 +271,7 @@ const double normalStiffness,
 const double slidingStiffness,
 const double slidingFrictionCoefficient)
 {
-	if (normalOverlap > 0)
+	if (normalOverlap > 0.)
 	{
 		const double3 normalRelativeVelocityAtContact = dot(relativeVelocityAtContact, contactNormal) * contactNormal;
 		const double3 normalContactForce = normalStiffness * normalOverlap * contactNormal;
@@ -314,7 +314,7 @@ const double slidingFrictionCoefficient,
 const double rollingFrictionCoefficient,
 const double torsionFrictionCoefficient)
 {
-	if (normalOverlap > 0)
+	if (normalOverlap > 0.)
 	{
 		const double normalStiffness = 4. / 3. * effectiveElasticModulus * sqrt(effectiveRadius * normalOverlap);
 		const double slidingStiffness = 8. * effectiveShearModulus * sqrt(effectiveRadius * normalOverlap);
@@ -406,7 +406,7 @@ double& tOut)
 {
     const double3 ab  = b - a;
     const double ab2 = dot(ab, ab);
-    if (ab2 <= 1e-30)
+    if (isZero(ab2))
     {
         tOut = 0.0;
         return a;
@@ -426,7 +426,7 @@ const double  r)
 {
     const double3 e = p1 - p0;
     const double  e2 = dot(e, e);
-    if (e2 <= 1e-30) return false;
+    if (isZero(e2)) return false;
 
     // Project center onto edge line: t in R
     const double3 v = c - p0;
@@ -480,7 +480,7 @@ double3& closestPoint)
     // --------------------------------------------------------
     // Degenerate triangle -> treat as 3 segments
     // --------------------------------------------------------
-    if (area2 <= 1e-30)
+    if (isZero(area2))
     {
         double t01, t02, t12;
         const double3 q01 = closestPointOnSegment(v0, v1, sphereCenter, t01);
@@ -584,7 +584,7 @@ double3& closestPoint)
 
     // Face region
     const double sum = va + vb + vc;
-    if (fabs(sum) <= 1e-30) return SphereTriangleContactType::None;
+    if (isZero(fabs(sum))) return SphereTriangleContactType::None;
 
     const double invSum = 1.0 / sum;
     const double v = vb * invSum;

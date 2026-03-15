@@ -1,5 +1,5 @@
 #include "kernel/DEMSolver.h"
-#include "externalForceTorque.h"
+#include "externalForceTorque.cuh"
 
 class problem:
     public DEMSolver

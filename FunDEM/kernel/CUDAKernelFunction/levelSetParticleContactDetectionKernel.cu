@@ -31,6 +31,7 @@ const size_t numBoundaryNode)
     int count = 0;
 
     const int idxA = particleID_bNode[idx];
+    bool isInvMassAZero = isZero(inverseMass_p[idxA]);
     const double3 globalPosition_idx = rotateVectorByQuaternion(orientation_p[idxA], localPosition_bNode[idx]) + position_p[idxA];
     int3 gridPositionA = calculateGridPosition(globalPosition_idx, minBound, cellSize);
     int3 gridStart = make_int3(-1, -1, -1);
@@ -56,7 +57,7 @@ const size_t numBoundaryNode)
                 {
                     const int idxB = hashIndex_p[i];
                     if (idxA >= idxB) continue;
-                    if (inverseMass_p[idxA] == 0. && inverseMass_p[idxB] == 0.) continue;
+                    if (isInvMassAZero && isZero(inverseMass_p[idxB])) continue;
                     const double3 r_idxidxB = globalPosition_idx - position_p[idxB];
                     if (lengthSquared(r_idxidxB) > radii_p[idxB] * radii_p[idxB]) continue;
 
@@ -172,6 +173,7 @@ const size_t numBoundaryNode)
     if (neighborPrefixSum_bNode[idx] - base_w == 0) return;
 
     const int idxA = particleID_bNode[idx];
+    bool isInvMassAZero = isZero(inverseMass_p[idxA]);
     const double3 globalPosition_idx = rotateVectorByQuaternion(orientation_p[idxA], localPosition_bNode[idx]) + position_p[idxA];
     int3 gridPositionA = calculateGridPosition(globalPosition_idx, minBound, cellSize);
     int3 gridStart = make_int3(-1, -1, -1);
@@ -197,7 +199,7 @@ const size_t numBoundaryNode)
                 {
                     const int idxB = hashIndex_p[i];
                     if (idxA >= idxB) continue;
-                    if (inverseMass_p[idxA] == 0. && inverseMass_p[idxB] == 0.) continue;
+                    if (isInvMassAZero && isZero(inverseMass_p[idxB])) continue;
                     const double3 r_idxidxB = globalPosition_idx - position_p[idxB];
                     if (lengthSquared(r_idxidxB) > radii_p[idxB] * radii_p[idxB]) continue;
 

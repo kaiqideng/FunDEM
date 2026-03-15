@@ -1,4 +1,4 @@
-#include "externalForceTorque.h"
+#include "externalForceTorque.cuh"
 #include "kernel/CUDAKernelFunction/myUtility/myVec.h"
 
 __global__ void addConstantForce(double3* force,

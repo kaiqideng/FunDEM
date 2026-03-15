@@ -17,7 +17,7 @@ const size_t numClump)
 	force_c[idx_c] = make_double3(0, 0, 0);
 	torque_c[idx_c] = make_double3(0, 0, 0);
 
-	if (invMass_c[idx_c] < 1.e-30) return;
+	if (isZero(invMass_c[idx_c])) return;
 	
 	double3 r_c = position_c[idx_c];
 	double3 F_c = make_double3(0, 0, 0);
@@ -50,12 +50,12 @@ const size_t numBall)
 	if (clumpID[idx_i] >= 0) return;
 
 	double invM_i = invMass[idx_i];
-	if (invM_i < 1.e-30) return;
+	if (isZero(invM_i)) return;
 
 	velocity[idx_i] += (force[idx_i] * invM_i + g) * dt;
 
 	double rad_i = radius[idx_i];
-	if (rad_i < 1.e-30) return;
+	if (isZero(rad_i)) return;
 
 	double invI_i = invM_i / (0.4 * rad_i * rad_i);
 	angularVelocity[idx_i] += torque[idx_i] * invI_i * dt;
@@ -89,7 +89,7 @@ const size_t numClump)
 	if (idx_c >= numClump) return;
 
     double invM_c = invMass_c[idx_c];
-	if (invM_c < 1.e-30) return;
+	if (isZero(invM_c)) return;
 
 	velocity_c[idx_c] += (force_c[idx_c] * invM_c + g) * dt;
 	angularVelocity_c[idx_c] += (rotateInverseInertiaTensor(orientation_c[idx_c], inverseInertiaTensor_c[idx_c]) * torque_c[idx_c]) * dt;
