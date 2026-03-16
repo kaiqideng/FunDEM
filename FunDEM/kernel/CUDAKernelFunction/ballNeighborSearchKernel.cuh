@@ -8,11 +8,11 @@
  *   1) countBallInteractionsKernel
  *   2) buildPrefixSum(neighborPrefixSum, neighborCount)
  *
- * @param[out] position              Ball center positions (device).
- * @param[out] radius                Ball radii (device).
- * @param[out] inverseMass           Ball inverse masses (device).
- * @param[out] clumpID               Ball clump ids (device).
- * @param[out] hashIndex             Sorted ball index list (device).
+ * @param[in] position              Ball center positions (device).
+ * @param[in] radius                Ball radii (device).
+ * @param[in] inverseMass           Ball inverse masses (device).
+ * @param[in] clumpID               Ball clump ids (device).
+ * @param[in] hashIndex             Sorted ball index list (device).
  * @param[out] neighborCount         neighborCount[idxA] output (device), length = numBall.
  * @param[out] neighborPrefixSum     inclusive_scan(neighborCount) (device), length = numBall.
 

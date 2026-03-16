@@ -6,64 +6,113 @@
 __constant__ paramsDevice para;
 
 /**
- * @brief Upload contact parameter tables to device arrays and commit pointers/meta to constant memory `para`.
+ * @brief Build and upload contact parameter tables, then publish device pointers via constant memory (`para`).
  *
- * This builds:
- * - per-material arrays: Young's modulus, Poisson ratio, restitution coefficient
- * - per-pair packed tables (upper-triangular indexing + fallback slot):
- *   friction (mu_s, mu_r, mu_t), linear stiffness (k_n,k_s,k_r,k_t), bond parameters (gamma,E,kn/ks,sigma,C,mu)
- * Then writes a paramsDevice struct (device pointers + sizes) into __constant__ memory `para`.
+ * This function prepares all material- and pair-dependent parameters needed by contact kernels:
  *
- * @param[in] materialTable          Per-material physical properties table (Young's modulus, Poisson ratio, restitution).
- * @param[in] frictionTable          Per-pair friction coefficients table (sliding/rolling/torsion friction).
- * @param[in] linearStiffnessTable   Per-pair linear stiffness table (k_n, k_s, k_r, k_t).
- * @param[in] bondTable              Per-pair bond parameters table (gamma, E_bond, kn/ks, tensile strength, cohesion, mu).
- * @param[in] stream                 CUDA stream used for async allocations/copies and cudaMemcpyToSymbolAsync.
+ * 1) Material table normalization
+ *    - Ensures the material table has at least @p nMat entries by padding missing rows with defaults:
+ *      Young's modulus = 0, Poisson ratio = 0, restitution coefficient = 1.
+ *
+ * 2) Pair table allocation (upper-triangular indexing)
+ *    - Computes @p pairTableSize_ = nMat*(nMat+1)/2 + 1 (with a fallback slot, depending on implementation).
+ *    - Builds per-pair scalar arrays:
+ *      - effectiveYoungsModulus_ (E_ij): effective Young's modulus for the pair (i,j)
+ *      - effectiveShearModulus_  (G_ij): effective shear modulus for the pair (i,j)
+ *      - dissipation_           (d_ij): normal dissipation factor derived from restitution coefficients
+ *    - Builds per-pair packed arrays (param-major layout using setPacked_ and the pair index):
+ *      - friction_        : sliding/rolling/torsion friction coefficients (mu_s, mu_r, mu_t)
+ *      - linearStiffness_ : linear stiffness values (k_n, k_s, k_r, k_t)
+ *      - bond_            : bond parameters (gamma, E_bond, kn/ks, sigma_s, cohesion, mu)
+ *
+ * 3) Upload to device
+ *    - Copies the above arrays to device memory using the provided CUDA stream.
+ *
+ * 4) Commit constant-memory descriptor
+ *    - Writes a small POD descriptor @c paramsDevice (sizes + device pointers) into
+ *      CUDA constant memory symbol @c para via cudaMemcpyToSymbolAsync.
+ *    - Contact kernels read parameters through @c para on the device side.
+ *
+ * Notes / conventions:
+ * - Pair indexing is symmetric: (i,j) == (j,i), using @c upperTriangularIndex(i,j,nMat,cap).
+ * - Effective moduli (E_ij, G_ij) are only computed when both inputs are non-zero; otherwise set to 0.
+ * - Dissipation d_ij is computed from restitution using: d = -log(e)/sqrt(log(e)^2 + pi^2),
+ *   where e_ij is combined from e_i and e_j (harmonic-like blend). If restitution is invalid, d_ij = 0.
+ *
+ * @param[in] materialTable         Per-material properties (Young's modulus, Poisson ratio, restitution coefficient).
+ * @param[in] frictionTable         Per-pair friction coefficients (mu_s, mu_r, mu_t).
+ * @param[in] linearStiffnessTable  Per-pair linear stiffness values (k_n, k_s, k_r, k_t).
+ * @param[in] bondTable             Per-pair bond parameters (gamma, E_bond, kn/ks, sigma_s, cohesion, mu).
+ * @param[in] stream                CUDA stream used for all async H2D copies and cudaMemcpyToSymbolAsync.
  */
-void contactParameters::buildFromTables(const std::vector<materialRow>& materialTable,
+void contactParameters::buildFromTables(const vector<materialRow>& materialTable,
 const std::vector<frictionRow>& frictionTable,
 const std::vector<linearStiffnessRow>& linearStiffnessTable,
 const std::vector<bondRow>& bondTable,
 cudaStream_t stream)
 {
 	const int nMat = inferNumberOfMaterials_(materialTable, frictionTable, linearStiffnessTable, bondTable);
-	numberOfMaterials_ = static_cast<std::size_t>(nMat);
+	numberOfMaterials_ = static_cast<size_t>(nMat);
 
-	for (std::size_t i = 0; i < nMat; i++)
+    vector<materialRow> materialTableNew = materialTable;
+	for (size_t i = 0; i < nMat - materialTableNew.size() + 1; i++)
 	{
-		if (i < materialTable.size())
-		{
-			YoungsModulus_.pushHost(materialTable[i].YoungsModulus);
-			poissonRatio_.pushHost(materialTable[i].poissonRatio);
-			restitutionCoefficient_.pushHost(materialTable[i].restitutionCoefficient);
-		}
-		else 
-		{
-			YoungsModulus_.pushHost(0.);
-			poissonRatio_.pushHost(0.);
-			restitutionCoefficient_.pushHost(1.0);
-		}
+		materialRow row;
+		row.YoungsModulus = 0.;
+		row.poissonRatio = 0.;
+		row.restitutionCoefficient = 1.;
+		materialTableNew.push_back(row);
 	}
-
-	YoungsModulus_.copyHostToDevice(stream);
-	poissonRatio_.copyHostToDevice(stream);
-	restitutionCoefficient_.copyHostToDevice(stream);	
 
     pairTableSize_ = computePairTableSize_(numberOfMaterials_);
     if (pairTableSize_ > 0)
 	{
-		std::vector<double> f(static_cast<std::size_t>(f_COUNT) * pairTableSize_, 0.0);
-		std::vector<double> l(static_cast<std::size_t>(l_COUNT) * pairTableSize_, 0.0);
-		std::vector<double> b(static_cast<std::size_t>(b_COUNT) * pairTableSize_, 0.0);
+		std::vector<double> E(pairTableSize_, 0.0);
+		std::vector<double> G(pairTableSize_, 0.0);
+		std::vector<double> d(pairTableSize_, 0.0);
+		std::vector<double> f(static_cast<size_t>(f_COUNT) * pairTableSize_, 0.0);
+		std::vector<double> l(static_cast<size_t>(l_COUNT) * pairTableSize_, 0.0);
+		std::vector<double> b(static_cast<size_t>(b_COUNT) * pairTableSize_, 0.0);
 
-		auto pairIdx = [&](int a, int b) -> std::size_t
+		auto pairIdx = [&](int a, int b) -> size_t
 		{
-			return static_cast<std::size_t>(upperTriangularIndex(a, b, nMat, static_cast<int>(pairTableSize_)));
+			return static_cast<size_t>(upperTriangularIndex(a, b, nMat, static_cast<int>(pairTableSize_)));
 		};
+
+		for (int i = 0; i < nMat; i++)
+		{
+			for (int j = i; j < nMat; j++)
+			{
+				const double E_i = materialTableNew[i].YoungsModulus;
+				const double E_j = materialTableNew[j].YoungsModulus;
+				const double nu_i = materialTableNew[i].poissonRatio;
+				const double nu_j = materialTableNew[j].poissonRatio;
+				const double e_i = materialTableNew[i].restitutionCoefficient;
+				const double e_j = materialTableNew[j].restitutionCoefficient;
+				double E_ij = 0., G_ij = 0., G_i = 0., G_j = 0.;
+				if (nu_i > -1. && nu_i < 2.) G_i = E_i / (2. * (1. + nu_i));
+				if (nu_j > -1. && nu_j < 2.) G_j = E_j / (2. * (1. + nu_j));
+				if ((!isZero(E_i)) && (!isZero(E_j))) E_ij = E_i * E_j / (E_j * (1. + nu_i * nu_i) + E_i * (1. + nu_j * nu_j));
+				if ((!isZero(G_i)) && (!isZero(G_j))) G_ij = G_i * G_j / (G_j * (2. - nu_i) + G_i * (2. - nu_j));
+				double d_ij = 0.;
+				if ((e_i <= 1.&& (!isZero(e_i))) || (e_j <= 1.&& (!isZero(e_j))))
+				{
+					const double e_ij = 2. * e_i * e_j / (e_i + e_j);
+					const double logE = log(e_ij);
+					d_ij = -logE / sqrt(logE * logE + pi() * pi());
+				}
+
+				const size_t idx = pairIdx(i, j);
+
+				setPacked_(E, pairTableSize_, 0, idx, E_ij);
+				setPacked_(G, pairTableSize_, 0, idx, G_ij);
+				setPacked_(d, pairTableSize_, 0, idx, d_ij);
+			}
+		}
 
 		for (const auto& row : frictionTable)
 		{
-			const std::size_t idx = pairIdx(row.materialIndexA, row.materialIndexB);
+			const size_t idx = pairIdx(row.materialIndexA, row.materialIndexB);
 
 			setPacked_(f, pairTableSize_, f_MUS, idx, row.slidingFrictionCoefficient);
 			setPacked_(f, pairTableSize_, f_MUR, idx, row.rollingFrictionCoefficient);
@@ -72,7 +121,7 @@ cudaStream_t stream)
 
 		for (const auto& row : linearStiffnessTable)
 		{
-			const std::size_t idx = pairIdx(row.materialIndexA, row.materialIndexB);
+			const size_t idx = pairIdx(row.materialIndexA, row.materialIndexB);
 
 			setPacked_(l, pairTableSize_, l_KN, idx, row.normalStiffness);
 			setPacked_(l, pairTableSize_, l_KS, idx, row.slidingStiffness);
@@ -82,7 +131,7 @@ cudaStream_t stream)
 
 		for (const auto& row : bondTable)
 		{
-			const std::size_t idx = pairIdx(row.materialIndexA, row.materialIndexB);
+			const size_t idx = pairIdx(row.materialIndexA, row.materialIndexB);
 
 			setPacked_(b, pairTableSize_, b_GAMMA, idx, row.bondRadiusMultiplier);
 			setPacked_(b, pairTableSize_, b_E, idx, row.bondYoungsModulus);
@@ -92,9 +141,16 @@ cudaStream_t stream)
 			setPacked_(b, pairTableSize_, b_MU, idx, row.frictionCoefficient);
 		}
 
+        effectiveYoungsModulus_.setHost(E);
+		effectiveShearModulus_.setHost(G);
+		dissipation_.setHost(d);
 		friction_.setHost(f);
 		linearStiffness_.setHost(l);
 		bond_.setHost(b);
+
+		effectiveYoungsModulus_.copyHostToDevice(stream);
+		effectiveShearModulus_.copyHostToDevice(stream);
+		dissipation_.copyHostToDevice(stream);
 		friction_.copyHostToDevice(stream);
 		linearStiffness_.copyHostToDevice(stream);
 		bond_.copyHostToDevice(stream);
@@ -103,9 +159,9 @@ cudaStream_t stream)
 	paramsDevice dev;
     dev.nMaterials = static_cast<int>(numberOfMaterials_);
     dev.cap = static_cast<int>(pairTableSize_);
-	dev.YoungsModulus = YoungsModulus_.d_ptr;
-	dev.poissonRatio = poissonRatio_.d_ptr;
-	dev.restitutionCoefficient = restitutionCoefficient_.d_ptr;
+	dev.effectiveYoungsModulus = effectiveYoungsModulus_.d_ptr;
+	dev.effectiveShearModulus = effectiveShearModulus_.d_ptr;
+	dev.dissipation = dissipation_.d_ptr;
     dev.friction = friction_.d_ptr;
     dev.linearStiffness = linearStiffness_.d_ptr;
     dev.bond = bond_.d_ptr;
@@ -312,11 +368,7 @@ const size_t numInteraction)
 	const int mat_j = materialID[idx_j];
     const int ip = upperTriangularIndex(mat_i, mat_j, para.nMaterials, para.cap);
 
-	const double e_i = getRestitutionCoefficientParam(mat_i);
-	const double e_j = getRestitutionCoefficientParam(mat_j);
-	const double e_ij = 2. * e_i * e_j / (e_i + e_j);
-	const double logE = log(e_ij);
-	const double d_n = -logE / sqrt(logE * logE + pi() * pi());
+	const double d_n = getDissipationParam(ip);
 	const double mu_s = getFrictionParam(ip, f_MUS);
     const double mu_r = getFrictionParam(ip, f_MUR);
     const double mu_t = getFrictionParam(ip, f_MUT);
@@ -333,15 +385,8 @@ const size_t numInteraction)
     }
     else
     {
-		const double E_i = getYoungsModulusParam(mat_i);
-		const double E_j = getYoungsModulusParam(mat_j);
-		if (isZero(E_i) || isZero(E_j)) return;
-		const double nu_i = getPoissonRatioParam(mat_i);
-		const double nu_j = getPoissonRatioParam(mat_j);
-		const double G_i = E_i / (2. * (1. + nu_i));
-		const double G_j = E_j / (2. * (1. + nu_j));
-		const double E_ij = E_i * E_j / (E_j * (1. +  nu_i * nu_i) + E_i * (1. +  nu_j * nu_j));
-		const double G_ij = G_i * G_j / (G_j * (2. - nu_i) + G_i * (2. - nu_j));
+		const double E_ij = getEffectiveYoungsModulusParam(ip);
+		const double G_ij = getEffectiveShearModulusParam(ip);
 
         HertzianMindlinContact(F_c, T_c, epsilon_s, epsilon_r, epsilon_t,
 		v_c_ij, w_ij, n_ij, delta, m_ij, rad_ij, dt,
@@ -679,10 +724,7 @@ const size_t numBall)
         const int mat_j = materialID_w[idx_w];
 		const int ip = upperTriangularIndex(mat_i, mat_j, para.nMaterials, para.cap);
 
-		const double e_j = getRestitutionCoefficientParam(mat_j);
-		const double e_ij = 2. * e_i * e_j / (e_i + e_j);
-		const double logE = log(e_ij);
-		const double d_n = -logE / sqrt(logE * logE + pi() * pi());
+		const double d_n = getDissipationParam(ip);
 		const double mu_s = getFrictionParam(ip, f_MUS);
 		const double mu_r = getFrictionParam(ip, f_MUR);
 		const double mu_t = getFrictionParam(ip, f_MUT);
@@ -699,12 +741,8 @@ const size_t numBall)
 		}
 		else
 		{
-			const double E_j = getYoungsModulusParam(mat_j);
-			if (isZero(E_i) || isZero(E_j)) return;
-			const double nu_j = getPoissonRatioParam(mat_j);
-			const double G_j = E_j / (2. * (1. + nu_j));
-			const double E_ij = E_i * E_j / (E_j * (1. +  nu_i * nu_i) + E_i * (1. +  nu_j * nu_j));
-			const double G_ij = G_i * G_j / (G_j * (2. - nu_i) + G_i * (2. - nu_j));
+			const double E_ij = getEffectiveYoungsModulusParam(ip);
+			const double G_ij = getEffectiveShearModulusParam(ip);
 
 			HertzianMindlinContact(F_c, T_c, epsilon_s, epsilon_r, epsilon_t,
 			v_c_ij, w_ij, n_ij, delta, m_ij, rad_ij, dt,
@@ -731,8 +769,8 @@ const size_t numBall)
  * ball i's candidate contact list (neighborPrefixSum + objectPointing). If found, the bonded
  * contribution is accumulated into contactForce/contactTorque to be later summed.
  *
- * @param[out]    bondPoint          Bond contact point (global) per bonded interaction.
- * @param[out]    bondNormal         Bond normal (global) per bonded interaction.
+ * @param[in,out] bondPoint          Bond contact point (global) per bonded interaction.
+ * @param[in,out] bondNormal         Bond normal (global) per bonded interaction.
  * @param[in,out] shearForce         Bond shear force history.
  * @param[in,out] bendingTorque      Bond bending torque history.
  * @param[in,out] normalForce        Bond normal force history (scalar).
@@ -964,7 +1002,7 @@ const size_t numInteraction)
 	const double3 v_c_ij = v_i + cross(w_i, r_c - r_i) - (v_j + cross(w_j, r_c - r_j));
 	const double3 w_ij = w_i - w_j;
 
-	double3 F_c = make_double3(0, 0, 0);
+	double3 F_c = make_double3(0., 0., 0.);
 	double3 epsilon_s = slidingSpring[idx];
 
     const int mat_i = materialID_p[idx_i];
@@ -1007,7 +1045,7 @@ const size_t numInteraction)
  * - accumulates forces and torques to both particles using atomic adds
  *
  * @param[out]    bondPoint          Bond center point (global).
- * @param[out]    bondNormal         Current bond direction (unit).
+ * @param[in,out] bondNormal         Bond direction (unit).
  * @param[in,out] shearForce         Bond shear force history.
  * @param[in,out] bendingTorque      Bond bending torque history.
  * @param[in,out] normalForce        Bond normal force history.

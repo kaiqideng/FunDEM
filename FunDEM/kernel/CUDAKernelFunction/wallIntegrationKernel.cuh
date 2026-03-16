@@ -32,7 +32,9 @@ extern "C" void launchWallIntegration(double3* position,
 double3* velocity, 
 double3* angularVelocity,
 quaternion* orientation, 
+
 const double timeStep,
+
 const size_t numWall,
 const size_t gridD,
 const size_t blockD, 

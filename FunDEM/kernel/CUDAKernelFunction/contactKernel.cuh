@@ -673,8 +673,8 @@ cudaStream_t stream);
  * @param[in] contactNormal       Contact list normals.
  * @param[in] objectPointing      Contact list pointing indices (ball j) per contact.
  *
- * @param[out] bondPoint          Bond point per bond.
- * @param[out] bondNormal         Bond normal per bond.
+ * @param[in,out] bondPoint          Bond point per bond.
+ * @param[in,out] bondNormal         Bond normal per bond.
  * @param[in,out] shearForce      Bond shear history.
  * @param[in,out] bendingTorque   Bond bending history.
  * @param[in,out] normalForce     Bond normal history.

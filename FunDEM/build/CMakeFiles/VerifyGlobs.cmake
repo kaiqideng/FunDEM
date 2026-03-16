@@ -44,7 +44,7 @@ if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
   file(TOUCH_NOCREATE "/teamspace/studios/this_studio/FunDEM/build/CMakeFiles/cmake.verify_globs")
 endif()
 
-# KERNEL_HEADERS at kernel/CMakeLists.txt:20 (file)
+# KERNEL_EXTRA_HEADERS at kernel/CMakeLists.txt:18 (file)
 file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "/teamspace/studios/this_studio/FunDEM/kernel/*.cuh")
 set(OLD_GLOB
   "/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/SPHNeighborSearchKernel.cuh"
@@ -63,7 +63,7 @@ if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
   file(TOUCH_NOCREATE "/teamspace/studios/this_studio/FunDEM/build/CMakeFiles/cmake.verify_globs")
 endif()
 
-# KERNEL_HEADERS at kernel/CMakeLists.txt:20 (file)
+# KERNEL_EXTRA_HEADERS at kernel/CMakeLists.txt:18 (file)
 file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "/teamspace/studios/this_studio/FunDEM/kernel/*.h")
 set(OLD_GLOB
   "/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility/myContactParameters.h"
@@ -86,7 +86,7 @@ if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
   file(TOUCH_NOCREATE "/teamspace/studios/this_studio/FunDEM/build/CMakeFiles/cmake.verify_globs")
 endif()
 
-# KERNEL_HEADERS at kernel/CMakeLists.txt:20 (file)
+# KERNEL_EXTRA_HEADERS at kernel/CMakeLists.txt:18 (file)
 file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "/teamspace/studios/this_studio/FunDEM/kernel/*.hpp")
 set(OLD_GLOB
   )
@@ -95,7 +95,7 @@ if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
   file(TOUCH_NOCREATE "/teamspace/studios/this_studio/FunDEM/build/CMakeFiles/cmake.verify_globs")
 endif()
 
-# KERNEL_COMPILE_SRCS at kernel/CMakeLists.txt:13 (file)
+# KERNEL_SRCS at kernel/CUDAKernelFunction/CMakeLists.txt:10 (file)
 file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/*.cpp")
 set(OLD_GLOB
   )
@@ -104,7 +104,7 @@ if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
   file(TOUCH_NOCREATE "/teamspace/studios/this_studio/FunDEM/build/CMakeFiles/cmake.verify_globs")
 endif()
 
-# KERNEL_COMPILE_SRCS at kernel/CMakeLists.txt:13 (file)
+# KERNEL_SRCS at kernel/CUDAKernelFunction/CMakeLists.txt:10 (file)
 file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/*.cu")
 set(OLD_GLOB
   "/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/SPHNeighborSearchKernel.cu"
@@ -123,7 +123,7 @@ if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
   file(TOUCH_NOCREATE "/teamspace/studios/this_studio/FunDEM/build/CMakeFiles/cmake.verify_globs")
 endif()
 
-# KERNEL_HEADERS at kernel/CMakeLists.txt:20 (file)
+# KERNEL_HEADERS at kernel/CUDAKernelFunction/CMakeLists.txt:17 (file)
 file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/*.cuh")
 set(OLD_GLOB
   "/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/SPHNeighborSearchKernel.cuh"
@@ -142,7 +142,7 @@ if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
   file(TOUCH_NOCREATE "/teamspace/studios/this_studio/FunDEM/build/CMakeFiles/cmake.verify_globs")
 endif()
 
-# KERNEL_COMPILE_SRCS at kernel/CMakeLists.txt:13 (file)
+# KERNEL_SRCS at kernel/CUDAKernelFunction/CMakeLists.txt:10 (file)
 file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/*.cxx")
 set(OLD_GLOB
   )
@@ -151,7 +151,7 @@ if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
   file(TOUCH_NOCREATE "/teamspace/studios/this_studio/FunDEM/build/CMakeFiles/cmake.verify_globs")
 endif()
 
-# KERNEL_HEADERS at kernel/CMakeLists.txt:20 (file)
+# KERNEL_HEADERS at kernel/CUDAKernelFunction/CMakeLists.txt:17 (file)
 file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/*.h")
 set(OLD_GLOB
   "/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/myUtility/myContactParameters.h"
@@ -166,7 +166,7 @@ if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
   file(TOUCH_NOCREATE "/teamspace/studios/this_studio/FunDEM/build/CMakeFiles/cmake.verify_globs")
 endif()
 
-# KERNEL_HEADERS at kernel/CMakeLists.txt:20 (file)
+# KERNEL_HEADERS at kernel/CUDAKernelFunction/CMakeLists.txt:17 (file)
 file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "/teamspace/studios/this_studio/FunDEM/kernel/CUDAKernelFunction/*.hpp")
 set(OLD_GLOB
   )

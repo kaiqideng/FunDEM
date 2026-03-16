@@ -9,6 +9,7 @@ int* neighborPrefixSum,
 
 int* cellHashStart,
 int* cellHashEnd,
+
 const double3 minBound,
 const double3 cellSize,
 const int3 gridSize,
@@ -28,6 +29,7 @@ int* objectPointing,
 
 int* cellHashStart,
 int* cellHashEnd,
+
 const double3 minBound,
 const double3 cellSize,
 const int3 gridSize,
@@ -46,6 +48,7 @@ int* neighborPrefixSum,
 
 int* cellHashStart,
 int* cellHashEnd,
+
 const double3 minBound,
 const double3 cellSize,
 const int3 gridSize,
@@ -66,6 +69,7 @@ int* objectPointing,
 
 int* cellHashStart,
 int* cellHashEnd,
+
 const double3 minBound,
 const double3 cellSize,
 const int3 gridSize,
@@ -86,6 +90,7 @@ int* hashIndex_dummy,
 
 int* cellHashStart,
 int* cellHashEnd,
+
 const double3 minBound,
 const double3 cellSize,
 const int3 gridSize,
@@ -108,6 +113,7 @@ int* objectPointing,
 
 int* cellHashStart,
 int* cellHashEnd,
+
 const double3 minBound,
 const double3 cellSize,
 const int3 gridSize,

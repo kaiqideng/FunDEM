@@ -71,7 +71,7 @@ rule CXX_COMPILER__tutorial-bondedBalls__bondedParticleBeam_unscanned_Release
 # Rule for linking CXX executable.
 
 rule CXX_EXECUTABLE_DEVICE_LINKER__tutorial-bondedBalls__bondedParticleBeam_Release
-  command = /usr/bin/nvcc -forward-unknown-to-host-compiler $LANGUAGE_COMPILE_FLAGS $LINK_FLAGS -Xcompiler=-fPIC -Wno-deprecated-gpu-targets -shared -dlink $in -o $TARGET_FILE $LINK_PATH $LINK_LIBRARIES -L"/lib/x86_64-linux-gnu"
+  command = /usr/bin/nvcc -forward-unknown-to-host-compiler $LANGUAGE_COMPILE_FLAGS $LINK_FLAGS -Xcompiler=-fPIC -Wno-deprecated-gpu-targets -shared -dlink $in -o $TARGET_FILE $LINK_PATH $LINK_LIBRARIES
   description = Linking CXX executable $TARGET_FILE
   restat = $RESTAT
 
@@ -99,7 +99,7 @@ rule CXX_COMPILER__tutorial-bondedBalls__ice-struct_unscanned_Release
 # Rule for linking CXX executable.
 
 rule CXX_EXECUTABLE_DEVICE_LINKER__tutorial-bondedBalls__ice-struct_Release
-  command = /usr/bin/nvcc -forward-unknown-to-host-compiler $LANGUAGE_COMPILE_FLAGS $LINK_FLAGS -Xcompiler=-fPIC -Wno-deprecated-gpu-targets -shared -dlink $in -o $TARGET_FILE $LINK_PATH $LINK_LIBRARIES -L"/lib/x86_64-linux-gnu"
+  command = /usr/bin/nvcc -forward-unknown-to-host-compiler $LANGUAGE_COMPILE_FLAGS $LINK_FLAGS -Xcompiler=-fPIC -Wno-deprecated-gpu-targets -shared -dlink $in -o $TARGET_FILE $LINK_PATH $LINK_LIBRARIES
   description = Linking CXX executable $TARGET_FILE
   restat = $RESTAT
 
@@ -127,7 +127,7 @@ rule CXX_COMPILER__tutorial-bondedLevelSetParticles__bondedLevelSetParticles_uns
 # Rule for linking CXX executable.
 
 rule CXX_EXECUTABLE_DEVICE_LINKER__tutorial-bondedLevelSetParticles__bondedLevelSetParticles_Release
-  command = /usr/bin/nvcc -forward-unknown-to-host-compiler $LANGUAGE_COMPILE_FLAGS $LINK_FLAGS -Xcompiler=-fPIC -Wno-deprecated-gpu-targets -shared -dlink $in -o $TARGET_FILE $LINK_PATH $LINK_LIBRARIES -L"/lib/x86_64-linux-gnu"
+  command = /usr/bin/nvcc -forward-unknown-to-host-compiler $LANGUAGE_COMPILE_FLAGS $LINK_FLAGS -Xcompiler=-fPIC -Wno-deprecated-gpu-targets -shared -dlink $in -o $TARGET_FILE $LINK_PATH $LINK_LIBRARIES
   description = Linking CXX executable $TARGET_FILE
   restat = $RESTAT
 
@@ -155,7 +155,7 @@ rule CXX_COMPILER__tutorial-singleBall__elasticBounce_unscanned_Release
 # Rule for linking CXX executable.
 
 rule CXX_EXECUTABLE_DEVICE_LINKER__tutorial-singleBall__elasticBounce_Release
-  command = /usr/bin/nvcc -forward-unknown-to-host-compiler $LANGUAGE_COMPILE_FLAGS $LINK_FLAGS -Xcompiler=-fPIC -Wno-deprecated-gpu-targets -shared -dlink $in -o $TARGET_FILE $LINK_PATH $LINK_LIBRARIES -L"/lib/x86_64-linux-gnu"
+  command = /usr/bin/nvcc -forward-unknown-to-host-compiler $LANGUAGE_COMPILE_FLAGS $LINK_FLAGS -Xcompiler=-fPIC -Wno-deprecated-gpu-targets -shared -dlink $in -o $TARGET_FILE $LINK_PATH $LINK_LIBRARIES
   description = Linking CXX executable $TARGET_FILE
   restat = $RESTAT
 
