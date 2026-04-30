@@ -164,7 +164,7 @@ Notes:
 For example:
 
 ```bash
-./build/apps/tutorial__tutorial2-LSParticleRolling
+./build/apps/tutorial__LSParticleRolling
 ```
 
 ⸻
