@@ -8,6 +8,7 @@ const quaternion* orientation,
 const int* geometryID,
 
 const double* inverseMass_geo, 
+const symMatrix* inertiaTensor_geo, 
 const symMatrix* inverseInertiaTensor_geo, 
 
 const double3 gravity,
@@ -23,7 +24,11 @@ const size_t num)
 	if (isZero(invM)) return;
 
 	velocity[idx] += (force[idx] * invM + gravity) * timeStep;
-	angularVelocity[idx] += (rotateInverseInertiaTensorByQuaternion(orientation[idx], inverseInertiaTensor_geo[geoID]) * torque[idx]) * timeStep;
+
+	const double3 w = angularVelocity[idx];
+	const quaternion q = orientation[idx];
+	const double3 Iw = rotateTensorByQuaternion(q, inertiaTensor_geo[geoID]) * w;
+	angularVelocity[idx] += (rotateTensorByQuaternion(q, inverseInertiaTensor_geo[geoID]) * (torque[idx] - cross(w, Iw))) * timeStep;
 }
 
 __global__ void particlePositionOrientationIntegrationKernel(double3* position, 
@@ -50,6 +55,7 @@ const quaternion* orientation,
 const int* geometryID,
 
 const double* inverseMass_geo, 
+const symMatrix* inertiaTensor_geo, 
 const symMatrix* inverseInertiaTensor_geo, 
 
 const double3 gravity,
@@ -68,6 +74,7 @@ cudaStream_t stream)
 	geometryID,
 
 	inverseMass_geo,
+	inertiaTensor_geo,
 	inverseInertiaTensor_geo,
 
 	gravity,

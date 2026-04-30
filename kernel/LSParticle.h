@@ -55,6 +55,7 @@ struct geometryInfo
 private:
     HostDeviceArray1D<double> radius_;
     HostDeviceArray1D<double> inverseMass_;
+    HostDeviceArray1D<symMatrix> inertiaTensor_;
     HostDeviceArray1D<symMatrix> inverseInertiaTensor_;
     HostDeviceArray1D<double3> gridNodeOrigin_;
     HostDeviceArray1D<double> gridNodeInverseSpacing_;
@@ -71,7 +72,7 @@ private:
 
 public:
     void pushHost(const double inverseMass, 
-    const symMatrix inverseInertiaTensor,
+    const symMatrix inertiaTensor,
     const double3 gridNodeOrigin, 
     const double gridNodeInverseSpacing, 
     const int3 gridNodeSize, 
@@ -80,7 +81,8 @@ public:
     const std::vector<int3>& boundaryNodeConnectivity)
     {
         inverseMass_.pushHost(inverseMass);
-        inverseInertiaTensor_.pushHost(inverseInertiaTensor);
+        inertiaTensor_.pushHost(inertiaTensor);
+        inverseInertiaTensor_.pushHost(inverse(inertiaTensor));
         gridNodeOrigin_.pushHost(gridNodeOrigin);
         gridNodeInverseSpacing_.pushHost(gridNodeInverseSpacing);
         gridNodeSize_.pushHost(gridNodeSize);
@@ -118,6 +120,7 @@ public:
     {
         radius_.copyHostToDevice(stream);
         inverseMass_.copyHostToDevice(stream);
+        inertiaTensor_.copyHostToDevice(stream);
         inverseInertiaTensor_.copyHostToDevice(stream);
         gridNodeOrigin_.copyHostToDevice(stream);
         gridNodeInverseSpacing_.copyHostToDevice(stream);
@@ -135,6 +138,7 @@ public:
 
         total += radius_.deviceMemoryGB();
         total += inverseMass_.deviceMemoryGB();
+        total += inertiaTensor_.deviceMemoryGB();
         total += inverseInertiaTensor_.deviceMemoryGB();
         total += gridNodeOrigin_.deviceMemoryGB();
         total += gridNodeInverseSpacing_.deviceMemoryGB();
@@ -151,6 +155,7 @@ public:
     size_t num() const { return radius_.hostSize(); }
     double* radius() { return radius_.d_ptr; }
     double* inverseMass() { return inverseMass_.d_ptr; }
+    symMatrix* inertiaTensor() { return inertiaTensor_.d_ptr; }
     symMatrix* inverseInertiaTensor() { return inverseInertiaTensor_.d_ptr; }
     double3* gridNodeOrigin() { return gridNodeOrigin_.d_ptr; }
     double* gridNodeInverseSpacing() { return gridNodeInverseSpacing_.d_ptr; }
@@ -275,7 +280,7 @@ public:
         }
 
         geometryInfo_.pushHost(mass > 0.0 ? 1.0 / mass : 0.0,
-        mass > 0.0 ? inverse(inertiaTensor) : symMatrix(),
+        mass > 0.0 ? inertiaTensor : symMatrix(),
         gridNodeOrigin, 
         1.0 / gridNodeSpacing, 
         gridNodeSize, 

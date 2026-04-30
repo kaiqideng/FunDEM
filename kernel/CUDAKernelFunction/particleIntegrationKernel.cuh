@@ -9,6 +9,7 @@ const quaternion* orientation,
 const int* geometryID,
 
 const double* inverseMass_geo, 
+const symMatrix* inertiaTensor_geo, 
 const symMatrix* inverseInertiaTensor_geo, 
 
 const double3 gravity,

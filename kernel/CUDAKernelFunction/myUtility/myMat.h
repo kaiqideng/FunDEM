@@ -101,10 +101,10 @@ HOST_DEVICE inline double3 operator*(double3 v, symMatrix m)
 // --------------------------------------------------------
 
 /**
- * Rotates an inverse inertia tensor (or any symmetric matrix) by a quaternion.
+ * Rotates an inverse any symmetric matrix by a quaternion.
  * Operation: I_world = R * I_local * R^T
  */
-HOST_DEVICE inline symMatrix rotateInverseInertiaTensorByQuaternion(quaternion q, symMatrix invI)
+HOST_DEVICE inline symMatrix rotateTensorByQuaternion(quaternion q, symMatrix I)
 {
     // 1. Construct Rotation Matrix elements from Quaternion
     // R = [ a b c ]
@@ -130,21 +130,21 @@ HOST_DEVICE inline symMatrix rotateInverseInertiaTensorByQuaternion(quaternion q
     double h = 2 * (q2 * q3 + q0 * q1);
     double i = 1.0 - q11 - q22;
 
-    // 2. Perform Similarity Transformation: M = R * invI * R^T
+    // 2. Perform Similarity Transformation: M = R * I * R^T
     // Explicit expansion is preferred here for compiler optimization over loops
     
     // Helper terms for row-matrix multiplication
-    double Row0_x = invI.xx * a + invI.xy * b + invI.xz * c;
-    double Row0_y = invI.xy * a + invI.yy * b + invI.yz * c;
-    double Row0_z = invI.xz * a + invI.yz * b + invI.zz * c;
+    double Row0_x = I.xx * a + I.xy * b + I.xz * c;
+    double Row0_y = I.xy * a + I.yy * b + I.yz * c;
+    double Row0_z = I.xz * a + I.yz * b + I.zz * c;
 
-    double Row1_x = invI.xx * d + invI.xy * e + invI.xz * f;
-    double Row1_y = invI.xy * d + invI.yy * e + invI.yz * f;
-    double Row1_z = invI.xz * d + invI.yz * e + invI.zz * f;
+    double Row1_x = I.xx * d + I.xy * e + I.xz * f;
+    double Row1_y = I.xy * d + I.yy * e + I.yz * f;
+    double Row1_z = I.xz * d + I.yz * e + I.zz * f;
 
-    double Row2_x = invI.xx * g + invI.xy * h + invI.xz * i;
-    double Row2_y = invI.xy * g + invI.yy * h + invI.yz * i;
-    double Row2_z = invI.xz * g + invI.yz * h + invI.zz * i;
+    double Row2_x = I.xx * g + I.xy * h + I.xz * i;
+    double Row2_y = I.xy * g + I.yy * h + I.yz * i;
+    double Row2_z = I.xz * g + I.yz * h + I.zz * i;
 
     // Final result calculation
     return symMatrix(
